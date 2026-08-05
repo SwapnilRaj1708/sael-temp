@@ -2,8 +2,20 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   // Standalone output is the deployment artefact: `.next/standalone/server.js`
-  // runs under PM2 behind Nginx. See docs/architecture.md §8.
-  output: 'standalone',
+  // runs under PM2 behind Nginx. See docs/architecture.md §8 and /CLAUDE.md §7,
+  // which requires it. It stays the default, so `pnpm build && pnpm package`
+  // produces the client's archive with no environment set at all.
+  //
+  // `STANDALONE_OUTPUT=false` turns it off, for a host that builds its own
+  // output rather than running ours. A platform-neutral switch on purpose: it
+  // names what it does, not who asked for it, and nothing about the shipped
+  // application changes either way.
+  //
+  // The concrete case is a preview deploy on Vercel, whose builder reads
+  // `.next/next-server.js.nft.json` to trace server files and fails with ENOENT
+  // once standalone has relocated that tree — Vercel's own guidance is not to
+  // set `output` there.
+  output: process.env.STANDALONE_OUTPUT === 'false' ? undefined : 'standalone',
   // URL parity with the legacy site — see docs/accessibility-and-seo.md.
   trailingSlash: true,
   reactStrictMode: true,
