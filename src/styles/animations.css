@@ -1,0 +1,248 @@
+/*
+ * Bespoke keyframes, ported from docs/design-guidelines.md §5.
+ *
+ * The contract, and it is the important part of this file:
+ *
+ *   Every class below defines its **still state** unconditionally, and adds
+ *   the animation only inside `@media (prefers-reduced-motion: no-preference)`.
+ *
+ * So a user who asks for reduced motion gets the resting design — not a
+ * half-applied one, and not an element stuck at `opacity: 0` because the
+ * animation that was going to reveal it never ran. That failure mode is the
+ * reason the default is the still state rather than the other way round.
+ * /CLAUDE.md §5, docs/design-guidelines.md §5.
+ *
+ * Components apply these classes. No component writes an `animation:`
+ * shorthand inline.
+ */
+
+/* ---------------------------------------------------------------------------
+ * Keyframes
+ * ------------------------------------------------------------------------ */
+
+/* Hero image Ken Burns. */
+@keyframes saelKen {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+
+/* Hero headline, one word at a time. */
+@keyframes fxWord {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+    filter: blur(9px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Letterbox panels wiping off the hero on load. */
+@keyframes fxLetter {
+  from {
+    transform: scaleY(1);
+  }
+  to {
+    transform: scaleY(0);
+  }
+}
+
+/* Active carousel dot filling over the slide interval. The one place a width
+ * is animated instead of a transform — the element is 34px wide, so the layout
+ * cost is bounded. docs/design-guidelines.md §5. */
+@keyframes fxFill {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* SDG strip. Travels exactly half its length, because the component renders
+ * the card set twice; at -50% the second set sits where the first began and
+ * the loop is seamless. */
+@keyframes sdgMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* The mobile nav drawer, entering from the right. */
+@keyframes drawerIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Vision timeline milestone dots. */
+@keyframes dotPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-brand-red) 45%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 0.75rem transparent;
+  }
+}
+
+/* The halo expanding out of a map pin. */
+@keyframes saelPing {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* The spark travelling along the timeline path. */
+@keyframes sparkFlick {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Everything below is inside `@layer components`, and must stay there.
+ *
+ * Unlayered author styles outrank every Tailwind layer regardless of
+ * specificity, so an unlayered `.anim-marquee { transform: translateX(0) }`
+ * would quietly beat a `translate-x-*` utility on the same element. Sitting in
+ * `components` puts these above `base` and below `utilities`: they are
+ * defaults a component can still override. See the warning in globals.css.
+ * ------------------------------------------------------------------------ */
+
+@layer components {
+  /* ---------------------------------------------------------------------------
+   * Still states — unconditional
+   * ------------------------------------------------------------------------ */
+
+  .anim-ken-burns {
+    transform: scale(1);
+  }
+
+  .anim-word-in {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  /* The letterbox panels are pure decoration for the reveal. With reduced motion
+   * they are not stuck open, they are absent. */
+  .anim-letterbox {
+    display: none;
+  }
+
+  /* No countdown to show, so the dot reads as plainly active. */
+  .anim-dot-fill {
+    width: 100%;
+  }
+
+  .anim-marquee {
+    transform: translateX(0);
+  }
+
+  .anim-dot-pulse {
+    box-shadow: 0 0 0 0 transparent;
+  }
+
+  .anim-spark-flick {
+    opacity: 1;
+  }
+
+  /* The pin's halo is decoration on top of a solid dot that is always there,
+     so its still state is simply absent rather than frozen mid-pulse. */
+  .anim-map-ping {
+    opacity: 0;
+  }
+
+  /* The drawer is already open by the time it renders; the slide is decoration
+   * on top of that, so its absence costs nothing. */
+  .anim-drawer-in {
+    transform: none;
+  }
+
+  /* ---------------------------------------------------------------------------
+   * Motion — only when the user has not asked for less
+   * ------------------------------------------------------------------------ */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .anim-ken-burns {
+      animation: saelKen 9s ease forwards;
+    }
+
+    /* `--anim-index` is set per word by the component; `backwards` holds the
+     * from-state through the delay so nothing flashes in before its turn. */
+    .anim-word-in {
+      animation: fxWord 700ms var(--ease-entrance) backwards;
+      animation-delay: calc(var(--anim-index, 0) * 55ms);
+    }
+
+    .anim-letterbox {
+      display: block;
+      transform-origin: top;
+      animation: fxLetter 1s var(--ease-letterbox) forwards;
+      animation-delay: calc(var(--anim-index, 0) * 55ms);
+    }
+
+    /* `--slide-duration` comes from the carousel, so the fill and the slide
+     * interval cannot drift apart. */
+    .anim-dot-fill {
+      width: 0;
+      animation: fxFill var(--slide-duration, 6s) linear forwards;
+    }
+
+    .anim-marquee {
+      animation: sdgMarquee 44s linear infinite;
+    }
+
+    /* Pause on hover, but only where there is a real pointer to hover with —
+     * on touch the marquee is replaced by native scroll anyway.
+     * docs/responsive-strategy.md §4. */
+    @media (hover: hover) and (pointer: fine) {
+      .anim-marquee:hover,
+      .anim-marquee:focus-within {
+        animation-play-state: paused;
+      }
+    }
+
+    .anim-dot-pulse {
+      animation: dotPulse 2.4s ease-out infinite;
+    }
+
+    .anim-spark-flick {
+      animation: sparkFlick 900ms ease-in-out infinite;
+    }
+
+    /* `--anim-index` is set per pin so the halos do not pulse in lockstep. */
+    .anim-map-ping {
+      animation: saelPing 2.6s ease-out infinite;
+      animation-delay: calc(var(--anim-index, 0) * 420ms);
+    }
+
+    .anim-drawer-in {
+      animation: drawerIn 280ms var(--ease-entrance);
+    }
+  }
+}

@@ -1,0 +1,232 @@
+/*
+ * The application's only stylesheet entry point, imported once by
+ * src/app/layout.tsx. Order matters: theme.css pulls in Tailwind and declares
+ * the tokens, animations.css consumes them.
+ *
+ * This file carries the document reset and base element styling only. Anything
+ * reusable belongs in a token (theme.css) or a primitive
+ * (src/components/ui/). See src/styles/README.md.
+ *
+ * ---------------------------------------------------------------------------
+ * EVERY RULE BELOW MUST STAY INSIDE `@layer base`. This is not stylistic.
+ *
+ * Tailwind sorts itself into `theme → base → components → utilities`, but the
+ * cascade treats *unlayered* author styles as higher priority than every
+ * layer, whatever the specificity. So a bare `* { padding: 0 }` here does not
+ * merely compete with `.px-gutter` — it beats it, and it beats every other
+ * padding, margin and gap utility in the codebase, silently, with no build
+ * error and no console warning. The symptom is a site that has all its
+ * colours and type but none of its spacing.
+ *
+ * That exact bug shipped in FE-01 and survived FE-02. `pnpm verify:guardrails`
+ * now fails on any unlayered rule in this file.
+ * ---------------------------------------------------------------------------
+ */
+
+@import './theme.css';
+@import './animations.css';
+
+@layer base {
+  /* Tailwind's preflight already sets `box-sizing: border-box` and zeroes
+     margin and padding on `*`, so none of that is repeated here. */
+
+  html {
+    /* Clears the fixed header when a jump link lands. Without this the SDG
+       deep links (/sustainable-development-goals#sdg-7) put their target
+       underneath the bar. Same token as the header's own height, so the two
+       cannot disagree. docs/accessibility-and-seo.md §1. */
+    scroll-padding-top: var(--spacing-header);
+  }
+
+  body {
+    min-height: 100svh;
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    color: var(--color-body-base);
+    background-color: var(--color-surface);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* DIN ships 400 and 700 only. Without this, a browser asked for a weight
+       it does not have will synthesise one by smearing the outlines.
+       docs/design-guidelines.md §2. */
+    font-synthesis-weight: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    overflow-wrap: break-word;
+  }
+
+  /* Headings inherit the ink colour; their size comes from a token applied at
+     the call site, because the same level renders at different sizes in
+     different sections. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+
+  /* A visible focus ring on everything, everywhere. Primitives may restyle it
+     — `focus-visible:outline-white` on a dark surface — but none of them may
+     remove it. Being in a layer is what lets a utility win. /CLAUDE.md §5. */
+  :focus-visible {
+    outline: 2px solid var(--color-brand-blue);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /*
+   * Section snapping, scoped to whichever page opts in by rendering an element
+   * marked `data-snap-sections`. Nothing else on the site is affected, and no
+   * page has to reach into the root layout to turn it on.
+   *
+   * Three deliberate choices:
+   *
+   * 1. **The document is the scroll container.** The obvious alternative — a
+   *    `height: 100dvh; overflow-y: scroll` wrapper — snaps just as well and
+   *    breaks everything around it: mobile browsers only collapse their
+   *    address bar for the *document* scroller, `Home`/`End` and find-in-page
+   *    stop behaving, and the footer ends up inside the scrolling box.
+   *
+   * 2. **`proximity`, not `mandatory`.** Mandatory forces the viewport to rest
+   *    on a snap point always, so any section taller than the viewport — which
+   *    is most of them on a phone once the news grid and the business tiles
+   *    land — has content that simply cannot be scrolled to. Proximity snaps
+   *    when you come to rest near a boundary and gets out of the way when you
+   *    do not. Switching is one word if the client wants the harder feel and
+   *    accepts the constraint that every section must then fit a screen.
+   *
+   * 3. `scroll-padding-top` is already set to the header height on `html`
+   *    above, so a `snap-start` section aligns under the fixed bar rather than
+   *    behind it. The two must stay in step.
+   */
+  html:has([data-snap-sections]) {
+    scroll-snap-type: y proximity;
+  }
+
+  /*
+   * …and stands down the moment <SectionScroller> takes over, which it does on
+   * mount unless the user has asked for reduced motion. The two must never run
+   * together: CSS would keep correcting the position mid-tween and fight the
+   * animation. So the snap rule above is the no-JavaScript baseline — a page
+   * whose bundle never arrives still snaps roughly — and this is the
+   * enhancement replacing it.
+   */
+  html.section-scroll-active {
+    scroll-snap-type: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Utilities
+ *
+ * Custom utilities live here rather than in a component, because Tailwind can
+ * only see `@utility` at the top level of a stylesheet. `@utility` registers
+ * into the utilities layer itself, so these are not the unlayered rules the
+ * warning above is about. Keep this list short — if a pattern needs more than
+ * a couple of declarations it is a primitive in src/components/ui/, not a
+ * utility.
+ * ------------------------------------------------------------------------ */
+
+/*
+ * Fill text with the current background-image. Used by the section eyebrow,
+ * and by anything else that needs a gradient clipped to glyphs.
+ *
+ * `-webkit-` first for Safari < 14, which only ever shipped the prefixed
+ * property. docs/design-guidelines.md §1.
+ */
+@utility gradient-text {
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/*
+ * One card on a horizontal rail. Width comes from `--rail-card-w`, which the
+ * section sets on the rail itself — the rail owns scrolling and the caller
+ * owns size, so one carousel can hold a 920px plant photograph and another a
+ * 296px news card.
+ *
+ * The fallback is the full rail, which is the honest answer for a rail that
+ * forgot to say.
+ */
+@utility rail-card {
+  width: var(--rail-card-w, 100%);
+}
+
+/*
+ * A full-bleed rail whose *centred* card is the subject, with its neighbours
+ * visible either side. Pair with `snap-center` on each card.
+ *
+ * The flex spacers are half the slack left over once a card and its two gaps
+ * are taken out of the rail, so the first and last cards can reach the centre
+ * — without them a mandatory snap cannot rest on either end and the rail
+ * jumps. Derived from `--rail-card-w` rather than written as a number, so a
+ * card resized at a breakpoint cannot leave the spacers behind.
+ */
+@utility rail-centred {
+  &::before,
+  &::after {
+    content: '';
+    flex: 0 0 calc((100% - var(--rail-card-w, 100%)) / 2 - var(--spacing-rail-gap));
+  }
+}
+
+@utility rail-inset {
+  scroll-padding-inline-start: var(--spacing-gutter);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 0 0 calc(var(--spacing-gutter) - var(--spacing-rail-gap));
+  }
+}
+
+/*
+ * Hide a scroll container's scrollbar without taking away its scrolling.
+ *
+ * Only for a rail that ships its own affordance — the solutions carousel has
+ * paging arrows that disable at each end, so the bar is redundant rather than
+ * missing. Do not reach for this to tidy up a scroller with no other control:
+ * the bar would be the only thing telling the user there is more to see.
+ *
+ * `overflow` stays `auto`, so keyboard scrolling, `scrollIntoView` and
+ * find-in-page all still work. Firefox and the WebKit/Blink pseudo-element are
+ * both needed; neither covers the other.
+ */
+@utility scrollbar-none {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/*
+ * The fallback. Without it, a browser that cannot clip a background to text
+ * renders `color: transparent` literally — an invisible heading, which is a
+ * far worse outcome than a flat-coloured one.
+ */
+@layer utilities {
+  @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+    .gradient-text {
+      background-image: none;
+      color: var(--color-brand-red-deep);
+    }
+  }
+}
