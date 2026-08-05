@@ -1,7 +1,9 @@
 import type { StaticImageData } from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Eyebrow } from '@/components/ui/eyebrow';
+import { CountUp } from '@/components/ui/count-up';
+import { FlankedEyebrow } from '@/components/ui/flanked-eyebrow';
 import { MediaFrame } from '@/components/ui/media-frame';
+import { Reveal } from '@/components/ui/reveal';
 import { Section } from '@/components/ui/section';
 import { SIZES_BUSINESS_ICON } from '@/lib/utils/image-sizes';
 import { cn } from '@/lib/utils/cn';
@@ -21,6 +23,12 @@ export interface BusinessTile {
   href: string;
   /** Accessible label for the card's action, e.g. "Know more about …". */
   ctaLabel: string;
+  /**
+   * Tailwind text-colour class for the capacity figure, keyed to this
+   * business's mark. A class rather than a raw colour so it stays in the
+   * token layer — /CLAUDE.md §2.
+   */
+  figureClassName: string;
 }
 
 export interface BusinessTilesProps {
@@ -62,32 +70,29 @@ export function BusinessTiles({ eyebrow, tiles, snap = false }: BusinessTilesPro
     >
       <div className="flex w-full flex-col items-center gap-stack">
         {eyebrow !== undefined && (
-          <div className="flex items-center gap-4">
-            {/* The design flanks this eyebrow with two short gradient rules.
-                Decorative, so they are hidden from assistive technology. */}
-            <span
-              aria-hidden="true"
-              className="h-rule-h w-rule-w bg-(image:--gradient-rule-left)"
-            />
-            <Eyebrow tone="accent">{eyebrow}</Eyebrow>
-            <span
-              aria-hidden="true"
-              className="h-rule-h w-rule-w bg-(image:--gradient-rule-right)"
-            />
-          </div>
+          <Reveal order={0}>
+            <FlankedEyebrow>{eyebrow}</FlankedEyebrow>
+          </Reveal>
         )}
 
         <div className="grid w-full max-w-(--business-max-w) gap-gap-grid md:grid-cols-2">
-          {tiles.map((tile) => (
-            <article
+          {tiles.map((tile, index) => (
+            <Reveal
               key={tile.id}
-              // Tight on purpose. `gap-flow` (24 → 50) and `p-10` made a card
-              // ~400px tall, and four of those plus the eyebrow do not fit one
-              // screenful — which is the whole point of a snapping section.
-              className="relative flex flex-col items-center gap-3 bg-tile-surface p-4 text-center lg:gap-4 lg:p-5"
+              // 2, 3, 4, 5 — the eyebrow is 0 and 1 is deliberately unused, so
+              // the label lands, a beat passes, then the cards follow in
+              // reading order.
+              order={index + 2}
+              className="flex"
             >
-              <div className="flex items-center justify-center gap-4">
-                {/*
+              <article
+                // Tight on purpose. `gap-flow` (24 → 50) and `p-10` made a card
+                // ~400px tall, and four of those plus the eyebrow do not fit one
+                // screenful — which is the whole point of a snapping section.
+                className="relative flex w-full flex-col items-center gap-3 bg-tile-surface p-4 text-center lg:gap-4 lg:p-5"
+              >
+                <div className="flex items-center justify-center gap-4">
+                  {/*
                   The client's clean marks — no baked-in lettering, so nothing
                   is cropped and the card's own heading is the only place the
                   business is named. This was the outstanding handover item in
@@ -99,55 +104,63 @@ export function BusinessTiles({ eyebrow, tiles, snap = false }: BusinessTilesPro
                   The ratio comes from the import, which is data, hence the
                   inline style. /CLAUDE.md §5.
                 */}
-                <MediaFrame
-                  image={tile.icon}
-                  alt=""
-                  sizes={SIZES_BUSINESS_ICON}
-                  pending={`business/${tile.id}`}
-                  className="h-icon-mark shrink-0 scale-115 bg-transparent"
-                  style={{
-                    aspectRatio:
-                      tile.icon === null
-                        ? 'var(--aspect-icon-mark)'
-                        : `${String(tile.icon.width)} / ${String(tile.icon.height)}`,
-                  }}
-                  imageClassName="object-contain"
-                />
+                  <MediaFrame
+                    image={tile.icon}
+                    alt=""
+                    sizes={SIZES_BUSINESS_ICON}
+                    pending={`business/${tile.id}`}
+                    className="mr-6 h-icon-mark shrink-0 scale-210 bg-transparent"
+                    style={{
+                      aspectRatio:
+                        tile.icon === null
+                          ? 'var(--aspect-icon-mark)'
+                          : `${String(tile.icon.width)} / ${String(tile.icon.height)}`,
+                    }}
+                    imageClassName="object-contain"
+                  />
 
-                <div className="text-left">
-                  <h3 className="text-tile-title text-ink uppercase">
-                    {tile.title[0]}
-                    <br />
-                    {tile.title[1]}
-                    {tile.titleMarker !== undefined && (
-                      <sup className="text-tile-marker">{tile.titleMarker}</sup>
+                  <div className="text-left">
+                    <h3 className="text-tile-title text-ink uppercase">
+                      {tile.title[0]}
+                      <br />
+                      {tile.title[1]}
+                      {tile.titleMarker !== undefined && (
+                        <sup className="text-tile-marker">{tile.titleMarker}</sup>
+                      )}
+                    </h3>
+
+                    {/* Counts up from zero when the section is reached. The
+                      figure is the reason this card exists, so it is the one
+                      thing on it that moves — and its colour is keyed to the
+                      mark beside it rather than all four sharing brand red. */}
+                    {tile.value !== null && (
+                      <p className={cn('mt-1 text-tile-figure', tile.figureClassName)}>
+                        <CountUp value={tile.value} />
+                      </p>
                     )}
-                  </h3>
-
-                  {tile.value !== null && (
-                    <p className="mt-1 text-tile-figure text-brand-red">{tile.value}</p>
-                  )}
-                  {tile.footnote !== null && (
-                    <p className="mt-1 text-tile-note text-body-soft">{tile.footnote}</p>
-                  )}
+                    {tile.footnote !== null && (
+                      <p className="mt-1 text-tile-note text-body-soft">{tile.footnote}</p>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <p className="max-w-(--measure) text-body-sm [text-wrap:pretty] text-body-soft">
-                {tile.description}
-              </p>
+                <p className="max-w-(--measure) text-body-sm [text-wrap:pretty] text-body-soft">
+                  {tile.description}
+                </p>
 
-              {/* `mt-auto` keeps the buttons on one line across a row of cards
+                {/* `mt-auto` keeps the buttons on one line across a row of cards
                   with copy of different lengths. */}
-              <Button
-                href={tile.href}
-                size="sm"
-                className="mt-auto after:absolute after:inset-0 after:content-['']"
-              >
-                <span className="sr-only">{tile.ctaLabel}</span>
-                <span aria-hidden="true">Know More</span>
-              </Button>
-            </article>
+                <Button
+                  href={tile.href}
+                  size="sm"
+                  variant="outline"
+                  className="mt-auto after:absolute after:inset-0 after:content-['']"
+                >
+                  <span className="sr-only">{tile.ctaLabel}</span>
+                  <span aria-hidden="true">Know More</span>
+                </Button>
+              </article>
+            </Reveal>
           ))}
         </div>
       </div>

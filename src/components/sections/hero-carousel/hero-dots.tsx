@@ -18,9 +18,16 @@ export interface HeroDotsProps {
 /**
  * Slide selection, and the countdown to the next advance.
  *
- * Each dot is a real `<button>` inside a 44px hit area. The visual dot stays
- * the prototype's 6px — a 6px tap target is the single most common carousel
- * accessibility failure, and padding the hit area costs nothing visually.
+ * Each dot is a real `<button>` with a hit area padded out around the 6px
+ * visual dot — a 6px tap target is the single most common carousel
+ * accessibility failure.
+ *
+ * The area is 44px tall but only 24px wide, and that asymmetry is the point.
+ * A 44px *square* per dot put 49px between one dot and the next however small
+ * `--hero-dot-gap` was set, because the padding, not the gap, was doing the
+ * spacing — the row read as four scattered dots rather than one control. 24px
+ * is the WCAG 2.5.8 minimum and there is nothing above or below the row to
+ * mis-hit, so the height keeps the full 44.
  * docs/responsive-strategy.md §5.
  *
  * The fill is the one place in the design system where a `width` is animated
@@ -51,7 +58,7 @@ export function HeroDots({ labels, activeIndex, onSelect, isPlaying, intervalMs 
             }}
             aria-label={`Show slide ${String(index + 1)} of ${String(labels.length)}: ${label}`}
             aria-current={isActive ? 'true' : undefined}
-            className="flex min-h-touch min-w-touch cursor-pointer items-center justify-center"
+            className="flex min-h-touch min-w-dot-target cursor-pointer items-center justify-center"
           >
             <span
               className={cn(

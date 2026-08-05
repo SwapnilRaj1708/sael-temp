@@ -182,6 +182,7 @@ export const businessTiles = [
       'affordable energy across India and advancing the nation’s renewable transition.',
     href: '/solar-energy/',
     ctaLabel: 'Know more about solar energy generation',
+    figureClassName: 'text-figure-solar',
   },
   {
     id: 'cell-manufacturing',
@@ -195,6 +196,7 @@ export const businessTiles = [
       'TOPCon technology, delivering superior output and reliability.',
     href: '/solar-cell-manufacturing/',
     ctaLabel: 'Know more about solar cell manufacturing',
+    figureClassName: 'text-figure-cell',
   },
   {
     id: 'module-manufacturing',
@@ -205,6 +207,7 @@ export const businessTiles = [
       'long-term reliability across diverse operating environments.',
     href: '/module-manufacturing/',
     ctaLabel: 'Know more about solar module manufacturing',
+    figureClassName: 'text-figure-module',
   },
   {
     id: 'agri-waste',
@@ -215,6 +218,7 @@ export const businessTiles = [
       'emissions while creating value for farming communities.',
     href: '/waste-to-energy/',
     ctaLabel: 'Know more about agri waste to energy',
+    figureClassName: 'text-figure-agri',
   },
 ];
 
@@ -272,6 +276,9 @@ export const presenceSites = [
  * the contract out; it is not worth a method of its own today.
  */
 export const presenceSummary = {
+  // Not from the PDF: added at the client's request on 2026-08-05 so the
+  // section has a heading of its own. The footprint label below is the PDF's.
+  heading: 'Our Current Power Portfolio',
   title: ['SAEL Pan India', 'Green Footprint'] as [string, string],
   primaryStat: '11 States',
   secondaryStat: '60 Projects Sites',

@@ -1,4 +1,5 @@
 import { DesktopNav } from '@/components/layout/header/desktop-nav';
+import { HeaderCta } from '@/components/layout/header/header-cta';
 import { HeaderGlass } from '@/components/layout/header/header-glass';
 import { Logo } from '@/components/layout/header/logo';
 import { MobileNav } from '@/components/layout/header/mobile-nav';
@@ -27,10 +28,21 @@ export function Header() {
       <HeaderGlass />
 
       <Container>
-        <div className="flex h-header items-center justify-between gap-4">
+        {/* Logo, then the nav taking the space between, then the button. The
+            nav is `flex-1` so it centres against the bar rather than against
+            whatever the logo and button happen to measure. */}
+        <div className="flex h-header items-center gap-4">
           <Logo priority />
           <DesktopNav />
-          <MobileNav />
+          {/* `ml-auto` and not `justify-between` on the row: below `lg` the nav
+              is `display: none` and contributes no width, so with
+              `justify-between` there were only two items and the trigger sat
+              against the logo. This pushes the right-hand group out at every
+              width, whether or not the nav is there to do it. */}
+          <div className="ml-auto flex items-center gap-3">
+            <HeaderCta />
+            <MobileNav />
+          </div>
         </div>
       </Container>
     </header>

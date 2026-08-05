@@ -17,7 +17,7 @@ export interface HeroCarouselState {
   previous: () => void;
   /** Whether autoplay is currently advancing. Drives the dot fill. */
   isPlaying: boolean;
-  /** Bind to the section: autoplay pauses while the pointer or focus is in. */
+  /** Bind to the section: autoplay pauses while keyboard focus is inside. */
   pause: () => void;
   resume: () => void;
 }
@@ -26,8 +26,9 @@ export interface HeroCarouselState {
  * Slide index, autoplay, and the three things that must stop it.
  *
  * Autoplay is the default, but it yields to all of: a reduced-motion
- * preference, the pointer or keyboard focus being inside the carousel, and the
- * section having scrolled out of view. The last one matters more than it
+ * preference, keyboard focus being inside the carousel, and the section having
+ * scrolled out of view. **Hovering does not pause it** — see the note at the
+ * binding in index.tsx. The last one matters more than it
  * looks — a carousel that keeps cycling three screens above the fold burns
  * battery to animate something nobody is looking at, and on a phone that is
  * the whole page's idle cost. docs/features/04 §1.

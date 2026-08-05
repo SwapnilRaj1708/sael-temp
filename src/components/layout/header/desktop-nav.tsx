@@ -1,11 +1,10 @@
 'use client';
 
-import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
-import { NavDropdown } from '@/components/layout/header/nav-dropdown';
-import { isNavItemActive, NAV_ITEMS } from '@/components/layout/header/nav-config';
+import { MegaMenu } from '@/components/layout/header/mega-menu';
+import { isNavItemActive, NAV_CTA_LABEL, NAV_ITEMS } from '@/components/layout/header/nav-config';
 import { cn } from '@/lib/utils/cn';
 
 /**
@@ -18,13 +17,31 @@ import { cn } from '@/lib/utils/cn';
  * It renders no content of its own — the nav data is a static import, so this
  * costs the bundle the interaction logic and nothing else.
  *
+ * **One full-screen panel, not a dropdown per item.** Pointing at any link
+ * opens {@link MegaMenu} with that section's column lit; moving along the bar
+ * moves the highlight, and the panel never closes and reopens between
+ * neighbours. That is the client's navbar design, and it is also why the
+ * open/close state here is a single `activeLabel` rather than one flag per
+ * item.
+ *
  * Hover intent: open after 120ms, close after 200ms. The close delay is the
- * important one — without it, the pointer travelling diagonally from trigger
- * to panel clips the gap and the menu shuts under the cursor.
+ * important one — without it, the pointer travelling diagonally from the bar
+ * to the panel clips the gap and the menu shuts under the cursor.
  */
 
 const OPEN_DELAY_MS = 120;
 const CLOSE_DELAY_MS = 200;
+
+/**
+ * How long the pointer may rest on the panel's own background before the menu
+ * gives up and closes.
+ *
+ * Longer than the leave delay on purpose: leaving the panel is a decision, and
+ * 200ms is only there to survive the diagonal travel between bar and columns.
+ * Sitting in the empty space is not a decision, so it gets a beat to become
+ * one before the menu takes it as "done here".
+ */
+const IDLE_CLOSE_MS = 1400;
 
 export function DesktopNav() {
   const pathname = usePathname();
@@ -59,6 +76,14 @@ export function DesktopNav() {
     timer.current = setTimeout(() => {
       setOpenLabel(null);
     }, CLOSE_DELAY_MS);
+  }, [clearTimer]);
+
+  /** The pointer is on the panel but not on anything in it. */
+  const scheduleIdleClose = useCallback(() => {
+    clearTimer();
+    timer.current = setTimeout(() => {
+      setOpenLabel(null);
+    }, IDLE_CLOSE_MS);
   }, [clearTimer]);
 
   const close = useCallback(
@@ -99,106 +124,125 @@ export function DesktopNav() {
     }
   }, [openLabel]);
 
+  const menuId = `${baseId}-mega`;
+  const open = openLabel !== null;
+
   return (
-    <nav aria-label="Main" className="hidden lg:block">
-      <ul className="flex list-none items-center gap-[42px]">
-        {NAV_ITEMS.map((item) => {
-          const active = isNavItemActive(item, pathname);
-          const hasChildren = (item.children?.length ?? 0) > 0;
-          const panelId = `${baseId}-${item.label}`;
-          const isOpen = openLabel === item.label;
+    <>
+      <nav
+        aria-label="Main"
+        className="hidden flex-1 justify-center lg:flex"
+        onPointerLeave={scheduleClose}
+      >
+        {/* Tight gaps, because each link now carries its own padding: the pill
+            is the spacing. A 42px gap on top of it read as six separate
+            buttons rather than one bar. */}
+        <ul className="flex list-none items-center gap-1">
+          {NAV_ITEMS.filter((item) => item.label !== NAV_CTA_LABEL).map((item) => {
+            const active = isNavItemActive(item, pathname);
+            const isOpen = openLabel === item.label;
 
-          const linkClasses = cn(
-            'text-nav text-nav-link relative inline-flex items-center gap-1',
-            'min-h-touch transition-colors duration-(--duration-micro)',
-            'hover:text-accent-hover',
-            // The active marker is a pseudo-element rather than a border, so
-            // it does not add height and shift the row.
-            active &&
-              'text-accent-hover after:bg-accent-hover after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:content-[""]',
-          );
-
-          if (!hasChildren && item.href !== undefined) {
-            return (
-              <li key={item.label}>
-                <Link
-                  href={item.href}
-                  className={linkClasses}
-                  aria-current={active ? 'page' : undefined}
-                >
-                  {item.label}
-                </Link>
-              </li>
+            // A pill, not an underline. The client's navbar design tints the
+            // link's own box on hover and marks the current one with a short
+            // gradient rule inset from the pill's edges — so the marker
+            // belongs to the pill rather than to the text, and the row never
+            // shifts height.
+            const linkClasses = cn(
+              'text-nav text-nav-link relative inline-flex items-center gap-1',
+              'min-h-touch rounded-nav-pill px-3 xl:px-4',
+              'transition-colors duration-(--duration-micro)',
+              'hover:bg-nav-pill hover:text-nav-accent',
+              (active || isOpen) && [
+                'bg-nav-pill text-nav-accent',
+                'after:absolute after:inset-x-3 after:bottom-1.5 after:h-0.5',
+                'after:rounded-pill after:bg-(image:--gradient-nav-cta) after:content-[""]',
+              ],
             );
-          }
 
-          return (
-            <li
-              key={item.label}
-              className="relative"
-              onMouseEnter={() => {
+            // Every top-level item opens the panel on hover, including the two
+            // that are pages in their own right — the design lights a column
+            // for each of the six, and skipping two would leave gaps in the
+            // bar. They stay real links, so a click still navigates.
+            const shared = {
+              onPointerEnter: () => {
                 scheduleOpen(item.label);
-              }}
-              onMouseLeave={scheduleClose}
-            >
-              <button
-                type="button"
-                ref={(node) => {
-                  triggerRefs.current.set(item.label, node);
-                }}
-                aria-expanded={isOpen}
-                aria-haspopup="true"
-                aria-controls={isOpen ? panelId : undefined}
-                className={cn(linkClasses, 'cursor-pointer')}
-                onClick={() => {
-                  clearTimer();
-                  setOpenLabel(isOpen ? null : item.label);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === 'Escape') {
-                    close(item.label);
-                    return;
-                  }
-                  if (event.key === 'ArrowDown' || (event.key === 'Enter' && !isOpen)) {
-                    event.preventDefault();
-                    clearTimer();
-                    focusOnOpen.current = true;
-                    setOpenLabel(item.label);
-                  }
-                }}
-              >
-                {item.label}
-                <ChevronDown
-                  className={cn(
-                    'size-4 transition-transform duration-(--duration-micro)',
-                    'motion-reduce:transition-none',
-                    isOpen && 'rotate-180',
-                  )}
-                  aria-hidden="true"
-                  focusable="false"
-                />
-              </button>
+              },
+              'aria-expanded': isOpen,
+              'aria-controls': open ? menuId : undefined,
+            };
 
-              {isOpen && (
-                <div
-                  onKeyDown={(event) => {
-                    if (event.key === 'Escape') close(item.label);
-                  }}
-                >
-                  <NavDropdown
-                    item={item}
-                    id={panelId}
-                    firstLinkRef={firstLinkRef}
-                    onNavigate={() => {
+            if (item.href !== undefined) {
+              return (
+                <li key={item.label}>
+                  <Link
+                    href={item.href}
+                    className={linkClasses}
+                    aria-current={active ? 'page' : undefined}
+                    onClick={() => {
                       close();
                     }}
-                  />
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+                    {...shared}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            }
+
+            return (
+              <li key={item.label}>
+                <button
+                  type="button"
+                  ref={(node) => {
+                    triggerRefs.current.set(item.label, node);
+                  }}
+                  aria-haspopup="true"
+                  className={cn(linkClasses, 'cursor-pointer')}
+                  onClick={() => {
+                    clearTimer();
+                    setOpenLabel(isOpen ? null : item.label);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape') {
+                      close(item.label);
+                      return;
+                    }
+                    if (event.key === 'ArrowDown' || (event.key === 'Enter' && !isOpen)) {
+                      event.preventDefault();
+                      clearTimer();
+                      focusOnOpen.current = true;
+                      setOpenLabel(item.label);
+                    }
+                  }}
+                  {...shared}
+                >
+                  {item.label}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <div
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') close(openLabel ?? undefined);
+        }}
+      >
+        <MegaMenu
+          id={menuId}
+          items={NAV_ITEMS.filter((item) => item.label !== NAV_CTA_LABEL)}
+          open={open}
+          activeLabel={openLabel}
+          onClose={() => {
+            close();
+          }}
+          onPointerOverContent={clearTimer}
+          onPointerOverBackground={scheduleIdleClose}
+          onPointerLeave={scheduleClose}
+          firstLinkRef={firstLinkRef}
+        />
+      </div>
+    </>
   );
 }

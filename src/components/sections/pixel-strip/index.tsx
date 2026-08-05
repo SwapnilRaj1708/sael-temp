@@ -12,30 +12,21 @@ import { PixelScatter } from './scatter';
  * few hundred bytes, stays sharp at any width, and puts the six ramp colours
  * in the token layer where they can be changed.
  *
- * Two parts, split by what each needs:
- *
- *  - the **solid bar** at the base is a CSS gradient, so it renders from the
- *    HTML alone;
- *  - the **dissolve** above it is a canvas, because how many squares there are
- *    depends on the viewport's width. See {@link PixelScatter}.
+ * **The squares are the whole strip.** It used to sit on a solid gradient bar
+ * — a CSS rectangle under the canvas, so that the band of colour rendered even
+ * without script. The client asked for the bar and the space it took to go, so
+ * the grid now runs to the strip's own base and the seven filled rows at the
+ * bottom do the job the bar was doing. `--spacing-pixel-strip` lost the bar's
+ * 18px with it, so nothing above the strip moved.
  *
  * Wholly decorative — it carries no information the page does not already
  * state — so it is `aria-hidden` and is a `<div>` rather than a `<section>`,
  * which would put an empty landmark in the document outline.
  */
 export function PixelStrip() {
-  // Kept in step with --spacing-pixel-bar, in the CSS pixels the canvas draws
-  // in. The token is authored in rem; this is that value at the 16px root the
-  // application never changes.
-  const BAR_HEIGHT = 18;
-
   return (
-    <div
-      aria-hidden="true"
-      className="relative h-pixel-strip w-full overflow-hidden bg-surface"
-    >
-      <PixelScatter barHeight={BAR_HEIGHT} />
-      <div className="absolute inset-x-0 bottom-0 h-pixel-bar bg-(image:--gradient-pixel-strip)" />
+    <div aria-hidden="true" className="relative h-pixel-strip w-full overflow-hidden bg-surface">
+      <PixelScatter />
     </div>
   );
 }

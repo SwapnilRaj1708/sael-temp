@@ -83,6 +83,29 @@ export function CardRail({
       start: element.scrollLeft <= EPSILON,
       end: element.scrollLeft >= furthest - EPSILON,
     });
+
+    // Mark whichever card is nearest the rail's centre. Written to the DOM
+    // rather than held in state: it changes on every frame of a scroll, and a
+    // re-render per frame to move one attribute is not a trade worth making.
+    // Styling it is then the section's business — see solutions-carousel.
+    const middle = element.getBoundingClientRect().left + element.clientWidth / 2;
+    let closest: Element | null = null;
+    let smallest = Number.POSITIVE_INFINITY;
+
+    for (const card of element.children) {
+      const box = card.getBoundingClientRect();
+      const distance = Math.abs(box.left + box.width / 2 - middle);
+      if (distance < smallest) {
+        smallest = distance;
+        closest = card;
+      }
+    }
+
+    for (const card of element.children) {
+      if (card instanceof HTMLElement) {
+        card.dataset.railActive = String(card === closest);
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -214,14 +237,14 @@ function RailArrow({ direction, label, spent, onActivate, emphasis }: RailArrowP
         onActivate(direction);
       }}
       className={cn(
-        'absolute top-1/2 -translate-y-1/2 rounded-pill z-10',
+        'absolute top-1/2 z-10 -translate-y-1/2 rounded-pill',
         'flex items-center justify-center',
         'cursor-pointer transition duration-(--duration-micro)',
         prominent
           ? [
               'size-rail-arrow bg-(image:--gradient-cta) text-white',
               'shadow-card-hover ring-2 ring-white/80',
-              'hover:brightness-110 hover:scale-105',
+              'hover:scale-105 hover:brightness-110',
             ]
           : [
               'size-touch bg-surface/90 text-ink shadow-card-hover backdrop-blur-sm',

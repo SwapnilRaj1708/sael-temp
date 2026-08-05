@@ -230,3 +230,14 @@
     }
   }
 }
+
+/*
+ * `hover-hover:` — applies only where the pointer can actually hover.
+ *
+ * Tailwind's `hover:` fires on touch too, on the tap that precedes a click, so
+ * a card that hides its content behind `group-hover` becomes a card a phone
+ * user has to tap to read. This variant scopes such rules to devices that
+ * really have a hover-capable pointer; the touch case then falls through to
+ * whatever the resting styles say, which is where the content should live.
+ */
+@custom-variant hover-hover (@media (hover: hover) and (pointer: fine));

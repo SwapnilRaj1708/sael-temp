@@ -35,6 +35,26 @@ const button = cva(
         /** Text plus an underline on hover. For a secondary action. */
         ghost:
           'rounded-none text-brand-red hover:text-accent-hover hover:underline underline-offset-4',
+        /**
+         * The gradient CTA, held back until it is wanted: an outline at rest,
+         * filling in on hover. For a grid of cards where four solid gradient
+         * buttons compete with the content they belong to.
+         *
+         * The border is drawn with the same gradient so the resting and hover
+         * states are the same shape in the same colours — `border-image` is the
+         * only way to put a gradient on a border, and it takes no radius, which
+         * is why this variant is square. It already is by design.
+         */
+        outline: [
+          'rounded-none border-2 [border-image:var(--gradient-cta)_1]',
+          'gradient-text bg-(image:--gradient-cta)',
+          'hover:bg-clip-border hover:text-white',
+        ],
+        /**
+         * Quiet by default, brand on hover. For a link that sits at the foot of
+         * a card and should not shout over the headline above it.
+         */
+        quiet: 'rounded-none text-ink hover:text-brand-red hover:underline underline-offset-4',
         /* On a dark background the shared blue focus ring has almost no
          * contrast against the surface, so this variant brings its own. */
         onDark:
@@ -42,6 +62,9 @@ const button = cva(
       },
       size: {
         sm: 'px-4 py-2 lg:px-5 lg:py-2.5',
+        /** No horizontal padding, so the label lines up with the copy above
+         *  it. For a text link inside a card that is already padded. */
+        flush: 'px-0 py-2',
         /* 10px/24px → 12px/32px. The prototype's 33px is rounded to the
          * spacing scale; a 1px difference is not worth an arbitrary value. */
         md: 'px-6 py-2.5 lg:px-8 lg:py-3',

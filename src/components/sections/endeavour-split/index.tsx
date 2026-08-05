@@ -1,6 +1,7 @@
 import type { StaticImageData } from 'next/image';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { MediaFrame } from '@/components/ui/media-frame';
+import { Reveal } from '@/components/ui/reveal';
 import { Section } from '@/components/ui/section';
 import { cn } from '@/lib/utils/cn';
 import { SIZES_ENDEAVOUR_FIGURE } from '@/lib/utils/image-sizes';
@@ -56,24 +57,30 @@ export function EndeavourSplit({ eyebrow, body, media, snap = false }: Endeavour
             mirrored layout costs nothing, because it reads the same way
             stacked on a phone as it does side by side. */}
         <div className="lg:flex-1">
-          <Eyebrow tone="accent">{eyebrow}</Eyebrow>
-          {body.map((paragraph) => (
-            <p key={paragraph} className="mt-stack text-body [text-wrap:pretty] text-body-muted">
-              {paragraph}
-            </p>
+          {/* Same shape as About SAEL: the label is fixed, everything under it
+              arrives. Orders continue 2, 3, 4 … so the paragraphs cascade. */}
+          <Reveal order={0}>
+            <Eyebrow tone="accent">{eyebrow}</Eyebrow>
+          </Reveal>
+          {body.map((paragraph, index) => (
+            <Reveal key={paragraph} order={index + 2}>
+              <p className="mt-stack text-body [text-wrap:pretty] text-body-muted">{paragraph}</p>
+            </Reveal>
           ))}
         </div>
 
-        <MediaFrame
-          image={media.image}
-          alt={media.alt}
-          sizes={SIZES_ENDEAVOUR_FIGURE}
-          pending="endeavour/girl"
-          className="aspect-(--aspect-endeavour) w-full max-w-(--endeavour-media-w) shrink-0 bg-transparent"
-          // The artwork's chamfered panel has transparent corners around it, so
-          // it must not be cropped to the box — `contain`, not `cover`.
-          imageClassName="object-contain"
-        />
+        <Reveal order={body.length + 2} className="w-full max-w-(--endeavour-media-w) shrink-0">
+          <MediaFrame
+            image={media.image}
+            alt={media.alt}
+            sizes={SIZES_ENDEAVOUR_FIGURE}
+            pending="endeavour/girl"
+            className="aspect-(--aspect-endeavour) w-full bg-transparent"
+            // The artwork's chamfered panel has transparent corners around it, so
+            // it must not be cropped to the box — `contain`, not `cover`.
+            imageClassName="object-contain"
+          />
+        </Reveal>
       </div>
     </Section>
   );

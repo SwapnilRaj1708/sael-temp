@@ -64,3 +64,6 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 *.swp
+
+# Cursor keeps per-machine hook state here. Editor state, not project code.
+.cursor/

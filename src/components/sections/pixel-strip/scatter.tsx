@@ -41,11 +41,6 @@ function hash(column: number, row: number): number {
   return n - Math.floor(n);
 }
 
-export interface PixelScatterProps {
-  /** Height of the solid bar at the base, in CSS pixels. Rows sit above it. */
-  barHeight: number;
-}
-
 /**
  * The scattered squares above the pixel strip's solid bar.
  *
@@ -58,11 +53,13 @@ export interface PixelScatterProps {
  * things a canvas costs — selectable text, assistive technology, CSS styling —
  * cost nothing.
  *
- * It is also purely an enhancement: the strip's solid bar is a CSS gradient on
- * the parent, so a browser that never runs this still gets the band of colour,
- * just without the dissolve above it.
+ * **It is the whole strip now**, where it used to be the dissolve above a CSS
+ * gradient bar. That bar was the no-script fallback; with it gone, a browser
+ * that never runs this draws nothing at all. Acceptable for a divider that
+ * carries no information — the page reads identically without it — and the
+ * alternative the client rejected was 18px of solid colour they did not want.
  */
-export function PixelScatter({ barHeight }: PixelScatterProps) {
+export function PixelScatter() {
   const canvas = useRef<HTMLCanvasElement>(null);
 
   const draw = useCallback(() => {
@@ -98,7 +95,7 @@ export function PixelScatter({ barHeight }: PixelScatterProps) {
 
     context.fillStyle = gradient;
 
-    const rows = Math.max(0, Math.floor((height - barHeight) / CELL));
+    const rows = Math.max(0, Math.floor(height / CELL));
     const columns = Math.ceil(width / CELL);
 
     // The rows the dissolve is spread over, once the solid band is taken out.
@@ -108,9 +105,8 @@ export function PixelScatter({ barHeight }: PixelScatterProps) {
 
     for (let row = 0; row < rows; row += 1) {
       const scattered = row - SOLID_ROWS;
-      const probability =
-        scattered < 0 ? 1 : Math.pow(1 - scattered / scatterRows, FALLOFF);
-      const y = height - barHeight - (row + 1) * CELL;
+      const probability = scattered < 0 ? 1 : Math.pow(1 - scattered / scatterRows, FALLOFF);
+      const y = height - (row + 1) * CELL;
 
       for (let column = 0; column < columns; column += 1) {
         if (hash(column, row) < probability) {
@@ -118,7 +114,7 @@ export function PixelScatter({ barHeight }: PixelScatterProps) {
         }
       }
     }
-  }, [barHeight]);
+  }, []);
 
   useEffect(() => {
     const element = canvas.current;

@@ -77,12 +77,38 @@
    * the default, and this is the `accent` tone on <Eyebrow>. */
   --color-eyebrow-accent: #8a2380;
 
+  /* The masthead's own accent — the mid-stop of the CTA gradient, used for a
+   * hovered or current nav link so the bar reads as one family. From the
+   * client's navbar design (`assets/navbar/index.html`). */
+  --color-nav-accent: #7a1f57;
+  --color-nav-pill: rgb(122 31 87 / 0.08);
+
+  /* The docked share-price ticker. Green is the design's "up" colour and is
+   * not a brand token — it means something, so it is named for what it means
+   * rather than for what it looks like. */
+  --color-quote-up: #0e9c6a;
+  --color-quote-up-ink: #0b7a4f;
+  --color-quote-down: #c22f3a;
+  --color-quote-label: #526b62;
+  --color-quote-value: #141a18;
+  --color-quote-muted: #8a9a92;
+
   /* Header. The nav link colour, the hairline under the bar, and the solid
    * background used where backdrop-filter is unsupported.
    * docs/design-guidelines.md §4. */
   --color-nav-link: rgb(28 32 40 / 0.82);
   --color-header-hairline: rgb(20 24 32 / 0.08);
   --color-header-solid: rgb(255 255 255 / 0.96);
+
+  /* A business card's capacity figure, keyed to its own mark rather than all
+   * four sharing --color-brand-red. Sampled from the client's icons: the solar
+   * flower is orange-red, the cell is magenta, the module mark is teal, the
+   * agri-waste leaves are green. Darkened from the artwork where they had to
+   * be, so each still clears 4.5:1 on --color-tile-surface. */
+  --color-figure-solar: #d2401a;
+  --color-figure-cell: #a01e86;
+  --color-figure-module: #16707e;
+  --color-figure-agri: #4a7d16;
 
   /* Business tile surface — docs/asset-inventory.md §4. The chamfered tile is
    * drawn in CSS, so the shape's fill has to be a token; in the prototype it
@@ -209,7 +235,7 @@
 
   /* 20 → 26. The capacity figure, set alongside the title rather than under
    * a divider as the stats band would have done. */
-  --text-tile-figure: clamp(1.125rem, 1.0817rem + 0.1923vw, 1.3125rem);
+  --text-tile-figure: clamp(1.25rem, 1.2115rem + 0.225vw, 1.4375rem);
   --text-tile-figure--line-height: 1.1;
   --text-tile-figure--font-weight: 700;
 
@@ -286,6 +312,11 @@
   /* The WCAG floor for a touch target. docs/responsive-strategy.md §5. */
   --spacing-touch: 2.75rem; /* 44 */
 
+  /* The narrow axis of a hero dot's hit area. WCAG 2.5.8's 24px minimum,
+   * used where a 44px square would space a row of controls apart rather than
+   * hold them together. See components/sections/hero-carousel/hero-dots.tsx. */
+  --spacing-dot-target: 1.5rem; /* 24 */
+
   /* The dotted India map, capped so the section still fits one screen: its
    * 620 × 660 viewBox is 0.939 wide for every 1 tall, so the height left over
    * after the header and the section's own padding decides the width.
@@ -322,13 +353,13 @@
 
   /* The pixel strip: its overall height, and the solid bar at its base.
    *
-   * 200 = the 18px bar + 26 rows of 7px. Twenty of those rows are the
-   * dissolve, which is the pattern as it was first drawn; the six beneath it
-   * are the solid band added on 2026-08-05, and they are why this is 42px
-   * taller than the 158 it started at. Change this only in whole cells, and
-   * keep `SOLID_ROWS` in sections/pixel-strip/scatter.tsx in step. */
-  --spacing-pixel-strip: 12.5rem; /* 200 */
-  --spacing-pixel-bar: 1.125rem; /* 18 */
+   * 182 = 26 rows of 7px. Twenty are the dissolve, which is the pattern as it
+   * was first drawn; the six beneath it are the solid band added on
+   * 2026-08-05. The 18px gradient bar that used to sit under them was removed
+   * at the client's request, and this lost its height with it. Change only in
+   * whole cells, and keep `SOLID_ROWS` in sections/pixel-strip/scatter.tsx in
+   * step. */
+  --spacing-pixel-strip: 11.375rem; /* 182 = 26 rows of 7px */
 
   /* A news card on the homepage rail. Narrow enough that six sit across a
    * wide screen, as the design has them. */
@@ -394,6 +425,12 @@
   --aspect-solution: 3 / 2;
   --aspect-solution-wide: 19 / 10;
 
+  /* The masthead's rounded shapes: a nav link's hover pill, the Contact Us
+   * button, and the ticker docked under the bar. */
+  --radius-nav-pill: 0.875rem; /* 14 */
+  --radius-nav-cta: 1rem; /* 16 */
+  --radius-quote: 1.125rem; /* 18 */
+
   --radius-card: 0.875rem; /* 14 — news cards */
   --radius-sdg: 1rem; /* 16 — SDG cards */
   --radius-pill: 62.4375rem; /* 999 — dots, social buttons */
@@ -403,6 +440,10 @@
   /* A map tooltip, which floats over a dark section and needs to lift off it. */
   --shadow-tooltip: 0 8px 24px rgb(0 0 0 / 0.35);
   --shadow-header: 0 1px 24px rgb(20 24 32 / 0.06);
+  --shadow-nav-cta: 0 10px 24px -8px rgb(216 31 53 / 0.5);
+  --shadow-nav-cta-hover: 0 16px 30px -8px rgb(216 31 53 / 0.6);
+  --shadow-quote: 0 16px 34px -18px rgb(6 40 30 / 0.45);
+  --shadow-quote-hover: 0 16px 44px -16px rgb(6 40 30 / 0.5);
 
   /* The business tile's elevation has to be a `drop-shadow` filter rather than
    * a `box-shadow`: the tile is a chamfered shape cut with `clip-path`, and a
@@ -504,18 +545,6 @@
   --color-pixel-5: #7b2382;
   --color-pixel-6: #4632a0;
 
-  /* The solid bar at the base of the pixel strip. The same six stops the
-   * canvas above it samples, so the scatter and the bar cannot drift apart. */
-  --gradient-pixel-strip: linear-gradient(
-    90deg,
-    #f5c000 0%,
-    #f28c00 20%,
-    #e8262a 42%,
-    #b81f6a 62%,
-    #7b2382 80%,
-    #4632a0 100%
-  );
-
   /* The rounded date chip on a news card. Navy to green, left to right —
    * a pairing that appears nowhere else in the system and is taken from the
    * client's design rather than derived from the brand ramp. */
@@ -529,6 +558,31 @@
    * 2:1. Flat rather than graduated, because the copy fills the card top to
    * bottom and there is no single edge to protect. */
   --gradient-goal-scrim: linear-gradient(180deg, rgb(8 10 14 / 0.42), rgb(8 10 14 / 0.58));
+
+  /* The masthead's Contact Us button, and the underline under a current nav
+   * link. The same three stops, so the bar reads as one object. */
+  --gradient-nav-cta: linear-gradient(100deg, #2b1a6b 0%, #7a1f57 48%, #d81f35 100%);
+
+  /* The full-screen menu. The light theme from the client's navbar design —
+   * a wash that is brightest where the panel meets the bar and settles into
+   * the page's own grey at the foot. */
+  --gradient-mega: radial-gradient(
+    130% 120% at 50% 0%,
+    rgb(255 255 255 / 0.74),
+    rgb(232 236 240 / 0.92)
+  );
+
+  /* The wash on the column under the pointer. Fades out well before the
+   * column's right edge so it reads as a highlight rather than a block. */
+  --gradient-mega-hot: linear-gradient(
+    90deg,
+    rgb(122 31 87 / 0.12),
+    rgb(216 31 53 / 0.05),
+    transparent 74%
+  );
+
+  --color-mega-rule: rgb(20 40 32 / 0.12);
+  --color-mega-head-rule: rgb(160 160 160 / 0.28);
 
   /* The Pan India Footprint heading, clipped to its letterforms. */
   --gradient-footprint: linear-gradient(90deg, #c3277a, #7b3fbf);
@@ -624,7 +678,7 @@
   /* Dots. The active one widens and fills over the slide interval. */
   --hero-dot-size: 0.375rem; /* 6 */
   --hero-dot-active-width: 2.125rem; /* 34 */
-  --hero-dot-gap: 0.6875rem; /* 11 */
+  --hero-dot-gap: 0.375rem; /* 6 */
 
   /* The prototype insets the dot row 34px from the bottom edge. Each dot is
    * now wrapped in a 44px touch target (docs/responsive-strategy.md §5), which
@@ -703,6 +757,16 @@
   --duration-micro: 180ms; /* micro-interactions: hover, focus */
   --duration-card: 280ms; /* card hovers */
   --duration-reveal: 550ms; /* scroll reveals */
+  /* Gap between one revealed element and the next in the same group. Small —
+   * a stagger you can count is a stagger that has become a wait. */
+  --duration-reveal-step: 90ms;
+  /* The full-screen menu: the panel's own fade, and the gap between one
+   * column arriving and the next. */
+  --duration-mega: 450ms;
+  --duration-mega-step: 60ms;
+  /* How far a revealed element travels. Enough to read as "up", not so far
+   * that the layout visibly reflows as it lands. */
+  --reveal-shift: 1.75rem; /* 28 */
   --duration-cross-fade: 1100ms; /* hero slide cross-fade */
   --duration-parallax: 500ms; /* hero parallax follow, ease-out */
 }

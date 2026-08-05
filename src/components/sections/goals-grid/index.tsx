@@ -1,6 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
 import type { StaticImageData } from 'next/image';
 import { MediaFrame } from '@/components/ui/media-frame';
+import { FlankedEyebrow } from '@/components/ui/flanked-eyebrow';
+import { Reveal } from '@/components/ui/reveal';
 import { Section } from '@/components/ui/section';
 import { cn } from '@/lib/utils/cn';
 import { SIZES_GOAL_CARD } from '@/lib/utils/image-sizes';
@@ -53,58 +55,102 @@ export function GoalsGrid({ title, goals, snap = false }: GoalsGridProps) {
       className={cn('flex items-center', snap && 'min-h-viewport snap-start')}
     >
       <div className="flex w-full flex-col items-center gap-flow">
-        {/* Regular weight and not uppercase, as the design sets it — the same
-            call as the other headings built from the PDF. */}
-        <h2 className="text-h2 text-center font-normal">{title}</h2>
+        {/* The same flanked label the Business Portfolio uses, so the centred
+            sections read as a set. */}
+        <Reveal order={0}>
+          <FlankedEyebrow>{title}</FlankedEyebrow>
+        </Reveal>
 
         <div className="grid w-full max-w-(--business-max-w) gap-gap-grid md:grid-cols-3">
-          {goals.map((goal) => {
+          {goals.map((goal, index) => {
             const Icon = goal.icon;
 
             return (
-              <article
-                key={goal.id}
-                // A floor, not a fixed ratio. A portrait aspect made the card
-                // as tall as its width dictated, which on a wide screen was
-                // taller than the section had room for — and the copy is
-                // absolutely positioned inside, so it had nowhere to go but
-                // over the edge. Min-height keeps the three cards matched by
-                // the grid while letting the longest one set the height.
-                className="relative flex min-h-(--spacing-goal-card) overflow-hidden"
-              >
-                <MediaFrame
-                  image={goal.image}
-                  alt=""
-                  sizes={SIZES_GOAL_CARD}
-                  pending={`goals/${goal.id}`}
-                  className="absolute inset-0"
-                />
-
-                {/* Legibility, not decoration — see --gradient-goal-scrim. */}
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 bg-(image:--gradient-goal-scrim)"
-                />
-
-                <div
-                  className={cn(
-                    'relative flex w-full flex-col items-center justify-center',
-                    'gap-stack p-5 text-center text-white lg:p-6',
-                  )}
+              <Reveal key={goal.id} order={index + 2} className="flex">
+                <article
+                  // A floor, not a fixed ratio. A portrait aspect made the card
+                  // as tall as its width dictated, which on a wide screen was
+                  // taller than the section had room for — and the copy is
+                  // absolutely positioned inside, so it had nowhere to go but
+                  // over the edge. Min-height keeps the three cards matched by
+                  // the grid while letting the longest one set the height.
+                  className="group relative flex min-h-(--spacing-goal-card) w-full overflow-hidden"
                 >
-                  <Icon
-                    className="size-goal-icon shrink-0 stroke-1"
-                    aria-hidden="true"
-                    focusable="false"
+                  <MediaFrame
+                    image={goal.image}
+                    alt=""
+                    sizes={SIZES_GOAL_CARD}
+                    pending={`goals/${goal.id}`}
+                    className="absolute inset-0"
                   />
-                  {/* `text-white` on the heading itself, not inherited from the
-                      wrapper: globals.css gives every h1–h6 an explicit
-                      `--color-ink` in the base layer, and an explicit colour
-                      beats an inherited one however close the ancestor is. */}
-                  <h3 className="text-label font-bold text-white uppercase">{goal.title}</h3>
-                  <p className="text-body-sm [text-wrap:pretty]">{goal.body}</p>
-                </div>
-              </article>
+
+                  {/* Legibility, not decoration — see --gradient-goal-scrim. */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-(image:--gradient-goal-scrim)"
+                  />
+
+                  {/*
+                  At rest the card is just its mark and its name, set large.
+                  The description arrives on hover — over a translucent panel,
+                  because white copy on a bright orange photograph needs the
+                  extra separation, and it is the same panel on all three so
+                  they behave alike.
+
+                  Gated on `(hover: hover)`. A touch device cannot hover, and a
+                  card whose only content is behind an interaction nobody can
+                  perform is a card with no content. There, both states are
+                  simply stacked and always visible.
+                */}
+                  <div
+                    className={cn(
+                      'relative flex w-full flex-col items-center justify-center',
+                      'gap-stack p-5 text-center text-white lg:p-6',
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        'flex flex-col items-center gap-stack',
+                        'transition duration-(--duration-card)',
+                        'hover-hover:group-hover:-translate-y-2 hover-hover:group-hover:opacity-0',
+                        'hover-hover:group-focus-within:-translate-y-2',
+                        'hover-hover:group-focus-within:opacity-0',
+                        'motion-reduce:transition-none',
+                      )}
+                    >
+                      <Icon
+                        className="size-goal-icon shrink-0 stroke-1"
+                        aria-hidden="true"
+                        focusable="false"
+                      />
+                      {/* `text-white` on the heading itself, not inherited from
+                        the wrapper: globals.css gives every h1–h6 an explicit
+                        `--color-ink` in the base layer, and an explicit colour
+                        beats an inherited one however close the ancestor is. */}
+                      <h3 className="text-goal-title font-bold text-white uppercase">
+                        {goal.title}
+                      </h3>
+                    </div>
+
+                    <p
+                      className={cn(
+                        'text-body-sm [text-wrap:pretty]',
+                        'hover-hover:absolute hover-hover:inset-0',
+                        'hover-hover:flex hover-hover:items-center',
+                        'hover-hover:bg-black/45 hover-hover:p-5 lg:hover-hover:p-6',
+                        'hover-hover:translate-y-2 hover-hover:opacity-0',
+                        'transition duration-(--duration-card)',
+                        'hover-hover:group-hover:translate-y-0 hover-hover:group-hover:opacity-100',
+                        'hover-hover:group-focus-within:translate-y-0',
+                        'hover-hover:group-focus-within:opacity-100',
+                        'motion-reduce:transition-none',
+                      )}
+                    >
+                      {goal.body}
+                    </p>
+                  </div>
+                </article>
+              </Reveal>
             );
           })}
         </div>

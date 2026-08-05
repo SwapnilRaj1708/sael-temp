@@ -94,6 +94,16 @@ export const NAV_ITEMS: readonly NavItem[] = [
 ];
 
 /**
+ * The one nav entry the masthead renders as a button rather than a link.
+ *
+ * It stays in `NAV_ITEMS` on purpose: the mobile drawer, the footer grid and
+ * `sitemap.ts` all read that array, and a route lifted out of it would quietly
+ * disappear from three places to gain a different style in one. The desktop
+ * bar filters on this label instead.
+ */
+export const NAV_CTA_LABEL = 'Contact Us';
+
+/**
  * Whether `pathname` sits inside `item` — the item itself, or any of its
  * children. Drives the desktop nav's active underline and the drawer's
  * current-section marker.

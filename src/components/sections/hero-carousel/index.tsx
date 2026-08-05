@@ -75,8 +75,13 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
       aria-label="SAEL highlights"
       // Autoplay yields to the user's attention, however it arrives: a
       // pointer resting on the hero, or focus landing on one of the dots.
-      onMouseEnter={pause}
-      onMouseLeave={resume}
+      // No pause on hover, by the client's decision on 2026-08-05: the hero
+      // is meant to keep cycling whether or not the pointer is resting on it.
+      //
+      // Focus still pauses, and that is not the same feature. A keyboard user
+      // who has tabbed to a dot is *operating* the carousel; advancing the
+      // slide under them moves the thing they are aiming at. Hover is
+      // incidental — focus is intent.
       onFocus={pause}
       onBlur={resume}
       onPointerDown={onPointerDown}

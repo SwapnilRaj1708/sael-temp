@@ -35,23 +35,43 @@ changes per section is recorded in `asset-inventory.md` §10.
 
 | # | Section | Component | State |
 |---|---|---|---|
-| 1 | Hero carousel | `sections/hero-carousel/` | Built |
-| 2 | About SAEL | `sections/intro-split/` | Built |
-| 3 | Business portfolio | `sections/business-tiles/` | Built — also carries the capacity figures, so `features/04` §2's stats band is not a separate section |
-| 4 | Pan India green footprint | `sections/presence-map/` | Built — the dotted vector map. Silhouette wants another pass against the PDF |
+| 1 | Hero carousel | `sections/hero-carousel/` | Built. Autoplay no longer pauses on hover, by the client's decision on 2026-08-05; it still pauses on keyboard focus |
+| 2 | About SAEL | `sections/intro-split/` | Built. First section to take the scroll reveal |
+| 3 | Business portfolio | `sections/business-tiles/` | Built — also carries the capacity figures, so `features/04` §2's stats band is not a separate section. Figures count up from zero |
+| 4 | Pan India green footprint | `sections/presence-map/` | Built — the dotted vector map. **The right-hand column is commented out pending a layout review**, which is why `title`/`primaryStat`/`secondaryStat` are on the interface but not destructured. Silhouette still wants a pass against the PDF |
 | 5 | Solutions | `sections/solutions-carousel/` | Built — a four-plant carousel, not `features/04` §6's single banner |
-| 6– | Our Strength, vision timeline, SDG marquee, Our Goals, In the News, pixel strip | — | Not started. Ask before starting Our Strength or the timeline: neither appears in the client's PDF |
+| 6 | Our Endeavour | `sections/endeavour-split/` | Built. The mirror of §2 |
+| 7 | Our Goals | `sections/goals-grid/` | Built — photographic cards, not `features/04` §10's grey boxes. Icons are `lucide-react` stand-ins |
+| 8 | In the News | `sections/news-carousel/` | Built. The one homepage surface fed by the repository |
+| 9 | Pixel strip | `sections/pixel-strip/` | Built — drawn to a canvas, not `features/04` §12's PNG |
+| — | SDG marquee (`features/04` §9) | — | **Skipped**, confirmed by the client on 2026-08-05: not to be built for now |
+| — | Our Strength (§7), vision timeline (§8) | — | Not started. Neither appears in the client's PDF — ask before building either |
 
 Also landed inside this item, as `features/05` intends: the content repository slice
-(`src/lib/content/`) with its mock and API adapters, behind `getContentRepository()`.
+(`src/lib/content/`) with its mock and API adapters behind `getContentRepository()`,
+now carrying `getCapacityStats()` and `getNewsItems()`.
+
+**And a change to FE-03, which is Done.** The masthead was reworked on 2026-08-05 to
+the client's `assets/navbar/` design: pill nav links, a gradient Contact Us button, and
+a full-screen mega menu in place of the per-item dropdowns (`nav-dropdown.tsx` is
+gone). `features/03` §2 describes the old bar and is now the stale document.
 
 Outstanding content, all rendering as `{{TODO: content}}` or flagged: hero `alt` ×4,
 the page meta description, Kurnool's capacity, the map's "Visit Location" URLs, and
-whether Patiala belongs on the map. Solutions `alt` text is written and wants a review.
+whether Patiala belongs on the map. The news items' `href` all point at `/newsroom/`
+because no per-article URLs were supplied, and two of their dates are in the future —
+both are the client's own design, transcribed rather than corrected. `alt` text for
+Solutions, Our Endeavour, About SAEL and the news thumbnails is written and wants a
+review.
 
-One deferred task to raise at the end of the project: the photography is committed
-unoptimised (~60 MB across `src/assets/images/`), by the client's decision on
-2026-08-04 to proceed and revisit.
+Two deferred tasks to raise at the end of the project:
+
+- The photography is committed unoptimised (~86 MB across `src/assets/images/`), by
+  the client's decision on 2026-08-04 to proceed and revisit. The Our Goals
+  backgrounds are the worst of it — 23 MB serving cards that render ~350px wide.
+- The Our Goals icons are `lucide-react` stand-ins. The design draws three bespoke
+  white line marks and none was in the handover; swapping them in is one line per
+  goal. Raised in `asset-inventory.md` §9.
 
 ---
 

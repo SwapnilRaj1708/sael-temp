@@ -49,7 +49,7 @@ export function Footer() {
                 into the artwork, so it is not repeated in text. */}
             <Link
               href="/"
-              className="bg-surface inline-flex rounded-card px-5 py-3 shadow-card-hover"
+              className="inline-flex rounded-card bg-surface px-5 py-3 shadow-card-hover"
               aria-label={`${siteConfig.name} — home`}
             >
               <Image

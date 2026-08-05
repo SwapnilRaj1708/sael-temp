@@ -246,3 +246,66 @@
     }
   }
 }
+
+/*
+ * Scroll reveal — components/ui/reveal.tsx.
+ *
+ * Two rules, and the split between them is the whole design:
+ *
+ *  - the **transition** is unconditional, so an element that is revealed
+ *    before the stylesheet has any reason to hide it simply sits at its
+ *    resting values;
+ *  - the **hidden** state is scoped to `html.reveal-ready`, a class only the
+ *    component adds once it is running. Without script the element is never
+ *    hidden, so a page whose bundle fails still reads.
+ *
+ * Both live inside `prefers-reduced-motion: no-preference`: for anyone who has
+ * asked for less motion there is no transition and no offset, and the content
+ * is simply there. /CLAUDE.md §5.
+ */
+@layer utilities {
+  @media (prefers-reduced-motion: no-preference) {
+    .anim-reveal {
+      transition:
+        opacity var(--duration-reveal) var(--ease-entrance),
+        transform var(--duration-reveal) var(--ease-entrance);
+      transition-delay: calc(var(--reveal-order, 0) * var(--duration-reveal-step));
+      will-change: opacity, transform;
+    }
+
+    html.reveal-ready .anim-reveal[data-reveal='pending'] {
+      opacity: 0;
+      transform: translateY(var(--reveal-shift));
+    }
+  }
+}
+
+/*
+ * The masthead's full-screen menu — components/layout/header/mega-menu.tsx.
+ *
+ * The columns rise and fade in one after another, `--mm-index` apart. Written
+ * here rather than as a utility because the delay is arithmetic on a custom
+ * property, and because the closed state has to be expressible without the
+ * panel being unmounted: it stays in the DOM so the transition has something
+ * to run on, and `inert` keeps it out of the tab order meanwhile.
+ */
+@layer utilities {
+  .anim-mega-col {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+
+  [data-mega='open'] .anim-mega-col {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .anim-mega-col {
+      transition:
+        opacity var(--duration-mega) var(--ease-entrance),
+        transform var(--duration-mega) var(--ease-entrance);
+      transition-delay: calc(var(--mm-index, 0) * var(--duration-mega-step));
+    }
+  }
+}
