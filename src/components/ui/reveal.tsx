@@ -46,12 +46,19 @@ export interface RevealProps extends Omit<ComponentPropsWithoutRef<'div'>, 'styl
 }
 
 /**
- * Fades its content up as it scrolls into view, once.
+ * Fades its content up as it scrolls into view — every time it does.
  *
- * **Once, not on every pass.** A reveal that replays every time the section
- * comes back is a distraction on a page that pages section by section, where
- * you cross the same boundary repeatedly. The observer disconnects on first
- * intersection.
+ * **Replays on every pass**, by the client's decision on 2026-08-06 (it was
+ * once-only before that). Two observers share the work, and the asymmetry
+ * between them is the point:
+ *
+ *  - the *reveal* observer fires at `ROOT_MARGIN`, 10% up from the bottom,
+ *    so content starts its entrance a beat after it appears;
+ *  - the *reset* observer re-arms at the true viewport edge, only once the
+ *    element is **completely** off screen. Resetting at the reveal margin
+ *    would visibly fade content back out while it still occupies the bottom
+ *    tenth of the screen; resetting off screen is free, because nobody can
+ *    see the state change.
  *
  * ---------------------------------------------------------------------------
  * The hidden state is applied by script, never by the server, and that is what
@@ -85,11 +92,12 @@ export function Reveal({ children, className, order = 0, ...props }: RevealProps
     };
 
     // Already on screen — reveal now rather than waiting for the observer's
-    // first callback, which would leave it hidden for a frame.
+    // first callback, which would leave it hidden for a frame. No early
+    // return any more: the observers below still need wiring, or the element
+    // would never re-arm after its first pass out of view.
     const box = node.getBoundingClientRect();
     if (box.top < window.innerHeight * ALREADY_SEEN && box.bottom > 0) {
       reveal();
-      return;
     }
 
     if (typeof IntersectionObserver === 'undefined') {
@@ -97,19 +105,27 @@ export function Reveal({ children, className, order = 0, ...props }: RevealProps
       return;
     }
 
-    const observer = new IntersectionObserver(
+    const revealObserver = new IntersectionObserver(
       (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          reveal();
-          observer.disconnect();
-        }
+        if (entries.some((entry) => entry.isIntersecting)) reveal();
       },
       { rootMargin: ROOT_MARGIN },
     );
 
-    observer.observe(node);
+    // Re-arms at the *unadjusted* viewport, so the hidden state only ever
+    // lands while the element cannot be seen. `!isIntersecting` here means
+    // fully outside the screen, whichever edge it left by.
+    const resetObserver = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => !entry.isIntersecting)) {
+        node.dataset.reveal = 'pending';
+      }
+    });
+
+    revealObserver.observe(node);
+    resetObserver.observe(node);
     return () => {
-      observer.disconnect();
+      revealObserver.disconnect();
+      resetObserver.disconnect();
     };
   }, []);
 

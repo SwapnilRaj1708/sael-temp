@@ -343,9 +343,9 @@
    * its full height, and this one section may exceed the viewport.
    *
    * So the ratio is the whole story, and `<SolutionsCarousel>` is the one
-   * snapping section allowed to be taller than a screen. The scroller already
-   * handles that — a section taller than the viewport is scrolled through
-   * before it pages. See components/layout/section-scroller.tsx. */
+   * snapping section allowed to be taller than a screen. Snapping already
+   * handles that: a snap area larger than the snapport is scrolled through
+   * freely and only snaps at its own edges. See globals.css. */
 
   /* A prominent rail arrow. Larger than the 44px touch floor because on a rail
    * of small cards the control has to out-weigh them. */

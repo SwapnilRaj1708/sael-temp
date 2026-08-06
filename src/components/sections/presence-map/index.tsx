@@ -226,14 +226,20 @@ export function PresenceMap({
                 </div>
               );
             })}
-            <Reveal order={3} className="absolute top-[10%] right-[-12%]">
+            <Reveal
+              order={3}
+              className="absolute top-[10%] right-[2%] md:top-[10%] md:right-[-12%]"
+            >
               <h3 className="bg-(image:--gradient-footprint) gradient-text text-center text-footprint-title uppercase">
                 {title[0]}
                 <br />
                 {title[1]}
               </h3>
             </Reveal>
-            <Reveal order={4} className="absolute right-[-10%] bottom-[25%]">
+            <Reveal
+              order={4}
+              className="absolute right-[10%] bottom-[12%] md:right-[-10%] md:bottom-[25%]"
+            >
               <p className="text-stat text-white uppercase">{primaryStat}</p>
               <p className="mt-1 text-h3 text-white uppercase">{secondaryStat}</p>
             </Reveal>

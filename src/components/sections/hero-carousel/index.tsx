@@ -1,6 +1,10 @@
 'use client';
 
-import { useRef, type PointerEvent as ReactPointerEvent } from 'react';
+import {
+  useRef,
+  type FocusEvent as ReactFocusEvent,
+  type PointerEvent as ReactPointerEvent,
+} from 'react';
 import { Section } from '@/components/ui/section';
 import { cn } from '@/lib/utils/cn';
 import { HeroDots } from './hero-dots';
@@ -11,6 +15,15 @@ import type { HeroSlide } from './types';
 
 /** Horizontal travel, in px, before a drag counts as a swipe. */
 const SWIPE_THRESHOLD = 50;
+
+/**
+ * How long after a pointer lands that the focus it causes still counts as
+ * "the pointer did this" rather than "the keyboard did this".
+ *
+ * Focus arrives on pointerdown, well inside this, so the ordering is never in
+ * doubt: pointerdown → focus → pointerup.
+ */
+const POINTER_FOCUS_MS = 400;
 
 export interface HeroCarouselProps {
   slides: HeroSlide[];
@@ -35,7 +48,8 @@ export interface HeroCarouselProps {
  */
 export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
   const sectionRef = useRef<HTMLElement>(null);
-  const dragOrigin = useRef<number | null>(null);
+  const dragOrigin = useRef<{ x: number; y: number } | null>(null);
+  const lastPointerAt = useRef(0);
 
   const { index, goTo, next, previous, isPlaying, pause, resume } = useHeroCarousel({
     count: slides.length,
@@ -48,10 +62,14 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
   if (slides.length === 0) return null;
 
   const onPointerDown = (event: ReactPointerEvent<HTMLElement>) => {
+    // Every pointer type, and before the mouse guard below: this is what tells
+    // the focus handler that a pointer, not the keyboard, is driving.
+    lastPointerAt.current = Date.now();
+
     // Mouse drags are not swipes — a click-drag across a hero is how people
     // select text or just move the pointer. Touch and pen only.
     if (event.pointerType === 'mouse') return;
-    dragOrigin.current = event.clientX;
+    dragOrigin.current = { x: event.clientX, y: event.clientY };
   };
 
   const onPointerUp = (event: ReactPointerEvent<HTMLElement>) => {
@@ -59,10 +77,39 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
     dragOrigin.current = null;
     if (origin === null) return;
 
-    const travel = event.clientX - origin;
-    if (Math.abs(travel) < SWIPE_THRESHOLD) return;
-    if (travel < 0) next();
+    const travelX = event.clientX - origin.x;
+    const travelY = event.clientY - origin.y;
+
+    if (Math.abs(travelX) < SWIPE_THRESHOLD) return;
+    // Horizontal intent, not just horizontal distance. A diagonal flick down
+    // the page covers plenty of x on the way, and changing the slide under
+    // someone who is scrolling is the carousel taking a gesture that was not
+    // aimed at it. `touch-action: pan-y` stops us stealing the *scroll*; this
+    // stops us acting on it.
+    if (Math.abs(travelX) <= Math.abs(travelY)) return;
+
+    if (travelX < 0) next();
     else previous();
+  };
+
+  /**
+   * Pause only for the keyboard.
+   *
+   * `onFocus` fires for a tap as much as for a Tab, and on a touch screen the
+   * matching blur very often never comes — there is nothing to move focus to,
+   * so it stays on the dot. Autoplay stopped for good the first time anyone
+   * touched a dot, which is the reported "sometimes stops working on mobile".
+   *
+   * Decided from *when the last pointer landed*, not from `:focus-visible`.
+   * The pseudo-class is the browser's own answer to the same question, but it
+   * also matches a programmatic `focus()`, so anything that moves focus in
+   * script re-introduces the bug — which is exactly how this was caught.
+   * Timing is the thing actually being asked about and it cannot be spoofed
+   * by a stray `focus()` call.
+   */
+  const onFocusCapture = (event: ReactFocusEvent<HTMLElement>) => {
+    void event;
+    if (Date.now() - lastPointerAt.current > POINTER_FOCUS_MS) pause();
   };
 
   return (
@@ -73,20 +120,30 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
       data-snap-section
       aria-roledescription="carousel"
       aria-label="SAEL highlights"
-      // Autoplay yields to the user's attention, however it arrives: a
-      // pointer resting on the hero, or focus landing on one of the dots.
       // No pause on hover, by the client's decision on 2026-08-05: the hero
-      // is meant to keep cycling whether or not the pointer is resting on it.
+      // keeps cycling whether or not the pointer rests on it.
       //
-      // Focus still pauses, and that is not the same feature. A keyboard user
+      // Keyboard focus still pauses, and that is not the same feature. Someone
       // who has tabbed to a dot is *operating* the carousel; advancing the
-      // slide under them moves the thing they are aiming at. Hover is
-      // incidental — focus is intent.
-      onFocus={pause}
+      // slide under them moves the thing they are aiming at. See
+      // `onFocusCapture`, which is where "keyboard" is decided.
+      onFocus={onFocusCapture}
       onBlur={resume}
       onPointerDown={onPointerDown}
-      onPointerUp={onPointerUp}
+      // Resume unconditionally on any pointer release, so autoplay cannot end
+      // up wedged off. Even if something pauses it that this component did not
+      // anticipate, touching the hero puts it back — a stuck carousel is the
+      // one failure worth being ungraceful about.
+      onPointerUp={(event) => {
+        onPointerUp(event);
+        resume();
+      }}
+      // Both reset the drag. Cancel is the browser taking the gesture over —
+      // a vertical pan, usually. Leave is the finger going out of the section
+      // mid-swipe, after which no `pointerup` will arrive here and a stale
+      // origin would otherwise turn the *next* tap into a phantom swipe.
       onPointerCancel={() => (dragOrigin.current = null)}
+      onPointerLeave={() => (dragOrigin.current = null)}
       className={cn(
         'relative isolate overflow-hidden bg-surface-deep',
         /*

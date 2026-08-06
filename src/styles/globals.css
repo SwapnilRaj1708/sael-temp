@@ -110,9 +110,10 @@
    * replacing native scrolling rather than correcting it.
    *
    * So scrolling is the browser's again, and snapping is what it always should
-   * have been — a *correction* applied when you come to rest near a boundary.
+   * have been — the browser correcting the rest position, never fighting the
+   * gesture.
    *
-   * Three choices remain deliberate:
+   * Four choices are deliberate:
    *
    * 1. **The document is the scroll container.** The obvious alternative — a
    *    `height: 100dvh; overflow-y: scroll` wrapper — snaps just as well and
@@ -120,20 +121,44 @@
    *    address bar for the *document* scroller, `Home`/`End` and find-in-page
    *    stop behaving, and the footer ends up inside the scrolling box.
    *
-   * 2. **`proximity`, not `mandatory`.** Mandatory forces the viewport to rest
-   *    on a snap point always, so any section taller than the viewport — the
-   *    Solutions carousel is, by the client's decision that its image keeps
-   *    its aspect ratio — has content that cannot be scrolled to. Proximity
-   *    snaps when you come to rest near a boundary and gets out of the way
-   *    when you do not, which is exactly "normal scrolling, and it aligns at
-   *    the joins".
+   * 2. **`mandatory`, not `proximity`.** The client wants one scroll to land
+   *    you on the next section, every time; proximity only corrects when you
+   *    happen to stop near a boundary, and reads as "sometimes it snaps".
+   *    Mandatory is safe here *because the spec handles the tall-section case
+   *    for us*: a snap area larger than the snapport may rest at any position
+   *    that keeps it covering the viewport (css-scroll-snap-1 §6.2), so the
+   *    Solutions carousel — taller than a screen by the client's decision —
+   *    scrolls freely inside itself and only snaps at its own edges. That is
+   *    the requested behaviour exactly, and it is why no scroll-hijacking
+   *    library is needed to get it.
    *
-   * 3. `scroll-padding-top` is already set to the header height on `html`
+   * 3. **`scroll-snap-stop: always` on every section**, so a hard fling stops
+   *    at the *next* boundary instead of sailing through three sections —
+   *    without it, mandatory only guarantees where you land, not how far.
+   *
+   * 4. `scroll-padding-top` is already set to the header height on `html`
    *    above, so a `snap-start` section aligns under the fixed bar rather than
    *    behind it. The two must stay in step.
+   *
+   * The footer is the one snap area outside the page's own tree. Under
+   * `mandatory` every rest position must be a snap position, and the pixel
+   * strip and footer after the last section are not inside any — the page
+   * bottom would be unreachable, with the viewport snapping back up to the
+   * news section. Aligning the footer's *end* makes the document's last
+   * scroll position legal again, with the strip and footer sharing that final
+   * screen. Scoped to the same `:has()`, so a page without snapping leaves
+   * the footer alone.
    */
   html:has([data-snap-sections]) {
-    scroll-snap-type: y proximity;
+    scroll-snap-type: y mandatory;
+  }
+
+  html:has([data-snap-sections]) [data-snap-section] {
+    scroll-snap-stop: always;
+  }
+
+  html:has([data-snap-sections]) footer {
+    scroll-snap-align: end;
   }
 }
 
