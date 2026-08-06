@@ -95,7 +95,24 @@
    * marked `data-snap-sections`. Nothing else on the site is affected, and no
    * page has to reach into the root layout to turn it on.
    *
-   * Three deliberate choices:
+   * **This is the whole mechanism.** It used to be a fallback: a GSAP
+   * `Observer` on the window replaced scrolling with one-gesture-per-section
+   * paging, and switched this rule off while it ran. That was removed on
+   * 2026-08-06 because it made the site worse on the devices most people use
+   * it on.
+   *
+   * `Observer` needs `preventDefault: true` to page — that is what stops a
+   * wheel tick also scrolling normally. On touch it takes the same gesture,
+   * which costs the browser's own momentum and rubber-banding, and a section
+   * taller than the viewport then advances only by the raw touch delta. The
+   * result on a phone is a page you have to swipe at repeatedly and that
+   * appears to stick. No amount of tuning fixes that: the cost is inherent in
+   * replacing native scrolling rather than correcting it.
+   *
+   * So scrolling is the browser's again, and snapping is what it always should
+   * have been — a *correction* applied when you come to rest near a boundary.
+   *
+   * Three choices remain deliberate:
    *
    * 1. **The document is the scroll container.** The obvious alternative — a
    *    `height: 100dvh; overflow-y: scroll` wrapper — snaps just as well and
@@ -104,12 +121,12 @@
    *    stop behaving, and the footer ends up inside the scrolling box.
    *
    * 2. **`proximity`, not `mandatory`.** Mandatory forces the viewport to rest
-   *    on a snap point always, so any section taller than the viewport — which
-   *    is most of them on a phone once the news grid and the business tiles
-   *    land — has content that simply cannot be scrolled to. Proximity snaps
-   *    when you come to rest near a boundary and gets out of the way when you
-   *    do not. Switching is one word if the client wants the harder feel and
-   *    accepts the constraint that every section must then fit a screen.
+   *    on a snap point always, so any section taller than the viewport — the
+   *    Solutions carousel is, by the client's decision that its image keeps
+   *    its aspect ratio — has content that cannot be scrolled to. Proximity
+   *    snaps when you come to rest near a boundary and gets out of the way
+   *    when you do not, which is exactly "normal scrolling, and it aligns at
+   *    the joins".
    *
    * 3. `scroll-padding-top` is already set to the header height on `html`
    *    above, so a `snap-start` section aligns under the fixed bar rather than
@@ -117,18 +134,6 @@
    */
   html:has([data-snap-sections]) {
     scroll-snap-type: y proximity;
-  }
-
-  /*
-   * …and stands down the moment <SectionScroller> takes over, which it does on
-   * mount unless the user has asked for reduced motion. The two must never run
-   * together: CSS would keep correcting the position mid-tween and fight the
-   * animation. So the snap rule above is the no-JavaScript baseline — a page
-   * whose bundle never arrives still snaps roughly — and this is the
-   * enhancement replacing it.
-   */
-  html.section-scroll-active {
-    scroll-snap-type: none;
   }
 }
 

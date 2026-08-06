@@ -171,3 +171,13 @@ Ask. Specifically:
 - Missing copy or a figure → `{{TODO: content}}` and flag it.
 - An API shape that `docs/api-contracts.md` does not cover → propose the contract in your response, add it to that doc, and mock it. Do not silently invent a response shape.
 - A design decision the prototype does not answer (almost always: "what does this look like on mobile?") → check `docs/responsive-strategy.md` first; if it is silent, propose an approach and flag it rather than guessing.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

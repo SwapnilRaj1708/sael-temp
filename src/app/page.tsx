@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { SectionScroller } from '@/components/layout/section-scroller';
 import { BusinessTiles, type BusinessTile } from '@/components/sections/business-tiles';
 import { EndeavourSplit } from '@/components/sections/endeavour-split';
 import { GoalsGrid } from '@/components/sections/goals-grid';
@@ -67,20 +66,6 @@ async function resolveBusinessTiles(): Promise<BusinessTile[]> {
 }
 
 /**
- * The homepage. A Server Component: it fetches, joins and passes down, and
- * only the hero carousel and the scroll controller opt into the client.
- *
- * **Sections 4–12 are not built yet.** docs/features/04 specifies twelve and
- * this page renders three — noting that its §2 (stats band) and §4 (business
- * tiles) are one section in the client's design, so the count will not reach
- * twelve. See docs/frontend-progress.md.
- *
- * `data-snap-sections` is what turns section snapping on. globals.css matches
- * it with `html:has(…)`, so the behaviour is scoped to this page without the
- * root layout needing to know which routes want it, and every section that
- * opts in carries `snap-start` and `min-h-viewport`.
- */
-/**
  * The homepage's press items.
  *
  * Wrapped locally for the same reason the capacity figures are: a repository
@@ -97,12 +82,29 @@ async function resolveNewsItems(): Promise<NewsItem[]> {
   }
 }
 
+/**
+ * The homepage. A Server Component: it fetches, joins and passes down, and
+ * only the hero carousel and the two rails' arrows opt into the client.
+ *
+ * Nine sections, against the twelve `docs/features/04` lists: its §2 (stats
+ * band) and §4 (business tiles) are one section in the client's design, §9
+ * (the SDG marquee) is skipped at the client's request, and §7 and §8 appear
+ * in neither the PDF nor this page. See docs/frontend-progress.md.
+ *
+ * `data-snap-sections` is what turns section snapping on. globals.css matches
+ * it with `html:has(…)`, so the behaviour is scoped to this page without the
+ * root layout needing to know which routes want it, and every section that
+ * opts in carries `snap-start` and `min-h-viewport`.
+ *
+ * **Snapping is CSS and nothing else.** A GSAP `Observer` used to replace
+ * scrolling with one-gesture-per-section paging; it is gone. See the note in
+ * globals.css.
+ */
 export default async function HomePage() {
   const [tiles, news] = await Promise.all([resolveBusinessTiles(), resolveNewsItems()]);
 
   return (
     <div data-snap-sections>
-      <SectionScroller />
       <HeroCarousel slides={heroSlides} />
       <IntroSplit {...aboutSael} snap />
       <BusinessTiles eyebrow="Business Portfolio" tiles={tiles} snap />
