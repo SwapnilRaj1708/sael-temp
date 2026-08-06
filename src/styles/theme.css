@@ -515,14 +515,22 @@
    * as cards. `SAEL Homepage v3.dc.html`. */
   --business-max-w: 72.5rem; /* 1160 */
 
-  /* A solutions card: 64% of the viewport, capped at 920px. Both numbers are
-   * the prototype's `Math.min(920, w * 0.64)`.
+  /* A solutions card. From `md` up: 64% of the viewport, capped at 920px —
+   * both numbers are the prototype's `Math.min(920, w * 0.64)`, and the
+   * override lives in the md block at the end of this file.
    *
    * It was the content width — viewport less two gutters — which at 1920 is a
    * 1600px card 840px tall, filling the screen. The design never had it that
    * large: the card is meant to sit *within* the page with its neighbours
-   * clearly beside it, not to be the page. */
-  --solution-card-w: min(57.5rem, 64%);
+   * clearly beside it, not to be the page.
+   *
+   * Below `md` those proportions invert: 64% of a 390px phone is a 250px card
+   * — a fifth of the screen, with more neighbour than subject. There the card
+   * takes the content width after all, its edges on the heading's own lines,
+   * and the neighbours peek from the gutters. The prototype has no answer
+   * here (it was authored at 1920); docs/responsive-strategy.md §2 does —
+   * fluid content width between the gutters. */
+  --solution-card-w: min(57.5rem, 100% - 2 * var(--spacing-gutter));
 
   /* The pixel strip's six ramp stops, left to right. Separate values rather
    * than one gradient because the scattered squares are painted to a canvas,
@@ -778,6 +786,17 @@
  * classic way an anchor link ends up under a fixed header is these three
  * drifting apart. docs/features/03-app-shell-header-footer.md §2.
  */
+/*
+ * The solutions card steps back from the content width to the prototype's
+ * 64%-of-viewport once there is room for neighbours to mean something. See
+ * the token's own comment for the mobile side of the story.
+ */
+@media (min-width: 48rem) {
+  :root {
+    --solution-card-w: min(57.5rem, 64%);
+  }
+}
+
 @media (min-width: 64rem) {
   :root {
     --spacing-header: 5.25rem; /* 84 */
