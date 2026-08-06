@@ -140,14 +140,23 @@
    *    above, so a `snap-start` section aligns under the fixed bar rather than
    *    behind it. The two must stay in step.
    *
-   * The footer is the one snap area outside the page's own tree. Under
-   * `mandatory` every rest position must be a snap position, and the pixel
-   * strip and footer after the last section are not inside any — the page
-   * bottom would be unreachable, with the viewport snapping back up to the
-   * news section. Aligning the footer's *end* makes the document's last
-   * scroll position legal again, with the strip and footer sharing that final
-   * screen. Scoped to the same `:has()`, so a page without snapping leaves
-   * the footer alone.
+   * **The page's tail — the pixel strip and the footer — is normal scroll**,
+   * by the client's decision on 2026-08-06. Snapping straight from the news
+   * section to the footer flung the strip past too fast to be seen at all.
+   *
+   * Under `mandatory` a region is only free when some snap area larger than
+   * the snapport covers it (css-scroll-snap-1 §6.2 — the same rule that lets
+   * the tall Solutions carousel scroll inside itself). The strip and footer
+   * are shorter than a screen, so no area of their own can grant that; and the
+   * footer sits outside the page's tree, so nothing can wrap the three into
+   * one. Instead the *last section's* snap area is extended downward past the
+   * end of the document with `scroll-margin-bottom`, which makes news-to-end
+   * one oversized area: approaching the news section still snaps to its top
+   * edge, and everything beyond it — through the strip, to the footer, to the
+   * document's end — is the browser's ordinary scrolling. The overshoot past
+   * the document end is deliberate slack for whatever height the footer takes
+   * at any width, and costs nothing: snap positions are clamped to the
+   * scrollable range.
    */
   html:has([data-snap-sections]) {
     scroll-snap-type: y mandatory;
@@ -157,8 +166,8 @@
     scroll-snap-stop: always;
   }
 
-  html:has([data-snap-sections]) footer {
-    scroll-snap-align: end;
+  html:has([data-snap-sections]) section[data-snap-section]:last-of-type {
+    scroll-margin-bottom: 150dvh;
   }
 }
 
