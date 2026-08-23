@@ -20,11 +20,12 @@
 export const SIZES_FULL_BLEED = '100vw';
 
 /**
- * The hero's watermark symbol: 42% of the viewport below `lg`, and 18.5% of
- * it above, which is the prototype's `18.5vw`. Kept in step with
- * `--hero-symbol-mobile-width` and the per-slide `symbolSize`.
+ * The hero's mark, which in `SAEL Home v2` sits in the content column rather
+ * than floating in the frame as a watermark. `--spacing-hero-icon` sets its
+ * height, 74 → 176px, and the marks are close to square, so the largest it is
+ * ever drawn is 176px. Kept in step with that token.
  */
-export const SIZES_HERO_SYMBOL = '(min-width: 64rem) 19vw, 42vw';
+export const SIZES_HERO_SYMBOL = '176px';
 
 /**
  * The About SAEL composite. Half the content column at `lg` and above, close
@@ -35,13 +36,14 @@ export const SIZES_HERO_SYMBOL = '(min-width: 64rem) 19vw, 42vw';
 export const SIZES_ABOUT_MEDIA = '(min-width: 64rem) 44vw, 88vw';
 
 /**
- * A card on the solutions rail: one on screen, the content width, so the
- * viewport less two gutters. That is 90% of the viewport on a phone and 84% at
- * 1920, and this rounds up rather than splitting the difference — the cost of
- * a hint that is a little generous is a slightly larger file, and the cost of
- * one that is short is a visibly soft photograph.
+ * A card on the solutions rail. `--spacing-solution-card` is
+ * `clamp(250px, 30vw, 440px)`; 30vw overtakes the 250px floor at about 833px
+ * of viewport, which is where the first condition starts, and the 440px cap
+ * binds from about 1467px. Rounded outward at both hinges — the cost of a hint
+ * that is a little generous is a slightly larger file, and the cost of one
+ * that is short is a visibly soft photograph.
  */
-export const SIZES_SOLUTION_CARD = '92vw';
+export const SIZES_SOLUTION_CARD = '(min-width: 90rem) 440px, (min-width: 52rem) 30vw, 250px';
 
 /**
  * The "Our Endeavour" cut-out. Capped at `--endeavour-media-w` (25rem) beside
@@ -56,14 +58,22 @@ export const SIZES_ENDEAVOUR_FIGURE = '(min-width: 64rem) 26rem, 88vw';
 export const SIZES_GOAL_CARD = '(min-width: 48rem) 32vw, 92vw';
 
 /**
- * A news card's thumbnail — `--spacing-news-card` wide, 224 → 296px.
+ * A news card's thumbnail — `--spacing-news-card` wide, 238 → 330px.
  */
-export const SIZES_NEWS_CARD = '(min-width: 64rem) 296px, 224px';
+export const SIZES_NEWS_CARD = '(min-width: 64rem) 330px, 238px';
 
 /**
- * A business card's mark. Small and fixed-height (`--spacing-icon-mark`,
- * 52 → 76px), so this is generous rather than precise — SVGs are served as-is
- * and never resampled, and the hint only matters if these are ever replaced
- * with raster artwork.
+ * An "Our Goals" mark — `--spacing-goal-icon` wide, 60 → 126px.
  */
-export const SIZES_BUSINESS_ICON = '96px';
+export const SIZES_GOAL_ICON = '126px';
+
+/**
+ * The dotted India map. Half the content column at `lg` and above, capped by
+ * `--spacing-map` at 608px; close to the full column below it.
+ */
+export const SIZES_MAP = '(min-width: 64rem) 38rem, 92vw';
+
+/**
+ * A business mark on a ledger row — `--spacing-ledger-icon` wide, 69 → 132px.
+ */
+export const SIZES_BUSINESS_ICON = '132px';

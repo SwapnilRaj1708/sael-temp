@@ -66,6 +66,27 @@
   }
 }
 
+/* The hero's progress bar, filling left to right over one slide's dwell.
+ *
+ * One full sweep per slide: the bar runs the whole width for the first image,
+ * resets, and runs it again for the second. It was a quarter-width run per
+ * slide for a day — continuous across the cycle — and the client asked on
+ * 2026-08-22 for the simpler reading.
+ *
+ * `clip-path` rather than `scaleX`, and rather than the `width` that fxFill
+ * animates. A `scaleX` would squash the gradient along with the box, so the
+ * ramp would compress and expand as the bar filled instead of staying put; a
+ * width would relayout a full-bleed element every frame. Clipping reveals a
+ * bar that is already the right size in the right colours. */
+@keyframes fxTrack {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
 /* SDG strip. Travels exactly half its length, because the component renders
  * the card set twice; at -50% the second set sits where the first began and
  * the loop is seamless. */
@@ -159,6 +180,11 @@
     width: 100%;
   }
 
+  /* Likewise: with no countdown to show, the bar reads as simply filled. */
+  .anim-track-fill {
+    clip-path: inset(0 0 0 0);
+  }
+
   .anim-marquee {
     transform: translateX(0);
   }
@@ -211,6 +237,11 @@
     .anim-dot-fill {
       width: 0;
       animation: fxFill var(--slide-duration, 6s) linear forwards;
+    }
+
+    .anim-track-fill {
+      clip-path: inset(0 100% 0 0);
+      animation: fxTrack var(--slide-duration, 6s) linear forwards;
     }
 
     .anim-marquee {

@@ -53,29 +53,28 @@
    * and specified separately by the client's design. */
   --color-surface-map: #101819;
 
-  /* The dotted map's colour ramp, running west to east across the landmass —
-   * red over Gujarat and Rajasthan to indigo over the north-east. The same
-   * brand travel as --gradient-shape and the eyebrow rules, laid across a map
-   * instead of a box.
-   *
-   * Five separate tokens rather than one gradient because they are consumed by
-   * SVG `<stop>` elements, which take a colour and not a CSS gradient. Offsets
-   * are 0, 0.5, 0.72, 0.88 and 1. */
-  --color-map-dot-1: #e0242c;
-  --color-map-dot-2: #d6203a;
-  --color-map-dot-3: #a6226e;
-  --color-map-dot-4: #6e2a96;
-  --color-map-dot-5: #4a3397;
   --color-border: #ececee;
   --color-rule: #d9d9d9;
   --color-inert: #c7c7c7;
-  --color-footer-bg: #3d4a48;
-  --color-footer-icon: #2f3d3a;
+  /* `SAEL Home v2`'s footer, at the client's request on 2026-08-22 — a cool
+   * slate in place of the green-grey that was here. The icon is a shade
+   * deeper than the ground: it is painted on a white pill in the footer and
+   * on --color-surface-alt in the mobile drawer, so it has to be the dark end
+   * of the pair, not the light one. */
+  --color-footer-bg: #22262e;
+  --color-footer-icon: #1a1e25;
 
   /* The flat purple the client's design uses for section eyebrows, in place of
    * the prototype's red→blue gradient. Both exist: --gradient-eyebrow is still
    * the default, and this is the `accent` tone on <Eyebrow>. */
   --color-eyebrow-accent: #8a2380;
+
+  /* The chamfered tile shape's fill — docs/asset-inventory.md §4. The shape is
+   * drawn in CSS, so the fill has to be a token; in the prototype it was
+   * hardcoded inside rtile-*.svg. Consumed by components/ui/tile-shape.tsx.
+   * The business portfolio no longer uses it: v2 sets those rows straight on
+   * the section's own ground. */
+  --color-tile-surface: #e8e9eb;
 
   /* The masthead's own accent — the mid-stop of the CTA gradient, used for a
    * hovered or current nav link so the bar reads as one family. From the
@@ -100,20 +99,58 @@
   --color-header-hairline: rgb(20 24 32 / 0.08);
   --color-header-solid: rgb(255 255 255 / 0.96);
 
-  /* A business card's capacity figure, keyed to its own mark rather than all
-   * four sharing --color-brand-red. Sampled from the client's icons: the solar
-   * flower is orange-red, the cell is magenta, the module mark is teal, the
-   * agri-waste leaves are green. Darkened from the artwork where they had to
-   * be, so each still clears 4.5:1 on --color-tile-surface. */
-  --color-figure-solar: #d2401a;
-  --color-figure-cell: #a01e86;
-  --color-figure-module: #16707e;
-  --color-figure-agri: #4a7d16;
+  /* The same four businesses, lifted for the dark ledger the client's
+   * `SAEL Home v2` design sets them on. The four above are the light-ground
+   * pair and stay where they are — a colour that clears 4.5:1 on
+   * --color-tile-surface is not the same colour that clears it on
+   * --color-surface-black, and one token cannot be both. */
+  --color-figure-solar-bright: #e8865c;
+  --color-figure-cell-bright: #cf74c4;
+  --color-figure-module-bright: #3fbf99;
+  --color-figure-agri-bright: #8fc44a;
 
-  /* Business tile surface — docs/asset-inventory.md §4. The chamfered tile is
-   * drawn in CSS, so the shape's fill has to be a token; in the prototype it
-   * was hardcoded inside rtile-*.svg. */
-  --color-tile-surface: #e8e9eb;
+  /* ------------------------------------------------------------------
+   * The two grounds of `SAEL Home v2`.
+   *
+   * The design alternates a near-black and a warm paper, each carrying the
+   * same 13px dot grid. Both are a shade off the surfaces already in this
+   * file — --color-surface-dark is #0b0d10 and stays the *header's* ground —
+   * so they are their own tokens rather than a nudge to those.
+   * ---------------------------------------------------------------- */
+  --color-surface-black: #08090c;
+  --color-paper: #fbfbf9;
+  --color-paper-alt: #f4f4f2;
+
+  /* Hairlines. A rule on the black ground and a rule on paper are the same
+   * design element at two opacities, not two elements. */
+  --color-hairline-dark: rgb(255 255 255 / 0.16);
+  --color-hairline-grid: rgb(255 255 255 / 0.14);
+  --color-hairline-paper: rgb(20 24 32 / 0.18);
+  --color-hairline-paper-soft: rgb(20 24 32 / 0.2);
+
+  /* Body copy on the black ground, at the three weights the design uses:
+   * a card's running copy, a small-caps qualifier, and a section's own
+   * label. --color-body-on-dark is the full-strength value they step down
+   * from. */
+  --color-on-dark-soft: rgb(230 233 238 / 0.72);
+  --color-on-dark-faint: rgb(230 233 238 / 0.62);
+  --color-on-dark-muted: rgb(230 233 238 / 0.55);
+
+  /* The date over a news card. Paper's equivalent of --color-on-dark-muted. */
+  --color-meta-paper: #6b6b73;
+
+  /* The unfilled part of a hero progress segment. */
+  --color-hero-track: rgb(255 255 255 / 0.16);
+
+  /* The "upcoming" business card.
+   *
+   * Solar Cell Manufacturing is the one block in the ledger that is not yet
+   * operational, and the client asked for it to carry its own ground rather
+   * than the section's black — the frosted grey the masthead takes over a
+   * white page, moved onto a dark one. Same treatment, same vocabulary: a
+   * translucent white wash and a hairline, not a solid slab. */
+  --color-tile-upcoming: rgb(255 255 255 / 0.07);
+  --color-tile-upcoming-edge: rgb(255 255 255 / 0.13);
 
   /* UN Sustainable Development Goal palette. Prescribed — do not adjust these
    * for contrast. docs/design-guidelines.md §1. */
@@ -155,6 +192,23 @@
   --text-h2: clamp(1.5rem, 1.3269rem + 0.7692vw, 2.25rem);
   --text-h2--line-height: 1.15;
   --text-h2--font-weight: 700;
+
+  /* 30 → 64. The gradient heading `SAEL Home v2` sets on About SAEL, Solutions
+   * and the Power Portfolio — a display size, well above --text-h2 (24 → 36),
+   * which in v2 is left to headings that sit inside a card or a rail. Regular
+   * weight and tight: DIN at this size does not need the extra. */
+  --text-display: clamp(1.875rem, 1.4423rem + 1.9231vw, 4rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.028em;
+  --text-display--font-weight: 400;
+
+  /* 36 → 76. The two footprint figures beside the map, which in v2 are the
+   * section's subject rather than a caption on it. --text-stat (28 → 40) is
+   * still what a stat inside a card takes. */
+  --text-stat-large: clamp(2.25rem, 1.6923rem + 2.5641vw, 4.75rem);
+  --text-stat-large--line-height: 0.9;
+  --text-stat-large--letter-spacing: -0.04em;
+  --text-stat-large--font-weight: 700;
 
   /* 16 → 22 */
   --text-h3: clamp(1rem, 0.9135rem + 0.3846vw, 1.375rem);
@@ -205,8 +259,16 @@
   --text-nav--letter-spacing: 0.0125em;
   --text-nav--font-weight: 400;
 
-  /* 13 → 16, uppercase */
-  --text-eyebrow: clamp(0.8125rem, 0.7692rem + 0.1923vw, 1rem);
+  /* 15 → 18, uppercase.
+   *
+   * Raised ~15% from the 13 → 16 it was, at the client's request on
+   * 2026-08-20: every section on the homepage is labelled with this and the
+   * labels were reading as captions rather than as titles.
+   *
+   * Note this is the one place the client's instruction and the design file
+   * disagree — `SAEL Home v2` sets these at 10px. The instruction wins; see
+   * the note on --text-meta, which is the same argument. */
+  --text-eyebrow: clamp(0.9375rem, 0.8942rem + 0.1923vw, 1.125rem);
   --text-eyebrow--line-height: 1;
   --text-eyebrow--letter-spacing: 0.1563em;
   --text-eyebrow--font-weight: 700;
@@ -223,37 +285,6 @@
   --text-badge--letter-spacing: 0.0214em;
   --text-badge--font-weight: 700;
 
-  /* Business portfolio card. Four sizes the prototype's scale does not cover,
-   * because the prototype had no such card — the capacity figure lives on the
-   * tile only in the client's design. docs/asset-inventory.md §10.
-   *
-   * 19 → 25, uppercase. The business name. */
-  --text-tile-title: clamp(1.1875rem, 1.101rem + 0.3846vw, 1.5625rem);
-  --text-tile-title--line-height: 1.05;
-  --text-tile-title--letter-spacing: 0.005em;
-  --text-tile-title--font-weight: 700;
-
-  /* 20 → 26. The capacity figure, set alongside the title rather than under
-   * a divider as the stats band would have done. */
-  --text-tile-figure: clamp(1.25rem, 1.2115rem + 0.225vw, 1.4375rem);
-  --text-tile-figure--line-height: 1.1;
-  --text-tile-figure--font-weight: 700;
-
-  /* 11 → 12. The qualifier beneath the figure. */
-  --text-tile-note: clamp(0.6875rem, 0.6731rem + 0.0641vw, 0.75rem);
-  --text-tile-note--line-height: 1.35;
-  --text-tile-note--font-weight: 400;
-
-  /* 13 → 15, uppercase. The place name on a solutions card's plaque. Widely
-   * tracked, which is what stops a five-letter word looking lost on a badge
-   * that is 26px wider than it on both sides. The line under it is
-   * --text-tile-note, shared with the business cards — same role, same size in
-   * the design, so it is not worth a second token. */
-  --text-plaque-title: clamp(0.8125rem, 0.7837rem + 0.1282vw, 0.9375rem);
-  --text-plaque-title--line-height: 1.2;
-  --text-plaque-title--letter-spacing: 0.07em;
-  --text-plaque-title--font-weight: 700;
-
   /* 21 → 26, uppercase. "SAEL Pan India / Green Footprint", which the design
    * sets deliberately smaller than the "11 States" figure beneath it — using
    * --text-h2 here makes the two compete. */
@@ -262,9 +293,71 @@
   --text-footprint-title--letter-spacing: 0.02em;
   --text-footprint-title--font-weight: 700;
 
+  /* 11 → 12. A qualifier set under a figure. The business ledger has its own
+   * --text-meta now; this is still what the map's callouts take. */
+  --text-tile-note: clamp(0.6875rem, 0.6731rem + 0.0641vw, 0.75rem);
+  --text-tile-note--line-height: 1.35;
+  --text-tile-note--font-weight: 400;
+
   /* The asterisk marking an upcoming facility. */
   --text-tile-marker: clamp(0.75rem, 0.7212rem + 0.1282vw, 0.875rem);
   --text-tile-marker--font-weight: 700;
+
+  /* 11 → 12.5, uppercase, widely tracked. The small caps that label a thing
+   * rather than say anything: a business name over its capacity figure, the
+   * date on a news card, the descriptor under a plant's name.
+   *
+   * The design sets these at a flat 10px. They are set larger here — 10px of
+   * tracked uppercase is under the floor this project holds itself to, and
+   * the design was drawn at 1920 where it is proportionally larger than it
+   * reads on a laptop. /CLAUDE.md §5, accessibility floor. */
+  --text-meta: clamp(0.6875rem, 0.6587rem + 0.1282vw, 0.78125rem);
+  --text-meta--line-height: 1.5;
+  --text-meta--letter-spacing: 0.2em;
+  --text-meta--font-weight: 700;
+
+  /* 12 → 13, uppercase. "Know More", "Read More" — an action set inside a
+   * card, where --text-cta (15 → 17) out-weighs the headline above it. */
+  --text-action: clamp(0.75rem, 0.7212rem + 0.1282vw, 0.8125rem);
+  --text-action--line-height: 1;
+  --text-action--letter-spacing: 0.18em;
+  --text-action--font-weight: 700;
+
+  /* 36 → 72. The capacity figure on a ledger row, which in the dark design is
+   * the largest thing on the page after the hero headline — it is why the row
+   * exists. --text-tile-figure (20 → 26) was sized for a figure sat beside a
+   * title on a small card; this one owns its line. */
+  --text-ledger-figure: clamp(2.25rem, 1.7308rem + 2.3077vw, 4.5rem);
+  --text-ledger-figure--line-height: 0.9;
+  --text-ledger-figure--letter-spacing: -0.04em;
+  --text-ledger-figure--font-weight: 700;
+
+  /* 28 → 58 for the same slot, where the figure runs long enough that the
+   * size above would break the row. "3625 MW + 5 GW" is the case. */
+  --text-ledger-figure-long: clamp(1.75rem, 1.3462rem + 1.7949vw, 3.625rem);
+  --text-ledger-figure-long--line-height: 0.9;
+  --text-ledger-figure-long--letter-spacing: -0.04em;
+  --text-ledger-figure-long--font-weight: 700;
+
+  /* 22 → 34. The name on an "Our Goals" card. Regular weight and tight, where
+   * --text-goal-title was bold and tracked — the design resets it. */
+  --text-goal-name: clamp(1.375rem, 1.2019rem + 0.7692vw, 2.125rem);
+  --text-goal-name--line-height: 1.15;
+  --text-goal-name--letter-spacing: -0.02em;
+  --text-goal-name--font-weight: 400;
+
+  /* 16 → 20. The place name on a solutions card, set under the photograph
+   * rather than on a plaque over it. */
+  --text-plate-title: clamp(1rem, 0.9423rem + 0.2564vw, 1.25rem);
+  --text-plate-title--line-height: 1.25;
+  --text-plate-title--letter-spacing: -0.01em;
+  --text-plate-title--font-weight: 400;
+
+  /* 15 → 17. A news headline, and a ledger row's running copy. */
+  --text-card-title: clamp(0.9375rem, 0.9087rem + 0.1282vw, 1.0625rem);
+  --text-card-title--line-height: 1.42;
+  --text-card-title--letter-spacing: -0.01em;
+  --text-card-title--font-weight: 400;
 
   /* ---------------------------------------------------------------------
    * Spacing — docs/design-guidelines.md §3
@@ -318,10 +411,10 @@
   --spacing-dot-target: 1.5rem; /* 24 */
 
   /* The dotted India map, capped so the section still fits one screen: its
-   * 620 × 660 viewBox is 0.939 wide for every 1 tall, so the height left over
+   * 311.33 × 337.45 viewBox is 0.923 wide for every 1 tall, so the height left over
    * after the header and the section's own padding decides the width.
    * Consumed by sections/presence-map/. */
-  --spacing-map: min(38rem, calc((100dvh - var(--spacing-header) - 12rem) * 0.9394));
+  --spacing-map: min(38rem, calc((100dvh - var(--spacing-header) - 12rem) * 0.9226));
 
   /* The solid square at the centre of a map pin. The 44px touch target around
    * it is --spacing-touch. */
@@ -363,15 +456,85 @@
 
   /* A news card on the homepage rail. Narrow enough that six sit across a
    * wide screen, as the design has them. */
-  --spacing-news-card: clamp(14rem, 12.27rem + 7.69vw, 18.5rem); /* 224 → 296 */
+  --spacing-news-card: clamp(14.875rem, 13.5481rem + 5.8974vw, 20.625rem); /* 238 → 330 */
 
-  /* The line icon at the top of an "Our Goals" card. */
-  --spacing-goal-icon: clamp(2.5rem, 2.2115rem + 1.2821vw, 3.5rem); /* 40 → 56 */
+  /* ------------------------------------------------------------------
+   * `SAEL Home v2` measurements.
+   * ---------------------------------------------------------------- */
+
+  /* The hero's per-slide mark, stacked above the headline rather than set
+   * loose in the frame as a watermark. */
+  --spacing-hero-icon: clamp(4.625rem, 3.1538rem + 6.5385vw, 11rem); /* 74 → 176 */
+
+  /* The hero's block padding. The top clears the fixed masthead with room to
+   * spare; the bottom keeps the content column clear of the progress bar
+   * pinned to the section's base, which is --spacing-hero-progress tall. */
+  --spacing-hero-pad-top: clamp(4.5rem, 9vh, 6.75rem); /* 72 → 108 */
+  --spacing-hero-pad-bottom: clamp(3.75rem, 8vh, 6rem); /* 60 → 96 */
+
+  /* The short red rule between the mark and the headline. */
+  --spacing-hero-rule-w: 3.25rem; /* 52 */
+  --spacing-hero-rule-h: 0.125rem; /* 2 */
+
+  /* The hero's progress bar: the row's own height, which is also its touch
+   * target, and the 3px track drawn along its base. The row is pinned to the
+   * bottom of the section, so the hero's content column reserves this much
+   * clearance plus its own padding and the two never meet. */
+  --spacing-hero-progress: 2.75rem; /* 44 */
+  --spacing-hero-track: 0.1875rem; /* 3 */
+
+  /* A business ledger row: the mark set at the row's right edge, the padding
+   * that keeps the copy clear of it, and the gutter between the two columns. */
+  /* A business mark on a ledger row.
+   *
+   * Three quarters of the size `SAEL Home v2` draws it at, at the client's
+   * request on 2026-08-22 — the design's own `clamp(92px, 10vw, 176px)` reads
+   * too heavy beside the capacity figure at the sizes this site is reviewed
+   * at. The shape of the curve is the design's; only the scale is ours.
+   *
+   * The design's matching `padding-right` on the row is not here, and does not
+   * need to be: the mark is a real column beside the copy rather than an
+   * absolutely-positioned overlay, so it takes its own space and the copy
+   * wraps against it without any reserve being declared. */
+  --spacing-ledger-icon: clamp(4.3125rem, 7.5vw, 8.25rem); /* 69 → 132 */
+  --spacing-ledger-col-gap: clamp(1.5rem, 0.8077rem + 3.0769vw, 4.5rem); /* 24 → 72 */
+
+  /* A solutions card, which in v2 is one of four on a rail rather than a
+   * single card spanning the content width, which is what the removed
+   * --solution-card-w used to size. */
+  --spacing-solution-card: clamp(15.625rem, 12.8846rem + 12.1795vw, 27.5rem); /* 250 → 440 */
+
+  /* The wide rail gap, for cards that read as separate objects. The news rail
+   * takes this; the solutions rail takes a hairline instead, so its four
+   * photographs read as one strip. */
+  --spacing-rail-gap-wide: clamp(1rem, 0.7115rem + 1.2821vw, 2.25rem); /* 16 → 36 */
+  --spacing-rail-gap-hair: 1px;
+
+  /* A square outline rail arrow, set in the section's heading row rather than
+   * floated over the artwork. */
+  --spacing-rail-arrow-sq: 3.25rem; /* 52 */
+
+  /* The dot grid laid over both of the v2 grounds. */
+  --spacing-dot-grid: 0.8125rem; /* 13 */
+
+  /* The mark on an "Our Goals" card.
+   *
+   * It was 40 → 56px, went to 120 → 252 on 2026-08-22 when the client asked
+   * for it four to five times larger, and is halved again here on 2026-08-24
+   * against their revised artwork — which carries less of its own padding, so
+   * it reads bigger at the same box size.
+   *
+   * The card's min-height is a floor, not a fixed height, so a mark that
+   * outgrows a card simply makes it taller rather than overflowing. */
+  --spacing-goal-icon: clamp(3.75rem, 2.7981rem + 4.2308vw, 7.875rem); /* 60 → 126 */
 
   /* The business icon's rendered height, and the short gradient rules that
    * flank a centred section eyebrow. */
   --spacing-icon-mark: clamp(2.5rem, 2.3558rem + 0.641vw, 3rem); /* 40 → 48 */
   --spacing-rule-w: 2.75rem; /* 44 */
+  /* The accent rule that fills across the top of a ledger row or a news card
+   * on hover. Thinner than --spacing-rule-h, which is a static label rule. */
+  --spacing-rule-accent: 0.125rem; /* 2 */
   --spacing-rule-h: 0.1875rem; /* 3 */
 
   /* One screenful below the fixed header — the height of a snapping section
@@ -398,32 +561,36 @@
    * interchangeable — so this is only ever used by the pending placeholder. */
   --aspect-icon-mark: 1 / 1;
 
-  /* The dotted India map's own viewBox. Kept beside the geometry it describes
-   * in sections/presence-map/dots.ts. */
-  --aspect-map-india: 620 / 660;
+  /* The dotted India map's own viewBox — `src/assets/images/dotted-map.svg`,
+   * supplied by the client on 2026-08-21. Kept beside the site coordinates it
+   * describes, in sections/presence-map/dots.ts. */
+  --aspect-map-india: 311.33 / 337.45;
 
   /* The floor an "Our Goals" card cannot fall below. The tallest card's copy
-   * sets the real height and the grid matches the other two to it. */
-  --spacing-goal-card: 21rem; /* 336 */
+   * sets the real height and the grid matches the other two to it.
+   *
+   * Two values, because below `md` the three cards stack: at the wide floor
+   * they would be 1500px of section on a phone, and the section is meant to
+   * be a screenful. The design makes the same reduction at its own
+   * single-column breakpoint. */
+  --spacing-goal-card: clamp(20rem, 17.4038rem + 11.5385vw, 31.25rem); /* 320 → 500 */
+  --spacing-goal-card-sm: clamp(13.125rem, 30vh, 18.125rem); /* 210 → 290 */
 
   /* A news card's thumbnail. */
-  --aspect-news-thumb: 16 / 10;
+  /* 5:4 in `SAEL Home v2`, where the card is narrower and taller than the
+   * 16:10 the earlier design drew. */
+  --aspect-news-thumb: 5 / 4;
 
   /* "Our Endeavour". The client supplies this section's artwork as one
    * pre-composited PNG — chamfered panel, solar-grid gradient and the cut-out
    * already assembled — so this is simply that file's own ratio. */
   --aspect-endeavour: 511 / 488;
 
-  /* A solutions card. 19:10 is the design's, and it is also the native ratio
-   * of three of the four photographs, so they are not cropped at all above
-   * `md` on a tall enough screen. Below `md` the card is narrow and 19:10
-   * leaves a 180px band — too shallow to read as a photograph, and too shallow
-   * for the plaque to sit on without covering the subject. 3:2 there instead.
-   * docs/responsive-strategy.md §4.
-   *
-   * Nothing caps the height these produce — see the note below on why. */
-  --aspect-solution: 3 / 2;
-  --aspect-solution-wide: 19 / 10;
+  /* A solutions card's photograph. 4:3 in `SAEL Home v2`, one ratio at every
+   * size — the card is now one of four on a rail rather than a single card
+   * spanning the content width, so it never gets wide enough to need the
+   * 19:10 landscape crop the earlier design used. */
+  --aspect-plate: 4 / 3;
 
   /* The masthead's rounded shapes: a nav link's hover pill, the Contact Us
    * button, and the ticker docked under the bar. */
@@ -515,23 +682,6 @@
    * as cards. `SAEL Homepage v3.dc.html`. */
   --business-max-w: 72.5rem; /* 1160 */
 
-  /* A solutions card. From `md` up: 64% of the viewport, capped at 920px —
-   * both numbers are the prototype's `Math.min(920, w * 0.64)`, and the
-   * override lives in the md block at the end of this file.
-   *
-   * It was the content width — viewport less two gutters — which at 1920 is a
-   * 1600px card 840px tall, filling the screen. The design never had it that
-   * large: the card is meant to sit *within* the page with its neighbours
-   * clearly beside it, not to be the page.
-   *
-   * Below `md` those proportions invert: 64% of a 390px phone is a 250px card
-   * — a fifth of the screen, with more neighbour than subject. There the card
-   * takes the content width after all, its edges on the heading's own lines,
-   * and the neighbours peek from the gutters. The prototype has no answer
-   * here (it was authored at 1920); docs/responsive-strategy.md §2 does —
-   * fluid content width between the gutters. */
-  --solution-card-w: min(57.5rem, 100% - 2 * var(--spacing-gutter));
-
   /* The pixel strip's six ramp stops, left to right. Separate values rather
    * than one gradient because the scattered squares are painted to a canvas,
    * which takes a colour and not a CSS gradient.
@@ -557,15 +707,6 @@
    * a pairing that appears nowhere else in the system and is taken from the
    * client's design rather than derived from the brand ramp. */
   --gradient-date-chip: linear-gradient(90deg, #16357e, #2f8f3f);
-
-  /* Legibility scrim over an "Our Goals" photograph.
-   *
-   * The three backgrounds run from near-black (the panel close-up) to bright
-   * orange (the flame), and the card sets white text over all of them. Without
-   * this the orange card fails contrast badly — white on that orange is about
-   * 2:1. Flat rather than graduated, because the copy fills the card top to
-   * bottom and there is no single edge to protect. */
-  --gradient-goal-scrim: linear-gradient(180deg, rgb(8 10 14 / 0.42), rgb(8 10 14 / 0.58));
 
   /* The masthead's Contact Us button, and the underline under a current nav
    * link. The same three stops, so the bar reads as one object. */
@@ -594,12 +735,6 @@
 
   /* The Pan India Footprint heading, clipped to its letterforms. */
   --gradient-footprint: linear-gradient(90deg, #c3277a, #7b3fbf);
-
-  /* The plaque naming the plant on a solutions card. Magenta → violet, the
-   * same travel as --gradient-footprint but deeper at both ends: this one has
-   * white text on it and has to carry the contrast, where the footprint
-   * heading *is* the gradient. */
-  --gradient-solution-plaque: linear-gradient(90deg, #c3106a, #5d2183);
 
   /* The two short rules flanking a centred section eyebrow. Mirrored, so the
    * pair reads as one gradient running outward from the label. */
@@ -654,6 +789,28 @@
    * docs/responsive-strategy.md §2. */
   --measure: 68ch;
 
+  /* The hero headline's own measure. Far tighter than --measure: this is
+   * display type at 28 → 58px, and a line of it is spent long before running
+   * copy would be. The design's own value. */
+  --hero-measure: 15ch;
+
+  /* The Power Portfolio's right-hand column, and the short rule inside it.
+   *
+   * The column is capped rather than left to fill its share of the grid: the
+   * map is capped too, so without this the two drift apart as the viewport
+   * widens and the section reads as two objects with a hole between them. The
+   * rule is capped harder still — a divider that runs the full column reads
+   * as a border on the section rather than as a break between two blocks.
+   * Both are the client's calls on 2026-08-22. */
+  --map-copy-w: 40rem; /* 640 */
+  --map-rule-w: 9rem; /* 144 */
+
+  /* A ledger row's running copy. Narrower than --measure by a long way, and
+   * the design's own value: the mark beside it is a real column now, so the
+   * copy cannot run under it, but 68ch would still set a line far wider than
+   * the design does. */
+  --ledger-measure: 46ch;
+
   /* The horizontal card rail's `--rail-per-view` and the width derived from it
    * are deliberately *not* here — see the `rail-card` utility in globals.css
    * for why a token cannot express that one. */
@@ -683,83 +840,109 @@
   --hero-parallax-symbol: 24px;
   --hero-parallax-text: -14px;
 
-  /* Dots. The active one widens and fills over the slide interval. */
-  --hero-dot-size: 0.375rem; /* 6 */
-  --hero-dot-active-width: 2.125rem; /* 34 */
-  --hero-dot-gap: 0.375rem; /* 6 */
-
-  /* The prototype insets the dot row 34px from the bottom edge. Each dot is
-   * now wrapped in a 44px touch target (docs/responsive-strategy.md §5), which
-   * adds (44 - 6) / 2 = 19px of padding below the visual dot. Insetting the
-   * row by 34 - 19 = 15px puts the dot itself back where the prototype had it.
-   * Change this only alongside --hero-dot-size or --spacing-touch. */
-  --hero-dots-inset: 0.9375rem; /* 15 */
-
-  /* Below lg the symbol is a decorative watermark rather than a positioned
-   * element: top-right, 42% of the hero width, barely there. */
-  --hero-symbol-mobile-width: 30%;
-  --hero-symbol-mobile-inset: 4%;
-  --hero-symbol-mobile-opacity: 0.8;
-
-  /* Clearance between the bottom-anchored mobile headline and the dot row.
-   * The row's own top edge sits at --hero-dots-inset + --spacing-touch = 59px
-   * off the bottom, so anything below ~4rem would run underneath it. */
-  --hero-text-mobile-inset: 4.5rem; /* 72 */
-
   /* The hero headline sits on photography, so it carries its own shadow
    * rather than relying on the scrim alone. */
   --shadow-hero-text: 0 2px 26px rgb(0 0 0 / 0.5);
 
-  /* -------------------------------------------------------------------------
-   * About SAEL image composite — consumed only by sections/intro-split/.
+  /* The About SAEL composite's own ratio — the supplied file's, 605 x 412.
    *
-   * Three layers: a gradient shape, a photograph clipped to it, and a cut-out
-   * figure overlapping the whole thing. The numbers are measured from
-   * `SAEL - New Website.pdf`, not eyeballed — the placements were read out of
-   * the PDF's content stream and expressed as percentages of the composite's
-   * own box, so the arrangement holds at any size.
-   *
-   * Three layers: a gradient shape, a photograph clipped to it and tinted by
-   * it, and a cut-out figure overlapping from the left.
-   *
-   * The visible shape occupies 92.8% × 85.1% of the composite and the figure
-   * 33.8% × 100%. Those two facts each imply an aspect ratio for the composite
-   * independently — 1.4384 from the shape's own 1.5686, and 1.4408 from the
-   * figure's native 0.487 — and they agree to 0.2%, which is what says the
-   * measurements are right rather than roughly right.
-   *
-   * `--about-shape-*` is the box the **SVG file** is drawn into, not the box
-   * the shape appears to occupy. 14.svg carries ~5% padding inside its
-   * viewBox, so the file is placed slightly larger than, and offset from, the
-   * silhouette it paints. The mask uses the same box, so the two cannot drift.
-   * ---------------------------------------------------------------------- */
-  /* The stage. Above `lg` the whole section is one fixed-proportion box with
-   * all four elements positioned inside it as percentages, exactly as the
-   * design specifies — not a grid that approximates it. The cap keeps the
-   * stage inside one screenful so it still works as a snapping section:
-   * 1380px wide, or whatever the available height allows at 2.4242:1,
-   * whichever is smaller. */
-  --about-stage-aspect: 1280 / 528;
-  --about-stage-max-w: min(86.25rem, calc((100dvh - var(--spacing-header) - 4.25rem) * 2.4242));
-
-  /* The image composite, placed in the stage. */
-  --about-media-x: 4.7%;
-  --about-media-y: 1.4%;
-  --about-media-w: 57.65%;
-
-  /* The composite's own ratio — the supplied file's, 605 x 412. The three
-   * layers that used to be positioned inside it (shape, clipped photograph,
-   * cut-out) are gone: the client supplies the artwork assembled. */
+   * All that is left of what was a whole stage: `--about-stage-*`,
+   * `--about-media-*`, `--about-heading-*` and `--about-body-*` placed four
+   * elements inside a fixed 1280:528 box as percentages, which is how
+   * `SAEL - New Website.pdf` draws the section. `SAEL Home v2` draws it as a
+   * plain twelve-column grid instead, so the coordinates have nothing left to
+   * position and are gone. */
   --about-aspect: 605 / 412;
 
-  /* Heading and body, also placed in the stage. The body sits below and to the
-   * right of the heading rather than beside it. */
-  --about-heading-x: 42.2%;
-  --about-heading-y: 9.5%;
-  --about-heading-w: 42.5%;
-  --about-body-x: 63.7%;
-  --about-body-y: 36.6%;
-  --about-body-w: 33.4%;
+  /* How wide the composite is allowed to get, expressed as the width at which
+   * it would be as tall as the design lets it be: `min(58vh, 520px)`, times
+   * its own 605:412. Capping the width rather than the height keeps the box
+   * on its ratio — a max-height on an aspect-ratio box whose width is already
+   * definite just squashes it and lets `object-contain` letterbox the result.
+   *
+   * The height cap is what keeps the section inside one screenful on a short
+   * laptop display, which is what it has to do to snap. */
+  --about-media-max-w: min(100%, calc(min(58vh, 32.5rem) * 605 / 412));
+
+  /* -------------------------------------------------------------------------
+   * `SAEL Home v2` — the grounds, the labels and the hero's progress bar.
+   * ---------------------------------------------------------------------- */
+
+  /* The dot grid over each ground. One dot per --spacing-dot-grid cell; the
+   * size is applied alongside in components/ui/section.tsx. */
+  --gradient-dot-dark: radial-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  --gradient-dot-paper: radial-gradient(rgb(20 24 32 / 0.07) 1px, transparent 1px);
+
+  /* The Power Portfolio heading, clipped to its letterforms. Brighter than
+   * --gradient-eyebrow-bright at both ends: this is display type on the black
+   * ground and it carries the section. */
+  --gradient-heading-bright: linear-gradient(90deg, #7d6fd4 0%, #cf3f7f 52%, #ff4a4f 100%);
+
+  /* Section labels, clipped to their letterforms. `bright` is the on-dark
+   * ramp; `deep` is the same travel darkened to carry on paper. Both are the
+   * design's, and both are consumed through <Eyebrow tone>. */
+  --gradient-eyebrow-bright: linear-gradient(90deg, #8f83e0 0%, #d95a95 52%, #ff6a6e 100%);
+  --gradient-eyebrow-deep: linear-gradient(90deg, #2b215f 0%, #8a1f43 55%, #c91d2f 100%);
+
+  /* The hero's four progress segments, and the four headline highlights.
+   *
+   * The segments walk the pixel-strip ramp end to end, one hop per slide, so
+   * the bar reads as a single gradient split into four rather than as four
+   * unrelated fills. The highlights are the design's own per-slide pairs and
+   * are not on that ramp — they sit on photography and have to stay light. */
+  /* The hero's progress bar. One ramp across the whole bar, walking the
+   * pixel-strip colours end to end — the bar fills once over the full cycle
+   * rather than four times over four slides, at the client's request on
+   * 2026-08-21, so it is one gradient and not four. */
+  --gradient-hero-fill: linear-gradient(
+    90deg,
+    #f5c000 0%,
+    #e8262a 33%,
+    #b81f6a 55%,
+    #7b2382 78%,
+    #4632a0 100%
+  );
+
+  --gradient-hero-word-1: linear-gradient(92deg, #ffd23d 0%, #ff7a3d 55%, #ff5470 100%);
+  --gradient-hero-word-2: linear-gradient(92deg, #8ce6a6 0%, #3fd2c4 55%, #4fa9e2 100%);
+  --gradient-hero-word-3: linear-gradient(92deg, #ff7ac0 0%, #d07ae8 100%);
+  --gradient-hero-word-4: linear-gradient(92deg, #ecf25c 0%, #7ad657 100%);
+
+  /* The v2 hero scrim. The headline sits in the right-hand half at every size
+   * above lg, so unlike --gradient-hero-scrim this one does not take an angle
+   * from the slide — there is one composition now, not four. */
+  --gradient-hero-scrim-side: linear-gradient(
+    90deg,
+    rgb(6 7 10 / 0) 0%,
+    rgb(6 7 10 / 0.06) 32%,
+    rgb(6 7 10 / 0.5) 52%,
+    rgb(6 7 10 / 0.78) 72%,
+    rgb(6 7 10 / 0.88) 100%
+  );
+  --gradient-hero-scrim-stacked: linear-gradient(
+    0deg,
+    rgb(6 7 10 / 0.92) 0%,
+    rgb(6 7 10 / 0.6) 42%,
+    rgb(6 7 10 / 0.3) 100%
+  );
+  /* Sat under the progress bar on every slide, so the track never lands on a
+   * bright patch of photograph. */
+  --gradient-hero-foot: linear-gradient(0deg, rgb(6 7 10 / 0.55) 0%, transparent 30%);
+
+  /* "Our Goals". The scrim is no longer always on — at rest the photograph is
+   * shown as it is, and this arrives with the pointer. See the note in
+   * sections/goals-grid. */
+  --gradient-goal-reveal: linear-gradient(
+    180deg,
+    rgb(8 9 12 / 0.28) 0%,
+    rgb(8 9 12 / 0.62) 46%,
+    rgb(8 9 12 / 0.9) 100%
+  );
+
+  /* A goal's name and mark sit on an untreated photograph at rest, so they
+   * carry their own separation rather than leaning on a scrim that is not
+   * there. Same argument as --shadow-hero-text. */
+  --shadow-goal-title: 0 2px 18px rgb(0 0 0 / 0.55);
 
   /* Motion — docs/design-guidelines.md §5 */
   --duration-micro: 180ms; /* micro-interactions: hover, focus */
@@ -786,17 +969,6 @@
  * classic way an anchor link ends up under a fixed header is these three
  * drifting apart. docs/features/03-app-shell-header-footer.md §2.
  */
-/*
- * The solutions card steps back from the content width to the prototype's
- * 64%-of-viewport once there is room for neighbours to mean something. See
- * the token's own comment for the mobile side of the story.
- */
-@media (min-width: 48rem) {
-  :root {
-    --solution-card-w: min(57.5rem, 64%);
-  }
-}
-
 @media (min-width: 64rem) {
   :root {
     --spacing-header: 5.25rem; /* 84 */

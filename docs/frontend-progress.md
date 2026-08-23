@@ -33,19 +33,55 @@ Built section by section, in the order the client's design lays them out. **Buil
 `SAEL - New Website.pdf`, not to the Designer prototype** — that reversal and what it
 changes per section is recorded in `asset-inventory.md` §10.
 
+**Revised on 2026-08-20 against `SAEL Home v2.dc.html`**, the client's Claude Design
+project (`980d47d4-c8e2-40f1-a514-465c538039fb`, read through the design MCP). That
+file is now the reference for the sections marked below; the PDF still governs the
+ones it does not cover. Where the client's instruction and v2 disagree, the
+instruction wins and the disagreement is recorded beside the token or component.
+
 | # | Section | Component | State |
 |---|---|---|---|
-| 1 | Hero carousel | `sections/hero-carousel/` | Built. Autoplay no longer pauses on hover, by the client's decision on 2026-08-05; it still pauses on keyboard focus |
-| 2 | About SAEL | `sections/intro-split/` | Built. First section to take the scroll reveal |
-| 3 | Business portfolio | `sections/business-tiles/` | Built — also carries the capacity figures, so `features/04` §2's stats band is not a separate section. Figures count up from zero |
-| 4 | Pan India green footprint | `sections/presence-map/` | Built — the dotted vector map. **The right-hand column is commented out pending a layout review**, which is why `title`/`primaryStat`/`secondaryStat` are on the interface but not destructured. Silhouette still wants a pass against the PDF |
-| 5 | Solutions | `sections/solutions-carousel/` | Built — a four-plant carousel, not `features/04` §6's single banner |
-| 6 | Our Endeavour | `sections/endeavour-split/` | Built. The mirror of §2 |
-| 7 | Our Goals | `sections/goals-grid/` | Built — photographic cards, not `features/04` §10's grey boxes. Icons are `lucide-react` stand-ins |
-| 8 | In the News | `sections/news-carousel/` | Built. The one homepage surface fed by the repository |
-| 9 | Pixel strip | `sections/pixel-strip/` | Built — drawn to a canvas, not `features/04` §12's PNG |
+| 1 | Hero carousel | `sections/hero-carousel/` | **Rebuilt to v2.** One composition, not four: mark → red rule → headline in a single column, right half above `lg` and bottom-anchored below it. The six per-slide placement coordinates are gone. The progress bar pinned to the section's base runs **one full sweep per slide** — four segments, then a quarter-run per slide, then this (2026-08-22). Headline set at `--text-hero`, not v2's larger size — the client's call. Slide 2's crop is shifted right above `lg` so its subject clears the headline. Autoplay still does not pause on hover, only on keyboard focus |
+| 2 | About SAEL | `sections/intro-split/` | **Rebuilt to v2** on 2026-08-21, after being held back a day. The PDF's fixed 1280:528 stage and its whole `--about-*` coordinate set are gone; it is a twelve-column grid with a display heading, a rule and running copy beside the composite. Copy on columns 2–6 and artwork on 7–11, drawn in off the gutters rather than v2's 1–6 / 8–12 — the client's call |
+| 3 | Business portfolio | `sections/business-tiles/` | **Rebuilt to v2.** A ledger of four rows on the black dotted ground, not four centred tiles on a light one. Capacity figure is now the largest thing on the row. Solar Cell Manufacturing carries its own frosted-grey ground as the one upcoming business. Marks are at three quarters of v2's own `clamp(92px, 10vw, 176px)` — the design's curve, our scale (2026-08-22). The agri mark's per-row nudge was withdrawn the same day; `iconScale` survives unused for when it returns. The copy is capped at v2's 46ch so it wraps before it reaches the mark, and the gutter beside the mark was deliberately **not** reduced with the mark. Each mark is drawn on **its own aspect ratio**, not forced square: the four run 0.918 to 1.040, so a square box letterboxed each differently and left the agri-waste leaves visibly smallest. **And the mark is in flow**, a real column beside the copy, rather than absolutely positioned over the row with a right padding reserving space for it — an out-of-flow box whose only child is also out of flow has no content to size against, so its height came from `aspect-ratio` alone and kept resolving short, which is what was trimming the artwork. `--spacing-ledger-gutter` went with it; a `gap-x-flow` does that job now. Both 2026-08-24 |
+| 4 | Our Current Power Portfolio | `sections/presence-map/` | **Rebuilt to v2** on 2026-08-21, and the layout review it was waiting on is closed: map left, display heading with the footprint label and the two figures right, nothing positioned over the artwork any more. A centred flex row rather than v2's 1–6 / 8–12 grid: on a grid both halves are capped and the slack lands between them, which is what kept reading as a hole. The two figures sit a `--spacing-stack` apart and the rule over the footprint label is capped at `--map-rule-w` — all the client's calls, 2026-08-21 and -22. **The 751-subpath generated map is gone**, replaced by the client's supplied `dotted-map.svg`; the six site coordinates are mapped across from the old viewBox and **want a visual check** — see the note in `presence-map/dots.ts` |
+| 5 | Solutions | `sections/solutions-carousel/` | **Rebuilt to v2** — four 4:3 plates a hairline apart, each captioned underneath; the gradient plaque is gone. Kept **before** Our Endeavour, where v2 puts it after, and set on the light ground where v2 sets it on black. Both the client's calls on 2026-08-20 |
+| 6 | Our Endeavour | `sections/endeavour-split/` | Unchanged. Left as-is at the client's request on 2026-08-20 |
+| 7 | Our Goals | `sections/goals-grid/` | **Rebuilt to v2** — three cards a hairline apart inside a hairline frame, on black. **The resting state shows the photograph untreated**: the scrim arrives with the pointer, along with the description. The three marks are the client's own artwork as of 2026-08-21, inverted to white at the call site; the `lucide-react` stand-ins are gone. Sized 40 → 56px, then ~4.5x that on 2026-08-22, then halved again to 60 → 126px on 2026-08-24 against the client's revised artwork — the mark is the card's subject, not an icon over a title. **Two sets of marks are in `src/assets/images/`**: `*-goal.svg`, which is what is wired up, and a later `*-icon.svg` set. Confirm which is current before this ships |
+| 8 | In the News | `sections/news-carousel/` | **Rebuilt to v2.** The card lost its box — a hairline it hangs from, the date above a 5:4 thumbnail, the accent filling across the rule on hover. Still the one homepage surface fed by the repository |
+| 9 | Pixel strip | `sections/pixel-strip/` | Unchanged — drawn to a canvas |
+| — | Timeline (v2 §08) | — | **Not built.** Deferred by the client on 2026-08-20; to be revisited |
 | — | SDG marquee (`features/04` §9) | — | **Skipped**, confirmed by the client on 2026-08-05: not to be built for now |
 | — | Our Strength (§7), vision timeline (§8) | — | Not started. Neither appears in the client's PDF — ask before building either |
+
+Landed alongside the v2 revision:
+
+- **`--text-display` (30 → 64px)**, v2's gradient section heading, now used by About
+  SAEL, Solutions and the Power Portfolio. `--text-h2` (24 → 36) is left to headings
+  inside a card or a rail. `--text-stat-large` (36 → 76) is the footprint figures.
+- **The footer takes v2's ground** — `--color-footer-bg` is `#22262e`, a cool slate
+  in place of the green-grey it was, with `--color-footer-icon` a shade deeper again
+  because it is painted on a white pill rather than on the ground.
+- **New client assets, 2026-08-21**: `dotted-map.svg` and the three goal marks, all in
+  `src/assets/images/`. The goal marks are drawn in near-black and inverted to white
+  with `brightness-0 invert` — they cannot be inlined as components, because all three
+  declare the same `clippath` id.
+
+- **`--text-eyebrow` up ~15%** (13 → 16px becomes 15 → 18px), at the client's request:
+  every section label on the site moves with it. Note this is the one place the
+  instruction and v2 disagree — v2 sets those labels at 10px.
+- **`<CardRail>` is gone**, replaced by `ui/rail/` — a `<Rail>` provider with a
+  `<RailTrack>` and a `<RailArrows>` that the section places itself. v2 sets the
+  arrows in the heading row rather than over the artwork, and one component cannot
+  render its own part into a sibling's layout.
+- New primitives: `ui/arrow-glyph.tsx`, and a `micro` size on `<Button>`. `<Eyebrow>`
+  gained the `bright` and `deep` tones; `<FlankedEyebrow>` gained `rules="leading"`;
+  `<Section>` gained the `black`, `black-dots`, `paper` and `paper-dots` grounds.
+- Tokens with no consumer left after the revision were removed (the hero dot sizes,
+  the light-ground figure colours, the solutions plaque gradient, the always-on goals
+  scrim, the tile type scale, the About stage's coordinates, the map's dot ramp).
+  `lib/utils/cn.ts`'s `FONT_SIZES` list was updated to match — a `--text-*` token
+  missing from it is silently discarded by `cn()`.
 
 Also landed inside this item, as `features/05` intends: the content repository slice
 (`src/lib/content/`) with its mock and API adapters behind `getContentRepository()`,
@@ -69,9 +105,8 @@ Two deferred tasks to raise at the end of the project:
 - The photography is committed unoptimised (~86 MB across `src/assets/images/`), by
   the client's decision on 2026-08-04 to proceed and revisit. The Our Goals
   backgrounds are the worst of it — 23 MB serving cards that render ~350px wide.
-- The Our Goals icons are `lucide-react` stand-ins. The design draws three bespoke
-  white line marks and none was in the handover; swapping them in is one line per
-  goal. Raised in `asset-inventory.md` §9.
+- ~~The Our Goals icons are `lucide-react` stand-ins.~~ Closed 2026-08-21: the client
+  supplied the three marks.
 
 ---
 

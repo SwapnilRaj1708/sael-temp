@@ -19,7 +19,12 @@ import { cn } from '@/lib/utils/cn';
 const button = cva(
   [
     'inline-flex items-center justify-center gap-2 text-center',
-    'text-cta uppercase',
+    // No font size here, deliberately: `size` owns it. Two `text-*` utilities
+    // on one element are only resolved by tailwind-merge if it recognises both
+    // as font sizes, and it does not recognise this project's custom scale —
+    // it would read `text-action` as a colour and leave `text-cta` standing.
+    // One source of the size, and the conflict cannot happen.
+    'uppercase',
     'cursor-pointer transition duration-(--duration-micro)',
     // The visual can be shorter than the touch target; the hit area cannot.
     // docs/responsive-strategy.md §5.
@@ -61,13 +66,23 @@ const button = cva(
           'rounded-none border border-white/40 text-white hover:bg-white/10 focus-visible:outline-white',
       },
       size: {
-        sm: 'px-4 py-2 lg:px-5 lg:py-2.5',
+        sm: 'text-cta px-4 py-2 lg:px-5 lg:py-2.5',
         /** No horizontal padding, so the label lines up with the copy above
          *  it. For a text link inside a card that is already padded. */
-        flush: 'px-0 py-2',
+        flush: 'text-cta px-0 py-2',
+        /**
+         * `flush`, one step down the scale.
+         *
+         * `SAEL Home v2` sets a card's "Know More" and "Read More" well below
+         * its other actions — they sit at the foot of a card whose headline is
+         * the subject, and --text-cta (15 → 17) out-weighs that headline. The
+         * hit area is unchanged: `min-h-touch` is on the base and the label
+         * simply sits smaller inside it.
+         */
+        micro: 'text-action px-0 py-2',
         /* 10px/24px → 12px/32px. The prototype's 33px is rounded to the
          * spacing scale; a 1px difference is not worth an arbitrary value. */
-        md: 'px-6 py-2.5 lg:px-8 lg:py-3',
+        md: 'text-cta px-6 py-2.5 lg:px-8 lg:py-3',
       },
       fullWidth: {
         true: 'w-full',

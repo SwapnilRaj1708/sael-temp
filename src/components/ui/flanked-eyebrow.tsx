@@ -1,28 +1,62 @@
-import { Eyebrow } from '@/components/ui/eyebrow';
+import { Eyebrow, type EyebrowTone } from '@/components/ui/eyebrow';
 import { cn } from '@/lib/utils/cn';
+
+/**
+ * The rule beside the label takes the label's own ramp, so the two read as one
+ * object. The two `gradient-rule-*` tokens are mirrored halves of a single
+ * travel and only make sense in the `both` arrangement; the v2 tones are
+ * directional already and are used as-is on the leading side.
+ */
+const RULE_CLASS: Record<EyebrowTone, { start: string; end: string }> = {
+  gradient: { start: 'bg-(image:--gradient-rule-left)', end: 'bg-(image:--gradient-rule-right)' },
+  accent: { start: 'bg-(image:--gradient-rule-left)', end: 'bg-(image:--gradient-rule-right)' },
+  bright: {
+    start: 'bg-(image:--gradient-eyebrow-bright)',
+    end: 'bg-(image:--gradient-eyebrow-bright)',
+  },
+  deep: { start: 'bg-(image:--gradient-eyebrow-deep)', end: 'bg-(image:--gradient-eyebrow-deep)' },
+};
 
 export interface FlankedEyebrowProps {
   children: string;
+  /**
+   * `both` is the centred label with a rule either side. `leading` is `SAEL
+   * Home v2`'s: one short rule, then the label, set against the left gutter
+   * like everything else in that design.
+   */
+  rules?: 'both' | 'leading';
+  /** Passed straight to {@link Eyebrow}. Pick for the ground underneath. */
+  tone?: EyebrowTone;
   className?: string;
 }
 
 /**
- * A centred section label with a short gradient rule either side.
+ * A section label with a short gradient rule beside it.
  *
- * The client's design uses this as the heading for every centred section —
- * Business Portfolio first, then Our Goals and In the News. It was written
- * inline in the first of those; it is a primitive now because three sections
- * having their own copy of it is exactly how the three quietly drift apart.
+ * Every labelled section on the homepage uses this — Business Portfolio,
+ * Solutions, Our Goals, In the News. It was written inline in the first of
+ * them; it is a primitive because four sections having their own copy of it is
+ * exactly how the four quietly drift apart.
  *
- * The rules are decorative and mirrored, so the pair reads as one gradient
- * running outward from the label rather than as two lines.
+ * In the `both` arrangement the rules are mirrored, so the pair reads as one
+ * gradient running outward from the label rather than as two lines. In
+ * `leading` there is only the left one and no mirroring to do.
  */
-export function FlankedEyebrow({ children, className }: FlankedEyebrowProps) {
+export function FlankedEyebrow({
+  children,
+  rules = 'both',
+  tone = 'accent',
+  className,
+}: FlankedEyebrowProps) {
+  const rule = RULE_CLASS[tone];
+
   return (
     <div className={cn('flex items-center gap-4', className)}>
-      <span aria-hidden="true" className="h-rule-h w-rule-w bg-(image:--gradient-rule-left)" />
-      <Eyebrow tone="accent">{children}</Eyebrow>
-      <span aria-hidden="true" className="h-rule-h w-rule-w bg-(image:--gradient-rule-right)" />
+      <span aria-hidden="true" className={cn('h-rule-h w-rule-w shrink-0', rule.start)} />
+      <Eyebrow tone={tone}>{children}</Eyebrow>
+      {rules === 'both' && (
+        <span aria-hidden="true" className={cn('h-rule-h w-rule-w shrink-0', rule.end)} />
+      )}
     </div>
   );
 }

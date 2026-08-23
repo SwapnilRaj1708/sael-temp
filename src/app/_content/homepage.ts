@@ -23,12 +23,15 @@ import goalEthos from '@/assets/images/goals/India-orange.jpg';
 import goalMission from '@/assets/images/goals/green.jpg';
 import goalVision from '@/assets/images/goals/panel-closeup.jpg';
 import endeavourGirl from '@/assets/images/endeavour/girl.png';
+import dottedMap from '@/assets/images/dotted-map.svg';
+import markEthos from '@/assets/images/ethos-icon.svg';
+import markMission from '@/assets/images/mission-icon.svg';
+import markVision from '@/assets/images/vision-icon.svg';
 import type { EndeavourSplitProps } from '@/components/sections/endeavour-split';
 import type { GoalsGridProps } from '@/components/sections/goals-grid';
 import type { HeroSlide } from '@/components/sections/hero-carousel';
 import type { IntroSplitProps } from '@/components/sections/intro-split';
 import type { SolutionsCarouselProps } from '@/components/sections/solutions-carousel';
-import { Crosshair, Eye, Sprout } from 'lucide-react';
 import { TODO_CONTENT } from '@/lib/config/site';
 
 /**
@@ -46,22 +49,26 @@ import { TODO_CONTENT } from '@/lib/config/site';
  */
 
 /**
- * Transcribed from the prototype's `defaultHeroSlides()`, with two changes and
- * no third:
+ * The hero's four slides, rebuilt to `SAEL Home v2`.
  *
- *  - `18.5vw` / `31vw` / `30vw` are written as percentages of the hero. The
- *    hero is full-bleed, so its box is the viewport width and the rendering is
- *    identical — but a bare `vw` is banned outside the token layer, and for
- *    good reason. docs/responsive-strategy.md §1.
- *  - The prototype's `objectPos: "center"` is dropped. It is `object-cover`'s
- *    default, and the mobile crop is art-directed rather than repositioned.
+ * The six placement coordinates each slide used to carry are gone with the
+ * design that needed them: v2 has one composition and the content column sits
+ * in the same place on every slide. What is per-slide now is the photograph,
+ * the mark, the headline, the run of words inside it that takes a gradient,
+ * and the ramp its progress segment fills with.
+ *
+ * The four highlights are the design's own. Each is an exact substring of the
+ * headline above it — `<HeroHeadline>` matches on words, and a highlight that
+ * does not match renders flat rather than breaking the headline.
+ *
+ * The progress bar no longer takes a ramp per slide: it fills once across the
+ * whole cycle from one gradient. See `<HeroProgress>`.
  *
  * Still outstanding, and each renders through `<MediaFrame>`'s pending state
  * until it lands (docs/asset-inventory.md §9):
  *
  *  - the four art-directed **portrait crops** for below `lg`. Until they
- *    arrive the landscape master stands in — see the note in hero-slide.tsx.
- *  - the four watermark **symbols**
+ *    arrive the landscape master stands in — see the note in hero-backdrop.tsx.
  *  - `alt` text for every photograph
  */
 export const heroSlides: HeroSlide[] = [
@@ -75,56 +82,41 @@ export const heroSlides: HeroSlide[] = [
     },
     symbol: { image: saelIcon1, pending: 'icons/symbol-cell-manufacturing' },
     headline: 'A leading manufacturer for Bifacial TOPCon solar modules',
-    desktop: {
-      textX: '64%',
-      textY: '43%',
-      textWidth: '31%',
-      symbolX: '12%',
-      symbolY: '70%',
-      symbolSize: '18.5%',
-    },
+    highlight: 'Bifacial TOPCon solar modules',
+    highlightClassName: 'bg-(image:--gradient-hero-word-1)',
   },
   {
     id: 'energy-generation',
-    image: { desktop: heroImage2, mobile: heroImageMobile2, alt: TODO_CONTENT },
+    image: {
+      desktop: heroImage2,
+      mobile: heroImageMobile2,
+      alt: TODO_CONTENT,
+      // The one slide whose subject stands in the middle of the frame, which
+      // above `lg` is directly under the headline. Aligning the crop's right
+      // edge with the frame moves them clear to the left. The design file
+      // marks this same photograph, and only this one, the same way.
+      objectClassName: 'lg:object-right',
+    },
     symbol: { image: saelIcon2, pending: 'icons/symbol-module-manufacturing' },
     headline: 'Generating clean energy by investing in advanced technology and systems',
-    desktop: {
-      textX: '8%',
-      textY: '48%',
-      textWidth: '31%',
-      symbolX: '88%',
-      symbolY: '70%',
-      symbolSize: '18.5%',
-    },
+    highlight: 'clean energy',
+    highlightClassName: 'bg-(image:--gradient-hero-word-2)',
   },
   {
     id: 'clean-energy-vision',
     image: { desktop: heroImage3, mobile: heroImageMobile3, alt: TODO_CONTENT },
     symbol: { image: saelIcon3, pending: 'icons/symbol-solar-generation' },
     headline: 'A vision to building the capacity for India’s clean energy needs',
-    desktop: {
-      textX: '58%',
-      textY: '46%',
-      textWidth: '31%',
-      symbolX: '11%',
-      symbolY: '70%',
-      symbolSize: '18.5%',
-    },
+    highlight: 'clean energy',
+    highlightClassName: 'bg-(image:--gradient-hero-word-3)',
   },
   {
     id: 'agri-waste',
     image: { desktop: heroImage4, mobile: heroImageMobile4, alt: TODO_CONTENT },
     symbol: { image: saelIcon4, pending: 'icons/symbol-agri-waste' },
     headline: 'Converting ~2 million tonnes of paddy waste into clean energy',
-    desktop: {
-      textX: '58%',
-      textY: '49%',
-      textWidth: '30%',
-      symbolX: '43%',
-      symbolY: '60%',
-      symbolSize: '18.5%',
-    },
+    highlight: 'clean energy',
+    highlightClassName: 'bg-(image:--gradient-hero-word-4)',
   },
 ];
 
@@ -165,6 +157,10 @@ export const aboutSael: Omit<IntroSplitProps, 'snap'> = {
  * `getCapacityStats()`; the page joins the two on `id`.
  * docs/content-model.md §1.
  *
+ * `upcoming` is the one per-row adjustment in force — see the note beside it.
+ * `iconScale` is the other one the component supports and nothing sets it; the
+ * agri-waste nudge it was added for was withdrawn on 2026-08-22.
+ *
  * The descriptions are the Designer prototype's, verbatim, as
  * docs/features/04 §4 requires. The client's PDF sets Lorem ipsum in these
  * four slots, so it is not a source for them — and inventing marketing copy
@@ -182,7 +178,8 @@ export const businessTiles = [
       'affordable energy across India and advancing the nation’s renewable transition.',
     href: '/solar-energy/',
     ctaLabel: 'Know more about solar energy generation',
-    figureClassName: 'text-figure-solar',
+    figureClassName: 'text-figure-solar-bright',
+    ruleClassName: 'bg-figure-solar-bright',
   },
   {
     id: 'cell-manufacturing',
@@ -196,7 +193,11 @@ export const businessTiles = [
       'TOPCon technology, delivering superior output and reliability.',
     href: '/solar-cell-manufacturing/',
     ctaLabel: 'Know more about solar cell manufacturing',
-    figureClassName: 'text-figure-cell',
+    figureClassName: 'text-figure-cell-bright',
+    ruleClassName: 'bg-figure-cell-bright',
+    // The one business that is not yet operational, so it takes its own
+    // ground in the ledger. The client's call on 2026-08-20.
+    upcoming: true,
   },
   {
     id: 'module-manufacturing',
@@ -207,7 +208,8 @@ export const businessTiles = [
       'long-term reliability across diverse operating environments.',
     href: '/module-manufacturing/',
     ctaLabel: 'Know more about solar module manufacturing',
-    figureClassName: 'text-figure-module',
+    figureClassName: 'text-figure-module-bright',
+    ruleClassName: 'bg-figure-module-bright',
   },
   {
     id: 'agri-waste',
@@ -218,16 +220,25 @@ export const businessTiles = [
       'emissions while creating value for farming communities.',
     href: '/waste-to-energy/',
     ctaLabel: 'Know more about agri waste to energy',
-    figureClassName: 'text-figure-agri',
+    figureClassName: 'text-figure-agri-bright',
+    ruleClassName: 'bg-figure-agri-bright',
+    // No `iconScale`. The leaves were carrying a +12% nudge against the other
+    // three marks; withdrawn on 2026-08-22, so all four are drawn at the same
+    // size again. The prop is still there for when it comes back.
   },
 ];
 
 /**
  * "SAEL Pan India Green Footprint" — section 4.
  *
- * Coordinates are points in the map's own 620 × 660 viewBox, taken from the
- * client's `Mock 3 Approved/mapDots.js` geometry; every one of them lands on
- * the dotted landmass.
+ * Coordinates are points in the artwork's own 311.33 × 337.45 viewBox —
+ * `src/assets/images/dotted-map.svg`, supplied by the client on 2026-08-21.
+ *
+ * They were carried across from the previous 620 × 660 geometry rather than
+ * re-measured, by mapping each point through the ratio of the two landmasses'
+ * bounding boxes. The two dot fields overlap closely, but that is a derivation
+ * and not a measurement — see the note in sections/presence-map/dots.ts. The
+ * pins want an eye before this ships.
  *
  * Five of the six sites are corroborated by the client's PDF itself — Jalore
  * and its 298 MW appear in the map callout, Bhadra's biomass plant beside the
@@ -241,29 +252,29 @@ export const businessTiles = [
  * render. The destinations have not been supplied.
  */
 export const presenceSites = [
-  { id: 'bhadra', name: 'Bhadra (Rajasthan)', description: 'Biomass Plant', x: 180, y: 144 },
+  { id: 'bhadra', name: 'Bhadra (Rajasthan)', description: 'Biomass Plant', x: 96.6, y: 91.8 },
   {
     id: 'greater-noida',
     name: 'Greater Noida (UP)',
     description: 'Solar Cell Manufacturing',
-    x: 222,
-    y: 157,
+    x: 113.9,
+    y: 97.5,
   },
   {
     id: 'kishangarh',
     name: 'Kishangarh (Rajasthan)',
     description: 'Solar Module Plant',
-    x: 174,
-    y: 196,
+    x: 94.1,
+    y: 114.7,
   },
-  { id: 'jalore', name: 'Jalore (Rajasthan)', description: '298 MW', x: 130, y: 222 },
-  { id: 'mizoram', name: 'Mizoram', description: '21 MW Solar Plant', x: 515, y: 256 },
+  { id: 'jalore', name: 'Jalore (Rajasthan)', description: '298 MW', x: 75.9, y: 126.1 },
+  { id: 'mizoram', name: 'Mizoram', description: '21 MW Solar Plant', x: 235.0, y: 141.0 },
   {
     id: 'kurnool',
     name: 'Kurnool (Andhra Pradesh)',
     description: TODO_CONTENT,
-    x: 234,
-    y: 417,
+    x: 118.9,
+    y: 211.8,
   },
 ];
 
@@ -279,6 +290,7 @@ export const presenceSummary = {
   // Not from the PDF: added at the client's request on 2026-08-05 so the
   // section has a heading of its own. The footprint label below is the PDF's.
   heading: 'Our Current Power Portfolio',
+  map: { image: dottedMap },
   title: ['SAEL Pan India', 'Green Footprint'] as [string, string],
   primaryStat: '11 States',
   secondaryStat: '60 Projects Sites',
@@ -383,12 +395,10 @@ export const ourEndeavour: Omit<EndeavourSplitProps, 'snap'> = {
  * closed up. Both the PDF and the Designer prototype carry the same three
  * paragraphs, so there is no source conflict here.
  *
- * **The icons are stand-ins.** The design draws three bespoke white line
- * marks — a target ringed by inward arrows, an eye with rays, two hands
- * cupping a lotus — and none was supplied in the handover. These are the
- * nearest equivalents from `lucide-react`, which is already a dependency and
- * matches the design's stroke weight. Swapping in the real artwork is a
- * one-line change per goal. Raised in docs/asset-inventory.md §9.
+ * **The marks are the client's own now.** They were `lucide-react` stand-ins
+ * while the artwork was outstanding; the three SVGs arrived on 2026-08-21 and
+ * are here. They are drawn in near-black for use on paper and the card inverts
+ * them to white — see the note at the call site in sections/goals-grid.
  */
 export const ourGoals: Omit<GoalsGridProps, 'snap'> = {
   title: 'Our Goals',
@@ -402,7 +412,7 @@ export const ourGoals: Omit<GoalsGridProps, 'snap'> = {
         'practices to provide dependable and eco-friendly energy solutions, fostering the ' +
         'widespread adoption of renewable energy across diverse markets.',
       image: goalMission,
-      icon: Crosshair,
+      icon: markMission,
     },
     {
       id: 'vision',
@@ -412,7 +422,7 @@ export const ourGoals: Omit<GoalsGridProps, 'snap'> = {
         'where renewable sources drive economies and enhance lives. We envision a future ' +
         'where sustainable energy solutions seamlessly integrate into global infrastructure.',
       image: goalVision,
-      icon: Eye,
+      icon: markVision,
     },
     {
       id: 'ethos',
@@ -423,7 +433,7 @@ export const ourGoals: Omit<GoalsGridProps, 'snap'> = {
         'a culture of excellence, inclusivity, and accountability, fostering resonance with ' +
         'our global communities and partners.',
       image: goalEthos,
-      icon: Sprout,
+      icon: markEthos,
     },
   ],
 };

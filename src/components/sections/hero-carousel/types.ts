@@ -1,42 +1,5 @@
 import type { StaticImageData } from 'next/image';
 
-/**
- * Where a slide's headline and watermark symbol sit within the hero frame,
- * **at `lg` and above only**. Below that the composition is abandoned
- * entirely — see the note on `HeroSlide.desktop`.
- *
- * Carried across from the prototype's `defaultHeroSlides()` as data, not as
- * CSS, so repositioning a slide is a content edit. docs/features/04 §1.
- *
- * Two conversions were applied to the prototype's values, and both are safe
- * because the hero is full-bleed — its box *is* the viewport width:
- *
- *  - `18.5vw` / `31vw` became `18.5%` / `31%`, percentages of the hero rather
- *    than of the viewport. Identical rendering, and a bare `vw` is banned
- *    outside the token layer. docs/responsive-strategy.md §1.
- *  - Nothing else. The percentages are the prototype's own.
- *
- * Note the asymmetry in what the coordinates mean, which the prototype's own
- * comment gets wrong: the symbol is centred on **both** axes, but the headline
- * is centred vertically and positioned by its **left edge** horizontally. That
- * is what its `translate(x, calc(-50% + y))` does, and it is why a headline
- * with `textX: '64%'` does not overflow the frame.
- */
-export interface HeroSlidePlacement {
-  /** Left edge of the headline block, as a percentage of the hero width. */
-  textX: string;
-  /** Vertical centre of the headline block. */
-  textY: string;
-  /** Width of the headline block. */
-  textWidth: string;
-  /** Horizontal centre of the watermark symbol. */
-  symbolX: string;
-  /** Vertical centre of the watermark symbol. */
-  symbolY: string;
-  /** Rendered width of the watermark symbol. */
-  symbolSize: string;
-}
-
 export interface HeroSlide {
   /** Stable across renders — keys the word animation, so it must not be the
    *  array index. docs/content-model.md §2. */
@@ -52,14 +15,53 @@ export interface HeroSlide {
     mobile: StaticImageData | null;
     /** Describes the scene, not the brand. docs/design-guidelines.md §6. */
     alt: string;
+    /**
+     * Tailwind `object-position` class for the landscape crop, e.g.
+     * `lg:object-right`. Absent means centred, which is what three of the four
+     * want.
+     *
+     * It reads backwards and it is not: aligning the image's *right* edge with
+     * the frame shows the right part of the photograph, which moves a centred
+     * subject to the *left* of the frame. That is the whole reason this
+     * exists — above `lg` the headline occupies the right-hand half, and a
+     * subject sitting under it has to move out from under it.
+     *
+     * A class rather than a raw value so it stays in the token layer, and
+     * scoped to `lg:` by the caller because the portrait crop below that
+     * breakpoint is art-directed and needs no shifting.
+     */
+    objectClassName?: string;
   };
-  /** Decorative watermark. Always `alt=""`. */
+  /**
+   * The slide's mark, stacked above the headline.
+   *
+   * Decorative at every size — the headline carries the meaning — so it is
+   * always `alt=""`. In the earlier design this floated free in the frame as
+   * a watermark, positioned per slide; `SAEL Home v2` sets it in the content
+   * column instead, which is why the six placement coordinates that used to
+   * live on this interface are gone.
+   */
   symbol: {
     image: StaticImageData | null;
     /** Name in docs/asset-inventory.md, for the pending-asset placeholder. */
     pending: string;
   };
   headline: string;
-  /** Ignored below `lg`, where the headline is bottom-anchored and full width. */
-  desktop: HeroSlidePlacement;
+  /**
+   * The run of words inside `headline` that takes the gradient fill, as an
+   * exact substring of it — "Bifacial TOPCon solar modules", say.
+   *
+   * A substring rather than a pre-split headline because the headline is also
+   * the slide's accessible name and the label on its progress segment, and
+   * those want it whole. If the substring is not found the headline simply
+   * renders flat, which is the right failure: a typo here costs a highlight,
+   * not a headline.
+   */
+  highlight?: string;
+  /**
+   * Tailwind background-image class for the highlight's ramp, e.g.
+   * `bg-(image:--gradient-hero-word-1)`. A class rather than a raw gradient so
+   * it stays in the token layer — /CLAUDE.md §2.
+   */
+  highlightClassName?: string;
 }

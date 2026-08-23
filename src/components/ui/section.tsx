@@ -27,6 +27,25 @@ const section = cva('relative', {
       'wash-strength':
         'bg-surface bg-(image:--gradient-wash-strength-stacked) lg:bg-(image:--gradient-wash-strength)',
       'wash-goals': 'bg-surface-alt bg-(image:--gradient-wash-goals)',
+      /* The two grounds of `SAEL Home v2`, each carrying the same fine dot
+       * grid. The grid is one background-image over a background-colour, so
+       * both are set here and neither is a component's business.
+       *
+       * `black`/`paper` are the same two grounds without the grid, for a
+       * section whose own content is a full-bleed photograph and would hide
+       * it anyway. */
+      black: 'bg-surface-black text-body-on-dark',
+      'black-dots': [
+        'bg-surface-black text-body-on-dark',
+        'bg-(image:--gradient-dot-dark)',
+        '[background-size:var(--spacing-dot-grid)_var(--spacing-dot-grid)]',
+      ],
+      paper: 'bg-paper text-ink',
+      'paper-dots': [
+        'bg-paper text-ink',
+        'bg-(image:--gradient-dot-paper)',
+        '[background-size:var(--spacing-dot-grid)_var(--spacing-dot-grid)]',
+      ],
     },
     spacing: {
       /** 48 → 96px. The standard. */

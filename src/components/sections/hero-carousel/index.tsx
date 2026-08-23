@@ -7,8 +7,9 @@ import {
 } from 'react';
 import { Section } from '@/components/ui/section';
 import { cn } from '@/lib/utils/cn';
-import { HeroDots } from './hero-dots';
-import { HeroSlideLayer } from './hero-slide';
+import { HeroBackdrop } from './hero-backdrop';
+import { HeroCopy } from './hero-copy';
+import { HeroProgress } from './hero-progress';
 import { useHeroCarousel } from './use-hero-carousel';
 import { usePointerParallax } from './use-pointer-parallax';
 import type { HeroSlide } from './types';
@@ -32,7 +33,22 @@ export interface HeroCarouselProps {
 }
 
 /**
- * The homepage hero. docs/features/04 §1.
+ * The homepage hero. docs/features/04 §1, rebuilt to `SAEL Home v2`.
+ *
+ * The v2 arrangement, and what changed from the one before it:
+ *
+ *  - **One composition, not four.** The mark, a short red rule and the
+ *    headline sit in a single content column — the right-hand half above `lg`,
+ *    the full width and bottom-anchored below it. The six per-slide
+ *    coordinates that used to place each headline in the frame are gone. See
+ *    `<HeroCopy>`.
+ *  - **A progress bar across the base**, pinned to the bottom edge of a
+ *    section that is exactly one viewport tall — so it is on screen for as
+ *    long as the hero is. It fills once across the whole cycle rather than
+ *    once per slide. See `<HeroProgress>`.
+ *  - **The headline is set at --text-hero**, the site's own display size,
+ *    rather than the larger size the design file draws it at. The client's
+ *    call on 2026-08-20: the layout is v2's, the type scale is ours.
  *
  * The one client component on this page, and the only section that needs to
  * be: it owns timers, pointer tracking and a slide index. Everything it can
@@ -117,6 +133,7 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
       ref={sectionRef}
       fullBleed
       spacing="none"
+      background="black"
       data-snap-section
       aria-roledescription="carousel"
       aria-label="SAEL highlights"
@@ -124,7 +141,7 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
       // keeps cycling whether or not the pointer rests on it.
       //
       // Keyboard focus still pauses, and that is not the same feature. Someone
-      // who has tabbed to a dot is *operating* the carousel; advancing the
+      // who has tabbed to a segment is *operating* the carousel; advancing the
       // slide under them moves the thing they are aiming at. See
       // `onFocusCapture`, which is where "keyboard" is decided.
       onFocus={onFocusCapture}
@@ -145,7 +162,7 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
       onPointerCancel={() => (dragOrigin.current = null)}
       onPointerLeave={() => (dragOrigin.current = null)}
       className={cn(
-        'relative isolate overflow-hidden bg-surface-deep',
+        'relative isolate overflow-hidden',
         /*
          * One screenful below the fixed header, at every size.
          *
@@ -158,7 +175,9 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
          * height this resolves to rather than letterboxing.
          *
          * `min-h`, not `h`: if the headline ever wraps past the available
-         * space at 360px the section grows instead of clipping it.
+         * space at 360px the section grows instead of clipping it. The content
+         * column reserves --spacing-hero-pad-bottom underneath itself, which
+         * is more than the progress bar is tall, so the two never meet.
          */
         'min-h-viewport snap-start',
         // Vertical page scroll is never captured by the swipe handler.
@@ -166,12 +185,11 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
       )}
     >
       {slides.map((slide, slideIndex) => (
-        <HeroSlideLayer
+        <HeroBackdrop
           key={slide.id}
           slide={slide}
           isActive={slideIndex === index}
           position={slideIndex + 1}
-          total={slides.length}
         />
       ))}
 
@@ -195,7 +213,9 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
         className="anim-letterbox pointer-events-none absolute inset-x-0 bottom-0 z-10 h-1/2 origin-bottom bg-surface-darker"
       />
 
-      <HeroDots
+      <HeroCopy slides={slides} activeIndex={index} />
+
+      <HeroProgress
         labels={slides.map((slide) => slide.headline)}
         activeIndex={index}
         onSelect={goTo}
@@ -206,4 +226,4 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
   );
 }
 
-export type { HeroSlide, HeroSlidePlacement } from './types';
+export type { HeroSlide } from './types';

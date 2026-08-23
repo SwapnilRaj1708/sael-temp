@@ -196,43 +196,24 @@
 }
 
 /*
- * One card on a horizontal rail. Width comes from `--rail-card-w`, which the
- * section sets on the rail itself — the rail owns scrolling and the caller
- * owns size, so one carousel can hold a 920px plant photograph and another a
- * 296px news card.
+ * A full-bleed rail whose cards come to rest on the page gutter.
  *
- * The fallback is the full rail, which is the honest answer for a rail that
- * forgot to say.
- */
-@utility rail-card {
-  width: var(--rail-card-w, 100%);
-}
-
-/*
- * A full-bleed rail whose *centred* card is the subject, with its neighbours
- * visible either side. Pair with `snap-center` on each card.
+ * The two spacers stand in for the padding the rail cannot have: padding on a
+ * scroll container is not honoured at its scroll end in every engine, so the
+ * last card would stop short of the gutter on some and past it on others. A
+ * flex spacer is a real box and behaves the same everywhere.
  *
- * The flex spacers are half the slack left over once a card and its two gaps
- * are taken out of the rail, so the first and last cards can reach the centre
- * — without them a mandatory snap cannot rest on either end and the rail
- * jumps. Derived from `--rail-card-w` rather than written as a number, so a
- * card resized at a breakpoint cannot leave the spacers behind.
+ * The gap is subtracted because the spacer sits beside one, and the rail's gap
+ * is set per section — hence `--rail-gap` rather than the token directly. See
+ * components/ui/rail/rail-track.tsx.
  */
-@utility rail-centred {
-  &::before,
-  &::after {
-    content: '';
-    flex: 0 0 calc((100% - var(--rail-card-w, 100%)) / 2 - var(--spacing-rail-gap));
-  }
-}
-
 @utility rail-inset {
   scroll-padding-inline-start: var(--spacing-gutter);
 
   &::before,
   &::after {
     content: '';
-    flex: 0 0 calc(var(--spacing-gutter) - var(--spacing-rail-gap));
+    flex: 0 0 calc(var(--spacing-gutter) - var(--rail-gap, var(--spacing-rail-gap)));
   }
 }
 

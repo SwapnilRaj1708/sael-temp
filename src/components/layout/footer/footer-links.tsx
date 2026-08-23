@@ -63,7 +63,7 @@ export function FooterLinks() {
               key={group.title}
               value={group.title}
               headingAs="h2"
-              title={<span className="text-label uppercase">{group.title}</span>}
+              title={<span key={group.title} className="text-label uppercase">{group.title}</span>}
               className="border-white/20"
               triggerClassName="text-white hover:text-white/80"
             >

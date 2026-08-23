@@ -9,25 +9,31 @@ import { extendTailwindMerge } from 'tailwind-merge';
  */
 const FONT_SIZES = [
   'hero',
+  'display',
   'h2',
   'h3',
   'stat',
+  'stat-large',
   'milestone',
   'sdg-num',
   'goal-title',
+  'goal-name',
   'body',
   'body-sm',
   'label',
   'nav',
   'eyebrow',
   'cta',
+  'action',
   'badge',
-  'tile-title',
-  'tile-figure',
+  'meta',
+  'ledger-figure',
+  'ledger-figure-long',
+  'plate-title',
+  'card-title',
   'tile-note',
   'tile-marker',
   'footprint-title',
-  'plaque-title',
 ] as const;
 
 /**
@@ -57,6 +63,11 @@ const FONT_SIZES = [
  * a size (`--text-body`) while `body-base`, `body-soft`, `body-muted` and
  * `body-on-dark` are colours (`--color-body-*`), and matching is by whole
  * suffix, so the two namespaces stay separate.
+ *
+ * The same trap is why `Button`'s font size lives on its `size` variant rather
+ * than on its base: `text-cta` and `text-action` are both in this list, so the
+ * two would resolve correctly — but only one of them can be right for a given
+ * button, and one source is simpler than a merge that has to be trusted.
  */
 const twMerge = extendTailwindMerge({
   extend: {
