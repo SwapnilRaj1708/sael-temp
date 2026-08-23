@@ -218,6 +218,41 @@
 }
 
 /*
+ * Stop a rail from becoming a *vertical* scroller.
+ *
+ * A rail is `overflow-x: auto`, and CSS gives no way to scroll one axis and
+ * leave the other alone — an `overflow-x` of `auto` forces `overflow-y` to
+ * compute to `auto` as well (css-overflow-3 §3). So anything overflowing the
+ * track downward makes the track scrollable *down*, by exactly that much.
+ *
+ * `<Reveal>` overflows it downward. A card that has not entered yet sits
+ * `--reveal-shift` low, and a rail always holds cards that have not entered:
+ * the ones off the right-hand end. Every rail therefore carried 28px of
+ * vertical slack at all times, and 28px is taller than a news card's date
+ * line — one diagonal swipe on a phone scrolled the rail down and the date
+ * disappeared under its own top edge. That is the bug this exists to fix, and
+ * it is a rail-wide one rather than that card's: the date was simply the only
+ * thing sitting in the top 28px of anything.
+ *
+ * The fix is to give the transform somewhere to land that is already inside
+ * the scrollport. End padding counts as part of a scroll container's
+ * scrollable overflow region, so a card translated `--reveal-shift` down now
+ * stops exactly on the padding edge and contributes nothing of its own:
+ * `scrollHeight` equals `clientHeight`, and there is no vertical scrolling
+ * left to do. The matching negative end margin takes the padding back out of
+ * the flow, so the correction costs no layout.
+ *
+ * Preferred over `overflow-y: clip`, which also stops the scrolling but shaves
+ * the bottom off every card for as long as it is animating in. Under
+ * `prefers-reduced-motion: reduce` there is no transform to absorb and this
+ * pair is inert, which is correct rather than merely harmless.
+ */
+@utility rail-reveal-slack {
+  padding-block-end: var(--reveal-shift);
+  margin-block-end: calc(var(--reveal-shift) * -1);
+}
+
+/*
  * Hide a scroll container's scrollbar without taking away its scrolling.
  *
  * Only for a rail that ships its own affordance — the solutions carousel has

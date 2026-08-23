@@ -18,6 +18,11 @@ const track = cva(
     'scrollbar-none snap-x snap-mandatory',
     // Full bleed, with the cards coming to rest on the page gutter.
     'rail-inset',
+    // `overflow-x: auto` drags `overflow-y` along with it, which let the
+    // entrance animation of the cards still off the end make the rail
+    // scrollable downward — far enough to hide a news card's date. See
+    // globals.css.
+    'rail-reveal-slack',
     // Stops a swipe past the last card triggering the browser's
     // back-navigation gesture, or scrolling the page behind it.
     'overscroll-x-contain',

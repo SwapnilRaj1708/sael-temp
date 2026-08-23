@@ -57,11 +57,21 @@ export function SolutionsCarousel({
               <Eyebrow tone="deep">{eyebrow}</Eyebrow>
             </Reveal>
 
-            {/* The heading sits left and everything that qualifies it sits
-                right, baselines aligned — the design's own arrangement. It
-                wraps to a stack before the two halves get too narrow to hold
-                a line of copy between them. */}
-            <div className="flex flex-wrap items-end justify-between gap-x-flow gap-y-stack">
+            {/* At `lg` and above the heading sits left and everything that
+                qualifies it sits right, baselines aligned — the design's own
+                arrangement. Below `lg` the three parts stack, each at the full
+                content width.
+
+                A breakpoint switch and not `flex-wrap`, which is what this was
+                and which never wrapped: the right-hand group was `flex-1`,
+                whose `flex-basis: 0` makes its hypothetical main size zero, so
+                it always "fits" beside the heading however little room is
+                left. On a phone that left the sentence in a ~100px column with
+                its lines running off the side of the screen.
+
+                `lg` is the hinge for a layout that changes rather than scales.
+                docs/responsive-strategy.md §2. */}
+            <div className="flex flex-col gap-stack lg:flex-row lg:items-end lg:justify-between lg:gap-x-flow">
               {/*
                 `--text-display`, which carries its own 400 weight — the same
                 size and face as "Endeavoring to make a sustainable impact" and
@@ -71,14 +81,20 @@ export function SolutionsCarousel({
 
                 The ramp is clipped to the letterforms, as the design has it.
                 `--gradient-eyebrow-deep` and not the bright one: this is paper.
+
+                The 15ch cap is scoped to `lg`, where it does its job of
+                keeping the heading clear of the column beside it. Below that
+                there is no column beside it, and capping a 360px screen at
+                15ch left a third of every line empty while the sentence
+                underneath had nowhere to go.
               */}
               <Reveal order={2}>
-                <h2 className="max-w-(--hero-measure) bg-(image:--gradient-eyebrow-deep) gradient-text text-display">
+                <h2 className="bg-(image:--gradient-eyebrow-deep) gradient-text text-display lg:max-w-(--hero-measure)">
                   {title}
                 </h2>
               </Reveal>
 
-              <div className="flex flex-1 flex-wrap items-end justify-end gap-x-flow gap-y-stack">
+              <div className="flex flex-col gap-stack lg:flex-1 lg:flex-row lg:flex-wrap lg:items-end lg:justify-end lg:gap-x-flow">
                 {/* No `--measure` cap here. The cap is for running copy, and
                     this is a single sentence the design sets on one or two
                     lines; capped at 68ch it broke after "propelling" on every
@@ -88,10 +104,14 @@ export function SolutionsCarousel({
                   <p className="text-body [text-wrap:pretty] text-body-soft">{lead}</p>
                 </Reveal>
 
+                {/* Stacked, the pair stays at the right-hand edge rather than
+                    sliding under the sentence — it is the corner of the frame
+                    in the design and it reads as one there too. */}
                 <RailArrows
                   previousLabel="Previous plant"
                   nextLabel="Next plant"
                   tone="paper"
+                  className="self-end lg:self-auto"
                 />
               </div>
             </div>
