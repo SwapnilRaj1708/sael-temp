@@ -80,7 +80,6 @@
    * hovered or current nav link so the bar reads as one family. From the
    * client's navbar design (`assets/navbar/index.html`). */
   --color-nav-accent: #7a1f57;
-  --color-nav-pill: rgb(122 31 87 / 0.08);
 
   /* The docked share-price ticker. Green is the design's "up" colour and is
    * not a brand token — it means something, so it is named for what it means
@@ -92,11 +91,23 @@
   --color-quote-value: #141a18;
   --color-quote-muted: #8a9a92;
 
-  /* Header. The nav link colour, the hairline under the bar, and the solid
-   * background used where backdrop-filter is unsupported.
-   * docs/design-guidelines.md §4. */
+  /* Header. The nav link colour, the two weights of hairline under the bar,
+   * the translucent veil the bar is painted with, and the solid background
+   * used where backdrop-filter is unsupported.
+   * docs/design-guidelines.md §4.
+   *
+   * The four alphas are `SAEL Home v2`'s, taken off its `#hdr` rule and turned
+   * over: the design paints a near-black bar at 0.70 that firms to 0.86 on
+   * scroll, over a white hairline that goes 0.09 → 0.13. This site's masthead
+   * is light and stays light (the client's 2026-08-25 note is explicit), so
+   * the hue is ours and only the *structure* is copied — one flat translucent
+   * fill rather than the vertical gradient this used to carry, at the design's
+   * two opacities, over an ink hairline at the design's two weights. */
   --color-nav-link: rgb(28 32 40 / 0.82);
-  --color-header-hairline: rgb(20 24 32 / 0.08);
+  --color-header-hairline: rgb(20 24 32 / 0.09);
+  --color-header-hairline-scrolled: rgb(20 24 32 / 0.13);
+  --color-header-veil: rgb(255 255 255 / 0.7);
+  --color-header-veil-scrolled: rgb(255 255 255 / 0.86);
   --color-header-solid: rgb(255 255 255 / 0.96);
 
   /* The same four businesses, lifted for the dark ledger the client's
@@ -127,6 +138,16 @@
   --color-hairline-grid: rgb(255 255 255 / 0.14);
   --color-hairline-paper: rgb(20 24 32 / 0.18);
   --color-hairline-paper-soft: rgb(20 24 32 / 0.2);
+
+  /* A rule drawn over a photograph rather than over a flat ground — the
+   * divider between a goal card's name and its description.
+   *
+   * More than twice --color-hairline-dark's 0.16, and it has to be: that
+   * one is tuned against #08090c, where 16% white is a clear line. Over a
+   * lit photograph behind a partial scrim there is no single value it is
+   * 16% *of*, and at 1px it disappeared into all three of the goal
+   * images. */
+  --color-hairline-on-media: rgb(255 255 255 / 0.38);
 
   /* Body copy on the black ground, at the three weights the design uses:
    * a card's running copy, a small-caps qualifier, and a section's own
@@ -258,6 +279,23 @@
   --text-nav--line-height: 1;
   --text-nav--letter-spacing: 0.0125em;
   --text-nav--font-weight: 400;
+
+  /* The six links in the middle of the masthead, and only those.
+   *
+   * `SAEL Home v2`'s own values, read off its deployed build rather than
+   * guessed: 11px, 700, 0.18em of tracking, uppercase. Small, bold and widely
+   * tracked is one type idea, not four — shrinking the size without opening
+   * the tracking would just make it cramped.
+   *
+   * Its own token rather than a change to --text-nav, which the CTA also takes.
+   * The design sets both at these values, but this build keeps the CTA as a
+   * filled pill (the client's 2026-08-25 call that the rest of the bar's inner
+   * styling stands), and 11px inside a pill is a different question from 11px
+   * on bare ground. One of them changed; one token changed. */
+  --text-nav-item: 0.6875rem; /* 11 */
+  --text-nav-item--line-height: 1.18;
+  --text-nav-item--letter-spacing: 0.18em;
+  --text-nav-item--font-weight: 700;
 
   /* 15 → 18, uppercase.
    *
@@ -405,6 +443,13 @@
   /* The WCAG floor for a touch target. docs/responsive-strategy.md §5. */
   --spacing-touch: 2.75rem; /* 44 */
 
+  /* Between two links in the middle of the masthead. The design's own
+   * `clamp(4px, 1vw, 18px)` — it closes right up on a narrow laptop, where
+   * six tracked labels and a logo and a CTA are competing for one bar. A
+   * bare `vw` is only safe inside a clamp, and only in this file.
+   * docs/responsive-strategy.md §3. */
+  --spacing-nav-gap: clamp(0.25rem, 1vw, 1.125rem); /* 4 → 18 */
+
   /* The narrow axis of a hero dot's hit area. WCAG 2.5.8's 24px minimum,
    * used where a 44px square would space a row of controls apart rather than
    * hold them together. See components/sections/hero-carousel/hero-dots.tsx. */
@@ -514,8 +559,26 @@
    * floated over the artwork. */
   --spacing-rail-arrow-sq: 3.25rem; /* 52 */
 
-  /* The dot grid laid over both of the v2 grounds. */
+  /* The dot grid laid over every ground but the hero's. */
   --spacing-dot-grid: 0.8125rem; /* 13 */
+
+  /* The radius of one dot, shared by both grounds so the two cannot drift
+   * apart — the grid is one texture that happens to be drawn in two colours,
+   * and a dot that is 1px on paper and 1.5px on black reads as two textures.
+   *
+   * In px and not rem deliberately. The grid's *pitch* scales with the root
+   * font size; a dot is a mark on the screen and wants to stay the same mark.
+   *
+   * The radius and the alpha have to be read together, and getting that wrong
+   * is what the client saw on 2026-08-26. Going from a 1px dot to 1.5px to
+   * survive a zoom-out multiplied each dot's area by 2.25, and the alphas were
+   * raised at the same time — so the grid arrived roughly three times heavier
+   * than the one it replaced and read as a solid texture rather than a hint of
+   * one. The radius is what the zoom fix needs and it stays; the alphas came
+   * back down past where they started, to about 0.4x the original, which is
+   * what puts the *painted weight* back under the original's.
+   */
+  --spacing-dot-radius: 1.5px;
 
   /* The mark on an "Our Goals" card.
    *
@@ -542,24 +605,25 @@
    * scroll, and `100vh` overflows by the height of the address bar for the
    * whole first screen. docs/responsive-strategy.md §3.
    *
-   * Derived from --spacing-header, so it tracks the 64 → 84px change at lg on
-   * its own. Consumed as `min-h-viewport`. */
+   * Derived from --spacing-header rather than restating 68px, so the two
+   * cannot drift. Consumed as `min-h-viewport`. */
   --spacing-viewport: calc(100dvh - var(--spacing-header));
 
-  /* Header height: 64px, rising to 84px at lg. Declared here so `h-header` and
-   * `pt-header` exist as utilities, and overridden in the media query at the
-   * foot of this file — one token, two values, so the fixed header's height
-   * and the offset that clears it can never drift apart.
+  /* Header height: a flat 68px, the `SAEL Home v2` bar's own height.
+   *
+   * It was 64px rising to 84px at lg, and the lg step is gone rather than
+   * retuned — the design draws one height at every width, and the step existed
+   * to make room for a taller logo lockup the bar no longer sets. Everything
+   * that has to clear the bar reads this one token: `h-header` on the row,
+   * `pt-header` on <main>, `scroll-padding-top` in globals.css, and
+   * --spacing-viewport. That is why there is no `lg:h-*` at any call site — the
+   * classic way an anchor lands under a fixed header is those drifting apart.
    * docs/design-guidelines.md §4, features/03 §2. */
-  --spacing-header: 4rem;
+  --spacing-header: 4.25rem; /* 68 */
 
   /* ---------------------------------------------------------------------
    * Radius and elevation — docs/design-guidelines.md §3
    * ------------------------------------------------------------------ */
-  /* Fallback box for a business mark that has not been supplied. The real ones
-   * each carry their own ratio — they range from 0.918 to 1.040 and are not
-   * interchangeable — so this is only ever used by the pending placeholder. */
-  --aspect-icon-mark: 1 / 1;
 
   /* The dotted India map's own viewBox — `src/assets/images/dotted-map.svg`,
    * supplied by the client on 2026-08-21. Kept beside the site coordinates it
@@ -594,7 +658,6 @@
 
   /* The masthead's rounded shapes: a nav link's hover pill, the Contact Us
    * button, and the ticker docked under the bar. */
-  --radius-nav-pill: 0.875rem; /* 14 */
   --radius-nav-cta: 1rem; /* 16 */
   --radius-quote: 1.125rem; /* 18 */
 
@@ -606,7 +669,6 @@
   --shadow-card-hover: 0 22px 44px rgb(20 24 32 / 0.14);
   /* A map tooltip, which floats over a dark section and needs to lift off it. */
   --shadow-tooltip: 0 8px 24px rgb(0 0 0 / 0.35);
-  --shadow-header: 0 1px 24px rgb(20 24 32 / 0.06);
   --shadow-nav-cta: 0 10px 24px -8px rgb(216 31 53 / 0.5);
   --shadow-nav-cta-hover: 0 16px 30px -8px rgb(216 31 53 / 0.6);
   --shadow-quote: 0 16px 34px -18px rgb(6 40 30 / 0.45);
@@ -648,7 +710,6 @@
  */
 :root {
   /* Gradients — docs/design-guidelines.md §1 */
-  --gradient-header: linear-gradient(180deg, rgb(255 255 255 / 0.92), rgb(248 249 251 / 0.8));
   --gradient-eyebrow: linear-gradient(90deg, #aa0505 0%, #0d2fa2 100%);
   --gradient-cta: linear-gradient(105deg, #f9e800 -24%, #e40f14 6%, #45258d 95%);
   --gradient-stats: linear-gradient(90deg, #e43026 0%, #4a3290 100%);
@@ -869,9 +930,34 @@
    * ---------------------------------------------------------------------- */
 
   /* The dot grid over each ground. One dot per --spacing-dot-grid cell; the
-   * size is applied alongside in components/ui/section.tsx. */
-  --gradient-dot-dark: radial-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px);
-  --gradient-dot-paper: radial-gradient(rgb(20 24 32 / 0.07) 1px, transparent 1px);
+   * size is applied alongside in components/ui/section.tsx.
+   *
+   * Three things about the shape, all of them about surviving a zoom:
+   *
+   *  - `circle`, not the implicit `ellipse`. An ellipse sized `farthest-corner`
+   *    against a 13x13 cell is not round, and it stops being round *differently*
+   *    as the cell is scaled.
+   *  - The radius is a token, so paper and black are the same dot. See
+   *    --spacing-dot-radius.
+   *  - The outer stop is half a pixel past the solid one rather than on top of
+   *    it. A gradient whose two stops coincide has no ramp to rasterise, so at
+   *    a zoom level that lands the dot on a fraction of a device pixel the
+   *    whole grid can round away to nothing — which is exactly the dropout the
+   *    client reported on 2026-08-25. Half a pixel of feather always leaves
+   *    something to paint, at any zoom and any DPR, and is invisible at 100%.
+   */
+  --gradient-dot-dark: radial-gradient(
+    circle at center,
+    rgb(255 255 255 / 0.028) 0,
+    rgb(255 255 255 / 0.028) var(--spacing-dot-radius),
+    transparent calc(var(--spacing-dot-radius) + 0.5px)
+  );
+  --gradient-dot-paper: radial-gradient(
+    circle at center,
+    rgb(20 24 32 / 0.04) 0,
+    rgb(20 24 32 / 0.04) var(--spacing-dot-radius),
+    transparent calc(var(--spacing-dot-radius) + 0.5px)
+  );
 
   /* The Power Portfolio heading, clipped to its letterforms. Brighter than
    * --gradient-eyebrow-bright at both ends: this is display type on the black
@@ -946,8 +1032,20 @@
 
   /* Motion — docs/design-guidelines.md §5 */
   --duration-micro: 180ms; /* micro-interactions: hover, focus */
+
+  /* The masthead firming up as the page leaves the top. `SAEL Home v2`'s
+   * own .3s, and slower than --duration-card on purpose: the bar is not
+   * responding to the pointer, it is following the scroll, and a quick
+   * step reads as a flicker when the reader is hovering the boundary. */
+  --duration-header: 300ms;
   --duration-card: 280ms; /* card hovers */
   --duration-reveal: 550ms; /* scroll reveals */
+
+  /* The rule under a section label drawing itself in. Longer than the
+   * reveal it rides on, deliberately: the label lands and the rule is
+   * still travelling under it, which is what makes it read as being drawn
+   * rather than as another thing that faded in. */
+  --duration-underline: 720ms;
   /* Gap between one revealed element and the next in the same group. Small —
    * a stagger you can count is a stagger that has become a wait. */
   --duration-reveal-step: 90ms;
@@ -963,14 +1061,3 @@
 }
 
 /*
- * The header grows at lg. Overriding the token rather than adding a `lg:h-*`
- * at each call site means the bar's height, the offset that clears it on
- * <main>, and `scroll-padding-top` in globals.css all move together — the
- * classic way an anchor link ends up under a fixed header is these three
- * drifting apart. docs/features/03-app-shell-header-footer.md §2.
- */
-@media (min-width: 64rem) {
-  :root {
-    --spacing-header: 5.25rem; /* 84 */
-  }
-}

@@ -22,6 +22,7 @@ const FONT_SIZES = [
   'body-sm',
   'label',
   'nav',
+  'nav-item',
   'eyebrow',
   'cta',
   'action',

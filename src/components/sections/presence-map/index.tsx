@@ -98,7 +98,7 @@ export function PresenceMap({
   return (
     <Section
       data-snap-section
-      background="black"
+      background="black-dots"
       spacing="tight"
       className={cn('flex items-center', snap && 'min-h-viewport snap-start')}
     >
@@ -215,9 +215,18 @@ export function PresenceMap({
               the PDF it was the heading, and v2 gives that job to the display
               line above. The rule is what separates the two, and it is a drawn
               element rather than a `border-t` because it is deliberately
-              shorter than the block it sits over. */}
+              shorter than the block it sits over.
+
+              It draws itself in on the same `anim-underline` the section
+              labels take — this is the one section whose header rule is not an
+              `<Eyebrow>`, and the client's 2026-08-25 note asks for the
+              movement on all of them. Nothing else is needed: the class reads
+              the `data-reveal` on the `<Reveal>` it is already inside. */}
           <Reveal order={3} className="mt-flow">
-            <span aria-hidden="true" className="block h-px w-(--map-rule-w) bg-hairline-grid" />
+            <span
+              aria-hidden="true"
+              className="anim-underline block h-px w-(--map-rule-w) bg-hairline-grid"
+            />
             <h3 className="mt-stack text-meta text-on-dark-faint uppercase">
               {title[0]}
               <br />

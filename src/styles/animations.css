@@ -312,6 +312,46 @@
 }
 
 /*
+ * The rule under a section label drawing itself in — components/ui/eyebrow.tsx.
+ *
+ * It rides on `<Reveal>` rather than observing anything of its own. `Reveal`
+ * already writes `data-reveal` on the box around the label, so the rule can
+ * simply read it: collapsed while that box is `pending`, full width once it is
+ * `shown`. No second observer, no second definition of "in view", and no way
+ * for the two to disagree about when the section arrived.
+ *
+ * It also inherits the good parts of that mechanism for free. It replays on
+ * every pass, because `Reveal` re-arms. And the collapsed state is scoped to
+ * `html.reveal-ready` for the same reason the reveal's is: without script the
+ * attribute never changes, so a rule that started at zero width would stay
+ * there for ever. Unscoped, the rule is simply drawn.
+ *
+ * `scaleX` from a left origin rather than an animated `width`: a width
+ * animation lays the element out again on every frame, and this one sits under
+ * text whose own box would be re-measured with it.
+ *
+ * An eyebrow outside any `<Reveal>` — the design-system page has several — is
+ * never `pending`, so it is never collapsed. That falls out of the selector
+ * rather than needing a case of its own.
+ */
+@layer utilities {
+  .anim-underline {
+    transform-origin: left center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .anim-underline {
+      transition: transform var(--duration-underline) var(--ease-entrance);
+      transition-delay: calc(var(--reveal-order, 0) * var(--duration-reveal-step));
+    }
+
+    html.reveal-ready [data-reveal='pending'] .anim-underline {
+      transform: scaleX(0);
+    }
+  }
+}
+
+/*
  * The masthead's full-screen menu — components/layout/header/mega-menu.tsx.
  *
  * The columns rise and fade in one after another, `--mm-index` apart. Written

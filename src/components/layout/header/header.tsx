@@ -6,9 +6,10 @@ import { MobileNav } from '@/components/layout/header/mobile-nav';
 import { Container } from '@/components/ui/container';
 
 /**
- * The fixed masthead. 64px, rising to 84px at lg — both from
- * `--spacing-header`, the same token that offsets `<main>` and sets
- * `scroll-padding-top`.
+ * The fixed masthead. A flat 68px at every width — `SAEL Home v2`'s own bar
+ * height, from `--spacing-header`, the same token that offsets `<main>` and
+ * sets `scroll-padding-top`. It stepped up to 84px at `lg` until 2026-08-25;
+ * the design draws one height, so there is one value.
  *
  * A Server Component. Only the two nav components are client, and only because
  * they need `usePathname()` and interaction state.

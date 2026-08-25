@@ -19,13 +19,20 @@ import { PixelScatter } from './scatter';
  * bottom do the job the bar was doing. `--spacing-pixel-strip` lost the bar's
  * 18px with it, so nothing above the strip moved.
  *
+ * **It sits on the paper ground with its dot grid**, like every section above
+ * it — the client's 2026-08-26 call. It was bare `--surface` white, which is
+ * both a different white from `--paper` and the only undotted band left on the
+ * page, so the strip read as a separate thing bolted to the end rather than as
+ * the page running out. The grid shows through the scatter because the canvas
+ * paints squares and leaves the gaps transparent.
+ *
  * Wholly decorative — it carries no information the page does not already
  * state — so it is `aria-hidden` and is a `<div>` rather than a `<section>`,
  * which would put an empty landmark in the document outline.
  */
 export function PixelStrip() {
   return (
-    <div aria-hidden="true" className="relative h-pixel-strip w-full overflow-hidden bg-surface">
+    <div aria-hidden="true" className="ground-dots-paper relative h-pixel-strip w-full overflow-hidden">
       <PixelScatter />
     </div>
   );

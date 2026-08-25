@@ -134,27 +134,40 @@ export function DesktopNav() {
         className="hidden flex-1 justify-center lg:flex"
         onPointerLeave={scheduleClose}
       >
-        {/* Tight gaps, because each link now carries its own padding: the pill
-            is the spacing. A 42px gap on top of it read as six separate
-            buttons rather than one bar. */}
-        <ul className="flex list-none items-center gap-1">
+        {/* The design's own gap, which closes to 4px on a narrow laptop — see
+            --spacing-nav-gap. With the pills gone the gap is the only thing
+            separating two labels, so it can no longer be a token-free `gap-1`. */}
+        <ul className="flex list-none items-center gap-nav-gap">
           {NAV_ITEMS.filter((item) => item.label !== NAV_CTA_LABEL).map((item) => {
             const active = isNavItemActive(item, pathname);
             const isOpen = openLabel === item.label;
 
-            // A pill, not an underline. The client's navbar design tints the
-            // link's own box on hover and marks the current one with a short
-            // gradient rule inset from the pill's edges — so the marker
-            // belongs to the pill rather than to the text, and the row never
-            // shifts height.
+            // No pill. `SAEL Home v2` sets these six as bare tracked labels
+            // on the bar's own ground — nothing but the type and a colour
+            // change — and the client's 2026-08-26 note is to copy that middle
+            // section across. So the tinted box and its radius are gone, along
+            // with `--color-nav-pill` and `--radius-nav-pill`, which nothing
+            // else used.
+            //
+            // What is kept from this build is the light palette (the bar stays
+            // light — the client's 2026-08-25 call) and the current item's
+            // marker. The design has no current-page state at all, which is
+            // fine for a prototype and not for a site: the rule is what tells a
+            // reader which of the six they are inside. It survives the pill
+            // because it was never attached to it — it is inset from the
+            // link's own box, so it sits under the label either way.
+            //
+            // `min-h-touch` also stays, and is now invisible: with no
+            // background to draw it, the 44px hit area costs nothing visually
+            // and the design's 33px would have been the only thing lost.
             const linkClasses = cn(
-              'text-nav text-nav-link relative inline-flex items-center gap-1',
-              'min-h-touch rounded-nav-pill px-3 xl:px-4',
+              'text-nav-item text-nav-link relative inline-flex items-center gap-1 uppercase',
+              'min-h-touch px-2',
               'transition-colors duration-(--duration-micro)',
-              'hover:bg-nav-pill hover:text-nav-accent',
+              'hover:text-nav-accent',
               (active || isOpen) && [
-                'bg-nav-pill text-nav-accent',
-                'after:absolute after:inset-x-3 after:bottom-1.5 after:h-0.5',
+                'text-nav-accent',
+                'after:absolute after:inset-x-2 after:bottom-1.5 after:h-0.5',
                 'after:rounded-pill after:bg-(image:--gradient-nav-cta) after:content-[""]',
               ],
             );

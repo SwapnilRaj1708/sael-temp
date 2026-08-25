@@ -3,7 +3,7 @@ import type { NewsItem } from '@/lib/content';
 import { ArrowGlyph } from '@/components/ui/arrow-glyph';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
-import { FlankedEyebrow } from '@/components/ui/flanked-eyebrow';
+import { Eyebrow } from '@/components/ui/eyebrow';
 import { Rail } from '@/components/ui/rail/rail';
 import { RailArrows } from '@/components/ui/rail/rail-arrows';
 import { RailTrack } from '@/components/ui/rail/rail-track';
@@ -63,9 +63,7 @@ export function NewsCarousel({ title, items, snap = false }: NewsCarouselProps) 
         <div className="flex w-full flex-col gap-flow">
           <Container className="flex flex-wrap items-center justify-between gap-stack">
             <Reveal order={0}>
-              <FlankedEyebrow rules="leading" tone="deep">
-                {title}
-              </FlankedEyebrow>
+              <Eyebrow tone="deep">{title}</Eyebrow>
             </Reveal>
 
             <RailArrows previousLabel="Previous news" nextLabel="Next news" tone="paper" />

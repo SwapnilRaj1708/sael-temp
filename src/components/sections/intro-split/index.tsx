@@ -34,12 +34,17 @@ export interface IntroSplitProps {
  * **The pair is pulled in off the gutters.** v2 sets the copy at columns 1–6
  * and the artwork at 8–12, which leaves the two ends of the section heavy and
  * a whole empty column down the middle. At the client's request on 2026-08-21
- * they are drawn together and centred instead — copy on 2–6, artwork on 7–11,
- * one spare column outside each rather than one between them.
+ * they are drawn together instead — copy on 2–6, artwork on 7–12, no empty
+ * column between them. It was 7–11 and symmetric until 2026-08-25; the note on
+ * the artwork says what bought the twelfth column and what it cost.
  *
- * The rule above the body is doing real work: it separates the display heading
- * from the running copy at a size where the two would otherwise read as one
- * block of text at two sizes.
+ * **There is no rule above the body any more**, by the client's decision on
+ * 2026-08-25. It used to separate the display heading from the running copy,
+ * on the argument that the two would otherwise read as one block of text at
+ * two sizes; the client's call is that the heading's own size and ramp already
+ * do that, and the rule was buying the separation at the price of a `--flow`
+ * of padding on either side of it. The gap is a single `--flow` now, and the
+ * height the column gave back is spent on the artwork — see the note there.
  *
  * Below `lg` the grid collapses to ordinary flow — heading, artwork, body —
  * per docs/responsive-strategy.md §4.
@@ -97,7 +102,7 @@ export function IntroSplit({ eyebrow, title, body, cta, media, snap = false }: I
             </h2>
           </Reveal>
 
-          <Reveal order={4} className="mt-flow border-t border-hairline-paper pt-flow">
+          <Reveal order={4} className="mt-flow">
             <p className="max-w-(--ledger-measure) text-body [text-wrap:pretty] text-body-soft">
               {body}
             </p>
@@ -110,8 +115,25 @@ export function IntroSplit({ eyebrow, title, body, cta, media, snap = false }: I
         </div>
 
         {/* The artwork lands last: the heading introduces it, so it reads
-            better arriving after the words that name it. */}
-        <Reveal order={3} className="w-full lg:col-start-7 lg:col-span-5">
+            better arriving after the words that name it.
+
+            Six columns, where it used to take five. The client asked on
+            2026-08-25 for the artwork to take up the room the rule above the
+            body gave back, and a column is the only place that room can come
+            from: the artwork is `w-full` of its column and always has been, so
+            it is the *grid* that sizes it, not `--about-media-max-w` —
+            measured at four widths, the cap was never once the binding
+            constraint. Raising the cap would have moved nothing.
+
+            The sixth column is the spare one at the right-hand end, not one
+            taken off the copy. Taking it off the copy was tried first and
+            keeps the client's 2026-08-21 symmetry — a spare column outside
+            each half — but it costs the body 100px at 1440 and leaves it 284px
+            wide at `lg`, well inside `--ledger-measure` and visibly ragged.
+            The artwork's own transparent margin means it does not read as
+            flush against the gutter even though its box now reaches it, so the
+            symmetry is given up where it shows least. */}
+        <Reveal order={3} className="w-full lg:col-start-7 lg:col-span-6">
           <MediaFrame
             image={media.image}
             alt={media.alt}

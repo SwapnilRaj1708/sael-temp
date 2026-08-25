@@ -24,7 +24,7 @@ export interface CountUpProps {
 }
 
 /**
- * Counts a figure up from zero when it first scrolls into view.
+ * Counts a figure up from zero as it scrolls into view — every time it does.
  *
  * **It animates the numbers inside a string, not a number.** These figures are
  * pre-formatted by the business — `"3625 MW + 5 GW"` is two quantities and two
@@ -41,6 +41,17 @@ export interface CountUpProps {
  * digit to four drags the layout along with it, and on a card with a heading
  * beside it that is very visible. The finished value is rendered underneath,
  * invisible but taking its full space, and the animating text sits over it.
+ *
+ * **Every figure takes the same time, whatever it counts to.** `3625 MW + 5 GW`
+ * and `164.9 MW` both run for `durationMs`, so a row of them finishes together
+ * rather than the small numbers landing first and the ledger settling in
+ * pieces. A per-digit or per-magnitude rate would do the opposite.
+ *
+ * **It replays on every pass**, like `<Reveal>` and by the same two-observer
+ * asymmetry — see the note there. The counting observer fires 10% up from the
+ * bottom edge; the re-arming one waits until the figure is *completely* off
+ * screen before resetting it to zero, because resetting at the counting margin
+ * would visibly blank a figure still sitting in the bottom tenth of the screen.
  *
  * Reduced motion prints the value and stops. Assistive technology always gets
  * the final string, never the intermediate ones — `aria-hidden` on the ticker
@@ -69,9 +80,13 @@ export function CountUp({ value, durationMs = 1500, className }: CountUpProps) {
 
     if (targets.length === 0) return;
 
+    const zeros = value.replace(NUMBER, () => '0');
+
     let frame = 0;
     let start: number | null = null;
-    let observer: IntersectionObserver | null = null;
+    let running = false;
+    let countObserver: IntersectionObserver | null = null;
+    let resetObserver: IntersectionObserver | null = null;
 
     const step = (now: number): void => {
       start ??= now;
@@ -88,11 +103,29 @@ export function CountUp({ value, durationMs = 1500, className }: CountUpProps) {
       );
 
       if (progress < 1) frame = requestAnimationFrame(step);
-      else setShown(value);
+      else {
+        running = false;
+        setShown(value);
+      }
     };
 
     const run = (): void => {
+      // Already counting, or already landed on this pass. Without this guard
+      // every scroll that re-crosses the margin without ever leaving the
+      // screen would restart the run, and the figure would stutter under the
+      // reader rather than settle.
+      if (running) return;
+      running = true;
+      start = null;
+      cancelAnimationFrame(frame);
       frame = requestAnimationFrame(step);
+    };
+
+    const rearm = (): void => {
+      running = false;
+      start = null;
+      cancelAnimationFrame(frame);
+      setShown(zeros);
     };
 
     // Zero until it is seen, so the count is not already over by the time the
@@ -100,35 +133,43 @@ export function CountUp({ value, durationMs = 1500, className }: CountUpProps) {
     // writing state during an effect makes React render twice before paint,
     // and here the second render is the one that matters.
     const prime = requestAnimationFrame(() => {
-      setShown(value.replace(NUMBER, () => '0'));
+      setShown(zeros);
 
-      // Already on screen, or no observer to ask: start now. The figure is
-      // real content — a card reading "0 MWp" because a callback never
-      // arrived is worse than one that never animated.
-      const box = node.getBoundingClientRect();
-      const onScreen = box.top < window.innerHeight && box.bottom > 0;
-
-      if (onScreen || typeof IntersectionObserver === 'undefined') {
+      // No observer to ask: count now and never re-arm. The figure is real
+      // content — a card reading "0 MWp" because a callback never arrived is
+      // worse than one that never animated.
+      if (typeof IntersectionObserver === 'undefined') {
         run();
         return;
       }
 
-      observer = new IntersectionObserver(
+      // Already on screen at mount: start now rather than waiting for the
+      // observer's first callback. The observers below are still wired, or
+      // the figure would never re-arm after its first pass out of view.
+      const box = node.getBoundingClientRect();
+      if (box.top < window.innerHeight && box.bottom > 0) run();
+
+      countObserver = new IntersectionObserver(
         (entries) => {
-          if (entries.some((entry) => entry.isIntersecting)) {
-            observer?.disconnect();
-            run();
-          }
+          if (entries.some((entry) => entry.isIntersecting)) run();
         },
         { rootMargin: '0px 0px -10% 0px' },
       );
 
-      observer.observe(node);
+      // Re-arms at the *unadjusted* viewport, so the figure is only ever
+      // blanked back to zero while nobody can see it happen.
+      resetObserver = new IntersectionObserver((entries) => {
+        if (entries.some((entry) => !entry.isIntersecting)) rearm();
+      });
+
+      countObserver.observe(node);
+      resetObserver.observe(node);
     });
 
     return () => {
       cancelAnimationFrame(prime);
-      observer?.disconnect();
+      countObserver?.disconnect();
+      resetObserver?.disconnect();
       cancelAnimationFrame(frame);
     };
   }, [value, durationMs, reducedMotion]);

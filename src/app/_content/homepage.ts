@@ -157,9 +157,10 @@ export const aboutSael: Omit<IntroSplitProps, 'snap'> = {
  * `getCapacityStats()`; the page joins the two on `id`.
  * docs/content-model.md §1.
  *
- * `upcoming` is the one per-row adjustment in force — see the note beside it.
- * `iconScale` is the other one the component supports and nothing sets it; the
- * agri-waste nudge it was added for was withdrawn on 2026-08-22.
+ * `upcoming` is the only per-row adjustment — see the note beside it. There
+ * was a second, `iconScale`, which scaled one mark against the other three;
+ * the agri-waste nudge it existed for was withdrawn on 2026-08-22 and the
+ * prop itself on 2026-08-26, when the mark stopped being drawn in a box.
  *
  * The descriptions are the Designer prototype's, verbatim, as
  * docs/features/04 §4 requires. The client's PDF sets Lorem ipsum in these
@@ -222,9 +223,9 @@ export const businessTiles = [
     ctaLabel: 'Know more about agri waste to energy',
     figureClassName: 'text-figure-agri-bright',
     ruleClassName: 'bg-figure-agri-bright',
-    // No `iconScale`. The leaves were carrying a +12% nudge against the other
-    // three marks; withdrawn on 2026-08-22, so all four are drawn at the same
-    // size again. The prop is still there for when it comes back.
+    // The leaves carried a +12% nudge against the other three marks until
+    // 2026-08-22. All four are drawn at one width now, each at its own
+    // height — see the mark in sections/business-tiles.
   },
 ];
 

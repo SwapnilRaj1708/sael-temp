@@ -253,6 +253,33 @@
 }
 
 /*
+ * The two grounds of `SAEL Home v2`, each with its dot grid.
+ *
+ * A utility rather than three classes repeated in two places, because there
+ * *are* two places: <Section>'s `paper-dots` / `black-dots` variants, and the
+ * pixel strip above the footer, which is a bare <div> and not a Section at all.
+ * The client asked on 2026-08-26 for the strip to carry the grid so it stops
+ * reading as a separate band — and a ground defined twice is a ground that
+ * drifts the first time one of the three declarations is touched.
+ *
+ * The colour is part of it deliberately. The grid is drawn *in* the ground, not
+ * over it: the dot alphas are tuned against these two colours and against
+ * nothing else, so letting a caller pair the image with some other background
+ * would silently break the one thing being tuned.
+ */
+@utility ground-dots-paper {
+  background-color: var(--color-paper);
+  background-image: var(--gradient-dot-paper);
+  background-size: var(--spacing-dot-grid) var(--spacing-dot-grid);
+}
+
+@utility ground-dots-dark {
+  background-color: var(--color-surface-black);
+  background-image: var(--gradient-dot-dark);
+  background-size: var(--spacing-dot-grid) var(--spacing-dot-grid);
+}
+
+/*
  * Hide a scroll container's scrollbar without taking away its scrolling.
  *
  * Only for a rail that ships its own affordance — the solutions carousel has

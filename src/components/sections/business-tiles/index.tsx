@@ -1,9 +1,8 @@
-import type { StaticImageData } from 'next/image';
+import Image, { type StaticImageData } from 'next/image';
 import { ArrowGlyph } from '@/components/ui/arrow-glyph';
 import { Button } from '@/components/ui/button';
 import { CountUp } from '@/components/ui/count-up';
-import { FlankedEyebrow } from '@/components/ui/flanked-eyebrow';
-import { MediaFrame } from '@/components/ui/media-frame';
+import { Eyebrow } from '@/components/ui/eyebrow';
 import { Reveal } from '@/components/ui/reveal';
 import { Section } from '@/components/ui/section';
 import { SIZES_BUSINESS_ICON } from '@/lib/utils/image-sizes';
@@ -45,19 +44,6 @@ export interface BusinessTile {
    * The same accent as the figure, so the row reads as one object.
    */
   ruleClassName: string;
-  /**
-   * Scales this row's mark against the others. The four are drawn to different
-   * optical weights and the agri-waste leaves read small beside the rest, so
-   * the client asked for that one to come up slightly. A number rather than a
-   * class: it is a nudge to one mark, not a size the system knows about.
-   *
-   * Applied to the box's **width**, not as a transform. The mark is pinned by
-   * its right edge, so a wider box grows leftward into the row's own reserved
-   * padding and its right edge does not move — where a `scale` grew it in
-   * every direction at once and pushed it past the row, which is the clipping
-   * the client reported on 2026-08-21.
-   */
-  iconScale?: number;
   /**
    * Marks the row as not yet operational, which gives it its own ground — the
    * frosted grey the masthead takes over a white page, moved onto the black
@@ -109,9 +95,7 @@ export function BusinessTiles({ eyebrow, tiles, snap = false }: BusinessTilesPro
       <div className="flex w-full flex-col gap-stack">
         {eyebrow !== undefined && (
           <Reveal order={0}>
-            <FlankedEyebrow rules="leading" tone="bright">
-              {eyebrow}
-            </FlankedEyebrow>
+            <Eyebrow tone="bright">{eyebrow}</Eyebrow>
           </Reveal>
         )}
 
@@ -233,55 +217,41 @@ export function BusinessTiles({ eyebrow, tiles, snap = false }: BusinessTilesPro
                   </div>
 
                   {/*
-                    The client's clean marks — no baked-in lettering, so nothing
-                    is cropped and the row's own heading is the only place the
-                    business is named.
+                    The client's clean marks — no baked-in lettering, so
+                    nothing is cropped and the row's own heading is the only
+                    place the business is named.
 
-                    Each is drawn in a box on its own aspect ratio, not a
-                    square: see the note on the style below.
+                    A plain <Image>, not <MediaFrame>. The frame primitive
+                    exists for a photograph filling a box its parent sized, and
+                    using it for a mark meant undoing it three times over: an
+                    aspect ratio computed from the import to stop the box
+                    disagreeing with the artwork, `object-contain` to cancel
+                    its `object-cover`, and `overflow-visible` to cancel its
+                    clip. Three corrections to arrive back at what an <img>
+                    does unaided. A static import already carries the artwork's
+                    intrinsic width and height, so a width and `h-auto` draw
+                    each mark at its own proportions — nothing to letterbox and
+                    nothing to crop, which is the whole requirement.
 
-                    A real column at the row's right edge, centred on it.
-                    `pointer-events-none` so it never intercepts the link
+                    The four run 0.838 to 1.002, so their rendered heights
+                    differ. That is the artwork, not a defect: they are pinned
+                    to a common width and centred on the row. (These files were
+                    re-cut on 2026-08-26 from the hero masters after the first
+                    set turned out to be sliced through at the bottom edge —
+                    the crop the client reported was baked into the PNGs, not
+                    applied by anything here.)
+
+                    `pointer-events-none` so the mark never intercepts the link
                     stretched over the row.
                   */}
-                  <MediaFrame
-                    image={tile.icon}
-                    alt=""
-                    sizes={SIZES_BUSINESS_ICON}
-                    pending={`business/${tile.id}`}
-                    style={{
-                      // Each mark keeps its own proportions rather than being
-                      // forced into a square. The four are not a uniform shape
-                      // — they run 0.918 to 1.040 — so a square box letterboxes
-                      // whichever way each one differs, and the agri-waste
-                      // leaves, the tallest of them, came out visibly smaller
-                      // than the other three for it. Both numbers come from the
-                      // import, which is data, hence the inline style.
-                      // /CLAUDE.md §5.
-                      aspectRatio:
-                        tile.icon === null
-                          ? 'var(--aspect-icon-mark)'
-                          : `${String(tile.icon.width)} / ${String(tile.icon.height)}`,
-                      // A per-row nudge, also data. Applied to the width; the
-                      // column is `shrink-0`, so the copy beside it gives way
-                      // rather than the mark being squeezed.
-                      ...(tile.iconScale === undefined
-                        ? {}
-                        : {
-                            width: `calc(var(--spacing-ledger-icon) * ${String(tile.iconScale)})`,
-                          }),
-                    }}
-                    className={cn(
-                      'pointer-events-none w-ledger-icon shrink-0 self-center',
-                      'bg-transparent',
-                      // <MediaFrame> clips by default, which is right for a
-                      // photograph in a fixed frame and pointless here: the box
-                      // is on the artwork's own ratio, so the two agree exactly
-                      // and there is nothing to clip.
-                      'overflow-visible',
-                    )}
-                    imageClassName="object-contain"
-                  />
+                  {tile.icon !== null && (
+                    <Image
+                      src={tile.icon}
+                      alt=""
+                      sizes={SIZES_BUSINESS_ICON}
+                      className="pointer-events-none h-auto w-ledger-icon shrink-0 self-center"
+                    />
+                  )}
                 </article>
               </Reveal>
             );

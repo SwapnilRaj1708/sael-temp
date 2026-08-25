@@ -41,6 +41,11 @@ export function EndeavourSplit({ eyebrow, body, media, snap = false }: Endeavour
   return (
     <Section
       data-snap-section
+      // The paper ground with its dot grid, like every section on this page but
+      // the hero. It was the bare white default, which left one undotted band
+      // between two dotted ones — /CLAUDE.md aside, the grid is the page's
+      // texture and a section without it reads as a gap in the page.
+      background="paper-dots"
       // No heading, so the section carries its own accessible name rather than
       // being an unlabelled region. An <h2> here would be inventing a level
       // the design does not have.

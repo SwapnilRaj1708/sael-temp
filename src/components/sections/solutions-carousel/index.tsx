@@ -57,63 +57,63 @@ export function SolutionsCarousel({
               <Eyebrow tone="deep">{eyebrow}</Eyebrow>
             </Reveal>
 
-            {/* At `lg` and above the heading sits left and everything that
-                qualifies it sits right, baselines aligned — the design's own
-                arrangement. Below `lg` the three parts stack, each at the full
-                content width.
+            {/*
+              `--text-display`, which carries its own 400 weight — the same
+              size and face as "Endeavoring to make a sustainable impact" and
+              "Our Current Power Portfolio", which is how v2 sets all three.
+              DIN has no 500, and asking for one would be synthesised.
+              docs/design-guidelines.md §2.
 
-                A breakpoint switch and not `flex-wrap`, which is what this was
-                and which never wrapped: the right-hand group was `flex-1`,
-                whose `flex-basis: 0` makes its hypothetical main size zero, so
-                it always "fits" beside the heading however little room is
-                left. On a phone that left the sentence in a ~100px column with
-                its lines running off the side of the screen.
+              The ramp is clipped to the letterforms, as the design has it.
+              `--gradient-eyebrow-deep` and not the bright one: this is paper.
 
-                `lg` is the hinge for a layout that changes rather than scales.
-                docs/responsive-strategy.md §2. */}
-            <div className="flex flex-col gap-stack lg:flex-row lg:items-end lg:justify-between lg:gap-x-flow">
-              {/*
-                `--text-display`, which carries its own 400 weight — the same
-                size and face as "Endeavoring to make a sustainable impact" and
-                "Our Current Power Portfolio", which is how v2 sets all three.
-                DIN has no 500, and asking for one would be synthesised.
-                docs/design-guidelines.md §2.
+              **The heading has the row to itself**, by the client's decision
+              on 2026-08-25. It used to share a line with the sentence that
+              qualifies it, which is why it carried a 15ch cap — the cap was
+              there to keep it clear of the column beside it. There is no
+              column beside it now, so the cap is gone with the arrangement
+              that needed it and the heading runs the content width.
+            */}
+            <Reveal order={2}>
+              <h2 className="bg-(image:--gradient-eyebrow-deep) gradient-text text-display">
+                {title}
+              </h2>
+            </Reveal>
 
-                The ramp is clipped to the letterforms, as the design has it.
-                `--gradient-eyebrow-deep` and not the bright one: this is paper.
+            {/* Underneath it, the sentence at the left edge and the paging
+                pair at the right — the two ends of one row, which is the
+                arrangement the heading used to be part of.
 
-                The 15ch cap is scoped to `lg`, where it does its job of
-                keeping the heading clear of the column beside it. Below that
-                there is no column beside it, and capping a 360px screen at
-                15ch left a third of every line empty while the sentence
-                underneath had nowhere to go.
-              */}
-              <Reveal order={2}>
-                <h2 className="bg-(image:--gradient-eyebrow-deep) gradient-text text-display lg:max-w-(--hero-measure)">
-                  {title}
-                </h2>
+                Stacked below `md`, where a sentence and a pair of 52px
+                controls on one line leave the sentence too narrow to read.
+                `md` rather than the page's usual `lg` hinge because this row
+                is no longer competing with the heading for width: it has the
+                whole content column, and a tablet has room for both halves
+                long before it has room for the old three-part arrangement.
+                docs/responsive-strategy.md §2 asks for the justification, and
+                that is it. */}
+            <div className="flex flex-col gap-stack md:flex-row md:items-end md:justify-between md:gap-x-flow">
+              {/* Capped at `--measure` now that it is running copy in a column
+                  of its own. It was uncapped while it sat in the narrow
+                  right-hand column, where the column was already the cap and
+                  68ch only made the line break in a worse place; across the
+                  full content width, uncapped means a single sentence stretched
+                  over 1600px. */}
+              <Reveal order={3}>
+                <p className="max-w-(--measure) text-body [text-wrap:pretty] text-body-soft">
+                  {lead}
+                </p>
               </Reveal>
 
-              <div className="flex flex-col gap-stack lg:flex-1 lg:flex-row lg:flex-wrap lg:items-end lg:justify-end lg:gap-x-flow">
-                {/* No `--measure` cap here. The cap is for running copy, and
-                    this is a single sentence the design sets on one or two
-                    lines; capped at 68ch it broke after "propelling" on every
-                    desktop width. It still wraps naturally once the column is
-                    narrower than the sentence. */}
-                <Reveal order={3}>
-                  <p className="text-body [text-wrap:pretty] text-body-soft">{lead}</p>
-                </Reveal>
-
-                {/* Stacked, the pair stays at the right-hand edge rather than
-                    sliding under the sentence — it is the corner of the frame
-                    in the design and it reads as one there too. */}
-                <RailArrows
-                  previousLabel="Previous plant"
-                  nextLabel="Next plant"
-                  tone="paper"
-                  className="self-end lg:self-auto"
-                />
-              </div>
+              {/* Stacked, the pair stays at the right-hand edge rather than
+                  sliding under the sentence — it is the corner of the frame in
+                  the design and it reads as one there too. */}
+              <RailArrows
+                previousLabel="Previous plant"
+                nextLabel="Next plant"
+                tone="paper"
+                className="self-end md:shrink-0 md:self-auto"
+              />
             </div>
           </Container>
 

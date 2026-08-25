@@ -228,7 +228,6 @@ export default function DesignSystemPage() {
           {(
             [
               ['shadow-card-hover', 'shadow-card-hover'],
-              ['shadow-header', 'shadow-header'],
               ['drop-shadow-tile', 'drop-shadow-tile'],
               ['drop-shadow-tile-hover', 'drop-shadow-tile-hover'],
             ] as const
