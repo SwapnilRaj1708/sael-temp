@@ -31,7 +31,7 @@ export function HeaderCta() {
       className={cn(
         'hidden shrink-0 items-center xl:inline-flex',
         'rounded-nav-cta px-5 py-3',
-        'text-nav font-bold text-white',
+        'text-nav text-white',
         'bg-(image:--gradient-nav-cta) shadow-nav-cta',
         'transition duration-(--duration-micro)',
         'hover:-translate-y-0.5 hover:shadow-nav-cta-hover',

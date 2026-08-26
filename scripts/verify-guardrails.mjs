@@ -2,7 +2,7 @@
  * Asserts that the project's guardrails actually fail when they should.
  *
  * A guardrail nobody tests is a guardrail that quietly stops working. This
- * script proves five things:
+ * script proves six things:
  *
  *   1. `src/lib/config/env.ts` rejects a missing or malformed environment with
  *      a readable message, at module load — so the build fails, not a request.
@@ -14,9 +14,14 @@
  *      token layer (/CLAUDE.md §2.2).
  *   5. `<Container>` is the only thing that sets horizontal page padding
  *      (docs/design-guidelines.md §3).
+ *   6. No file under `src/` carries a magic number in a Tailwind arbitrary
+ *      value (/CLAUDE.md §2.2, third clause).
  *
  * 4 and 5 are the FE-02 acceptance criteria that would otherwise be "someone
- * remembers to grep for it".
+ * remembers to grep for it". 6 closes the gap they left: rule 2.2 has four
+ * clauses and only three were enforced, which is why FE-04 accumulated
+ * `h-[42px]`, `z-[100]` and friends with a green build. Added as C-5 of
+ * docs/design-reconciliation.md, ahead of FE-06.
  *
  * Runs in `pnpm check` and on pre-push. No test framework — see
  * docs/architecture.md §1 ("Not in scope").
@@ -283,6 +288,38 @@ const VALUE_CHECKS = [
     allow: new Set(['src/components/ui/container.tsx']),
     hint: 'Wrap the content in <Container> instead. docs/design-guidelines.md §3.',
   },
+  {
+    name: 'tokens: no magic number in a Tailwind arbitrary value',
+    /*
+     * /CLAUDE.md §2.2's third clause — "no magic pixel numbers" — which was the
+     * one rule here with nothing enforcing it. A Tailwind arbitrary value whose
+     * contents *begin with a number* is a raw dimension: `h-[42px]`, `z-[100]`,
+     * `backdrop-blur-[22px]`, `scale-[1.02]`, `tracking-[0.25em]`.
+     *
+     * Anchoring on that leading digit is what makes the rule cheap and precise.
+     * It admits, without needing an allowlist:
+     *
+     *   - composed values — `pt-[calc(var(--a)+var(--b))]`, `w-[min(…)]` — which
+     *     start with a function name and are how a token is *used*, not dodged;
+     *   - arbitrary properties — `[clip-path:polygon(…)]`, `[text-wrap:pretty]`
+     *     — which have no `utility-` prefix before the bracket;
+     *   - variant brackets — `supports-[backdrop-filter]`, `data-[state=open]`,
+     *     `transition-[color,background-color]` — which start with a letter.
+     *
+     * The token layer keeps its literals, and the design-system page is a
+     * showcase of raw values by definition; both are already exempt above.
+     */
+    pattern: /\b[a-z][a-zA-Z-]*-\[-?\d[^\]]*\]/g,
+    /*
+     * Grid track sizing is the one place a bare number is the idiom rather than
+     * a magic value: `grid-rows-[0fr]` → `grid-rows-[1fr]` is how a collapsing
+     * row is animated, and `1fr` is a ratio, not a dimension. There is no token
+     * that could express it and no drift for it to cause.
+     */
+    except: /^grid-(?:rows|cols)-\[/,
+    allow: TOKEN_LAYER,
+    hint: 'Mint a token in src/styles/theme.css. /CLAUDE.md §2.2, docs/design-guidelines.md §3.',
+  },
 ];
 
 /**
@@ -306,7 +343,9 @@ for (const check of VALUE_CHECKS) {
     if (check.allow.has(file.id) || VALUE_EXEMPT.has(file.id)) continue;
 
     const source = stripComments(readFileSync(file.path, 'utf8'));
-    const matches = [...source.matchAll(check.pattern)];
+    const matches = [...source.matchAll(check.pattern)].filter(
+      (match) => check.except === undefined || !check.except.test(match[0]),
+    );
     if (matches.length === 0) continue;
 
     // Report the line, so the message is actionable rather than a filename.

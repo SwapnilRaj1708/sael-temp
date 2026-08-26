@@ -361,22 +361,28 @@
  * to run on, and `inert` keeps it out of the tab order meanwhile.
  */
 @layer utilities {
-  .anim-mega-col {
-    opacity: 0;
-    transform: translateY(22px);
-  }
-
-  [data-mega='open'] .anim-mega-col {
-    opacity: 1;
-    transform: none;
-  }
-
+  /* The still state is the unconditional one, per this file's contract: a
+   * column is simply there. Both the hidden state and the transition that
+   * leaves it live inside the media query, so a reduced-motion user opening
+   * the panel sees the columns at once rather than watching them rise.
+   *
+   * Nothing is exposed while the panel is closed, because the panel carries
+   * its own `opacity-0 pointer-events-none` and `inert={!open}` — the column's
+   * own `opacity: 0` was only ever the animation's starting point, never what
+   * hid it. */
   @media (prefers-reduced-motion: no-preference) {
     .anim-mega-col {
+      opacity: 0;
+      transform: translateY(var(--reveal-shift));
       transition:
         opacity var(--duration-mega) var(--ease-entrance),
         transform var(--duration-mega) var(--ease-entrance);
       transition-delay: calc(var(--mm-index, 0) * var(--duration-mega-step));
+    }
+
+    [data-mega='open'] .anim-mega-col {
+      opacity: 1;
+      transform: none;
     }
   }
 }

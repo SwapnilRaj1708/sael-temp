@@ -25,7 +25,7 @@ import { Container } from '@/components/ui/container';
  */
 export function Header() {
   return (
-    <header className="fixed inset-x-0 top-0 z-[100]">
+    <header className="fixed inset-x-0 top-0 z-(--z-header)">
       <HeaderGlass />
 
       <Container>

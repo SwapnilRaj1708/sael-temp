@@ -74,7 +74,7 @@ export function Footer() {
                           'rounded-pill bg-white text-footer-icon',
                           'inline-flex size-touch items-center justify-center',
                           'transition-transform duration-(--duration-micro)',
-                          'hover:-translate-y-[3px] focus-visible:-translate-y-[3px]',
+                          'hover:-translate-y-(--lift-social) focus-visible:-translate-y-(--lift-social)',
                           'motion-reduce:transform-none',
                         )}
                       >
@@ -91,7 +91,7 @@ export function Footer() {
           <FooterLinks />
 
           {/* Corporate block */}
-          <address className="mt-flow text-body-sm text-white/72 not-italic">
+          <address className="mt-flow text-body-sm text-on-dark-soft not-italic">
             <span className="block font-bold text-white">{siteConfig.legalName}</span>
             <span className="block">Registered Office: {siteConfig.registeredOffice}</span>
             <span className="block">CIN: {siteConfig.cin}</span>
@@ -118,10 +118,10 @@ export function Footer() {
             </span>
           </address>
 
-          <hr className="mt-flow border-white/20" />
+          <hr className="mt-flow border-hairline-dark" />
 
           {/* Legal bar */}
-          <div className="mt-stack flex flex-col items-center gap-stack text-body-sm text-white/72 md:flex-row md:justify-between">
+          <div className="mt-stack flex flex-col items-center gap-stack text-body-sm text-on-dark-soft md:flex-row md:justify-between">
             <p>
               © {year} {siteConfig.name} | All Rights Reserved
             </p>

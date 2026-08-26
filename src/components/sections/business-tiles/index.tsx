@@ -1,6 +1,7 @@
 import Image, { type StaticImageData } from 'next/image';
 import { ArrowGlyph } from '@/components/ui/arrow-glyph';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { CountUp } from '@/components/ui/count-up';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { Reveal } from '@/components/ui/reveal';
@@ -115,7 +116,13 @@ export function BusinessTiles({ eyebrow, tiles, snap = false }: BusinessTilesPro
                 order={index + 2}
                 className="flex"
               >
-                <article
+                <Card
+                  as="article"
+                  ground="dark"
+                  inset="block"
+                  // Each row's own accent colour. The hairline it fills across,
+                  // and the timing, come from the primitive.
+                  accentClassName={tile.ruleClassName}
                   className={cn(
                     // A row, not a stack: the copy is one column and the mark
                     // is the other. The mark used to be absolutely positioned
@@ -126,30 +133,14 @@ export function BusinessTiles({ eyebrow, tiles, snap = false }: BusinessTilesPro
                     // alone and any disagreement about that showed up as a
                     // trimmed mark. In flow it is laid out like anything else
                     // and there is nothing left to get wrong.
-                    'group relative flex w-full gap-x-flow',
-                    'border-t border-hairline-dark',
-                    'py-4 lg:py-6',
+                    'gap-x-flow',
                     // The one row that is not yet operational carries its own
                     // ground. Inline padding comes with it: without it the
                     // copy would start hard against the panel's edge, where
                     // every other row starts against nothing.
-                    tile.upcoming === true && 'bg-tile-upcoming px-4 lg:px-5',
+                    tile.upcoming === true && 'bg-tile-upcoming px-inset',
                   )}
                 >
-                  {/* The accent filling across the row's own hairline on hover.
-                      `scaleX` rather than a width, so nothing in the row is
-                      laid out again per frame. */}
-                  <span
-                    aria-hidden="true"
-                    className={cn(
-                      'absolute inset-x-0 -top-px h-rule-accent origin-left',
-                      'scale-x-0 transition-transform duration-(--duration-card)',
-                      'group-focus-within:scale-x-100 group-hover:scale-x-100',
-                      'motion-reduce:transition-none',
-                      tile.ruleClassName,
-                    )}
-                  />
-
                   {/* `min-w-0` so a long capacity figure shrinks the column
                       rather than pushing the mark off the row — a flex item's
                       floor is its content's min-content width until you say
@@ -204,12 +195,12 @@ export function BusinessTiles({ eyebrow, tiles, snap = false }: BusinessTilesPro
                         // ground; its outline and hover fill belong to a boxed
                         // button and are removed, because here the action is a
                         // bare label with an arrow.
-                        'border-0 pt-5 hover:bg-transparent',
+                        'border-0 pt-card-flow hover:bg-transparent',
                         "after:absolute after:inset-0 after:content-['']",
                       )}
                     >
                       <span className="sr-only">{tile.ctaLabel}</span>
-                      <span aria-hidden="true" className="inline-flex items-center gap-2">
+                      <span aria-hidden="true" className="inline-flex items-center gap-tight">
                         Know More
                         <ArrowGlyph />
                       </span>
@@ -252,7 +243,7 @@ export function BusinessTiles({ eyebrow, tiles, snap = false }: BusinessTilesPro
                       className="pointer-events-none h-auto w-ledger-icon shrink-0 self-center"
                     />
                   )}
-                </article>
+                </Card>
               </Reveal>
             );
           })}

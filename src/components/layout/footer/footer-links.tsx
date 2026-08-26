@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils/cn';
 
 function FooterAnchor({ link }: { link: FooterLink }) {
   const className = cn(
-    'text-body-sm inline-flex min-h-touch items-center text-white/80',
+    'text-body-sm inline-flex min-h-touch items-center text-body-on-dark',
     'transition-colors duration-(--duration-micro) hover:text-white',
   );
 
@@ -43,7 +43,7 @@ export function FooterLinks() {
       <div className="hidden gap-gap-grid md:grid md:grid-cols-2 lg:grid-cols-4">
         {FOOTER_GROUPS.map((group) => (
           <div key={group.title}>
-            <h2 className="mb-stack text-label text-white uppercase">{group.title}</h2>
+            <h2 className="mb-stack text-label text-white">{group.title}</h2>
             <ul className="flex list-none flex-col">
               {group.links.map((link) => (
                 <li key={link.href}>
@@ -63,9 +63,13 @@ export function FooterLinks() {
               key={group.title}
               value={group.title}
               headingAs="h2"
-              title={<span key={group.title} className="text-label uppercase">{group.title}</span>}
-              className="border-white/20"
-              triggerClassName="text-white hover:text-white/80"
+              title={
+                <span key={group.title} className="text-label">
+                  {group.title}
+                </span>
+              }
+              className="border-hairline-dark"
+              triggerClassName="text-white hover:text-body-on-dark"
             >
               <ul className="flex list-none flex-col">
                 {group.links.map((link) => (

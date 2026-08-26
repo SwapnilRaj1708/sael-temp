@@ -79,8 +79,8 @@ export function HeaderGlass() {
         // the base layer in both states and the veil paints over it, which is
         // why the two `bg-*` classes below are not in conflict.
         'bg-header-solid',
-        'supports-[backdrop-filter]:backdrop-blur-[22px]',
-        'supports-[backdrop-filter]:backdrop-saturate-[1.4]',
+        'supports-[backdrop-filter]:backdrop-blur-header',
+        'supports-[backdrop-filter]:backdrop-saturate-(--saturate-glass)',
         scrolled
           ? 'border-header-hairline-scrolled supports-[backdrop-filter]:bg-header-veil-scrolled'
           : 'border-header-hairline supports-[backdrop-filter]:bg-header-veil',

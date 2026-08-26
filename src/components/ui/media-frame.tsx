@@ -71,6 +71,11 @@ export function MediaFrame({
         <Image
           src={image}
           alt={alt}
+          // A decorative image needs both halves. `alt=""` keeps it out of the
+          // accessible name; `aria-hidden` keeps the node itself out of the
+          // tree, so a screen reader cannot land on an empty graphic while
+          // walking the section. docs/design-guidelines.md §6.
+          aria-hidden={alt === '' ? true : undefined}
           fill
           sizes={sizes}
           priority={priority}

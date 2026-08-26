@@ -2,6 +2,7 @@ import Image from 'next/image';
 import type { NewsItem } from '@/lib/content';
 import { ArrowGlyph } from '@/components/ui/arrow-glyph';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { Rail } from '@/components/ui/rail/rail';
@@ -75,25 +76,17 @@ export function NewsCarousel({ title, items, snap = false }: NewsCarouselProps) 
                 {/* 2, 3, 4 … — the label is 0 and 1 is skipped, so the cards
                     cascade in after it rather than alongside it. */}
                 <Reveal order={index + 2} className="flex w-full">
-                  <article
-                    className={cn(
-                      'group relative flex w-full flex-col',
-                      'border-t border-hairline-paper pt-4 lg:pt-5',
-                    )}
+                  {/* The hairline, the inset under it and the accent that
+                      fills across it on hover all come from <Card> — the same
+                      three the ledger rows take. Only the column direction is
+                      this section's own. */}
+                  <Card
+                    as="article"
+                    ground="paper"
+                    inset="top"
+                    accentClassName="bg-brand-red"
+                    className="flex-col"
                   >
-                    {/* The accent filling across the card's own hairline on
-                        hover. `scaleX`, so nothing is laid out again per
-                        frame — same treatment as a ledger row. */}
-                    <span
-                      aria-hidden="true"
-                      className={cn(
-                        'absolute inset-x-0 -top-px h-rule-accent origin-left bg-brand-red',
-                        'scale-x-0 transition-transform duration-(--duration-card)',
-                        'group-hover:scale-x-100 group-focus-within:scale-x-100',
-                        'motion-reduce:transition-none',
-                      )}
-                    />
-
                     {/* The machine-readable instant and the human one come
                         from the same helper, so they cannot disagree — and the
                         display string is pinned to IST, which is what keeps
@@ -116,7 +109,7 @@ export function NewsCarousel({ title, items, snap = false }: NewsCarouselProps) 
                           fill
                           sizes={SIZES_NEWS_CARD}
                           className={cn(
-                            'object-cover transition duration-(--duration-reveal)',
+                            'object-cover transition duration-(--duration-card)',
                             'group-hover:scale-105',
                             'motion-reduce:transition-none motion-reduce:group-hover:scale-100',
                           )}
@@ -137,7 +130,7 @@ export function NewsCarousel({ title, items, snap = false }: NewsCarouselProps) 
                       variant="quiet"
                       size="micro"
                       className={cn(
-                        'mt-auto pt-4 hover:no-underline',
+                        'mt-auto pt-card-flow hover:no-underline',
                         "after:absolute after:inset-0 after:content-['']",
                       )}
                     >
@@ -146,12 +139,12 @@ export function NewsCarousel({ title, items, snap = false }: NewsCarouselProps) 
                           is a list of identical links to a screen-reader
                           user. */}
                       <span className="sr-only">Read more: {item.title}</span>
-                      <span aria-hidden="true" className="inline-flex items-center gap-2">
+                      <span aria-hidden="true" className="inline-flex items-center gap-tight">
                         Read More
                         <ArrowGlyph />
                       </span>
                     </Button>
-                  </article>
+                  </Card>
                 </Reveal>
               </li>
             ))}

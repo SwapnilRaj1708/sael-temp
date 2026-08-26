@@ -45,8 +45,8 @@ instruction wins and the disagreement is recorded beside the token or component.
 | 2 | About SAEL | `sections/intro-split/` | **Rebuilt to v2** on 2026-08-21, after being held back a day. The PDF's fixed 1280:528 stage and its whole `--about-*` coordinate set are gone; it is a twelve-column grid with a display heading, a rule and running copy beside the composite. Copy on columns 2–6 and artwork on 7–11, drawn in off the gutters rather than v2's 1–6 / 8–12 — the client's call |
 | 3 | Business portfolio | `sections/business-tiles/` | **Rebuilt to v2.** A ledger of four rows on the black dotted ground, not four centred tiles on a light one. Capacity figure is now the largest thing on the row. Solar Cell Manufacturing carries its own frosted-grey ground as the one upcoming business. Marks are at three quarters of v2's own `clamp(92px, 10vw, 176px)` — the design's curve, our scale (2026-08-22). The agri mark's per-row nudge was withdrawn the same day; `iconScale` survives unused for when it returns. The copy is capped at v2's 46ch so it wraps before it reaches the mark, and the gutter beside the mark was deliberately **not** reduced with the mark. Each mark is drawn on **its own aspect ratio**, not forced square: the four run 0.918 to 1.040, so a square box letterboxed each differently and left the agri-waste leaves visibly smallest. **And the mark is in flow**, a real column beside the copy, rather than absolutely positioned over the row with a right padding reserving space for it — an out-of-flow box whose only child is also out of flow has no content to size against, so its height came from `aspect-ratio` alone and kept resolving short, which is what was trimming the artwork. `--spacing-ledger-gutter` went with it; a `gap-x-flow` does that job now. Both 2026-08-24. **All of that box is gone as of 2026-08-26**: the mark is a plain `<Image>` at a width with `h-auto`, so it draws at its own proportions with nothing to letterbox and nothing to clip, and `iconScale`, `--aspect-icon-mark` and the `<MediaFrame>` around it went with it. The four PNGs were re-cut the same day — see the revision note below |
 | 4 | Our Current Power Portfolio | `sections/presence-map/` | **Rebuilt to v2** on 2026-08-21, and the layout review it was waiting on is closed: map left, display heading with the footprint label and the two figures right, nothing positioned over the artwork any more. A centred flex row rather than v2's 1–6 / 8–12 grid: on a grid both halves are capped and the slack lands between them, which is what kept reading as a hole. The two figures sit a `--spacing-stack` apart and the rule over the footprint label is capped at `--map-rule-w` — all the client's calls, 2026-08-21 and -22. **The 751-subpath generated map is gone**, replaced by the client's supplied `dotted-map.svg`; the six site coordinates are mapped across from the old viewBox and **want a visual check** — see the note in `presence-map/dots.ts`. Carries a **"Portfolio"** section label as of 2026-08-26 — v2's own screen has none, so this is a deliberate departure at the client's request |
-| 5 | Solutions | `sections/solutions-carousel/` | **Rebuilt to v2** — four 4:3 plates a hairline apart, each captioned underneath; the gradient plaque is gone. Kept **before** Our Endeavour, where v2 puts it after, and set on the light ground where v2 sets it on black. Both the client's calls on 2026-08-20 |
-| 6 | Our Endeavour | `sections/endeavour-split/` | Unchanged. Left as-is at the client's request on 2026-08-20 |
+| 5 | Our Endeavour | `sections/endeavour-split/` | Unchanged. Left as-is at the client's request on 2026-08-20. **Moved ahead of Solutions on 2026-08-26** — a two-line reorder in `page.tsx`; the section itself is untouched |
+| 6 | Solutions | `sections/solutions-carousel/` | **Rebuilt to v2** — four 4:3 plates a hairline apart, each captioned underneath; the gradient plaque is gone. It was kept **before** Our Endeavour and set on the light ground, both the client's calls on 2026-08-20; **both were withdrawn on 2026-08-26** and it now follows Our Endeavour on the black ground, which is v2's own arrangement. The flip minted no token — every ramp is the declared dark counterpart of the paper one it replaced |
 | 7 | Our Goals | `sections/goals-grid/` | **Rebuilt to v2** — three cards a hairline apart inside a hairline frame, on black. **The resting state shows the photograph untreated**: the scrim arrives with the pointer, along with the description. The three marks are the client's own artwork as of 2026-08-21, inverted to white at the call site; the `lucide-react` stand-ins are gone. Sized 40 → 56px, then ~4.5x that on 2026-08-22, then halved again to 60 → 126px on 2026-08-24 against the client's revised artwork — the mark is the card's subject, not an icon over a title. **Two sets of marks are in `src/assets/images/`**: `*-goal.svg`, which is what is wired up, and a later `*-icon.svg` set. Confirm which is current before this ships |
 | 8 | In the News | `sections/news-carousel/` | **Rebuilt to v2.** The card lost its box — a hairline it hangs from, the date above a 5:4 thumbnail, the accent filling across the rule on hover. Still the one homepage surface fed by the repository |
 | 9 | Pixel strip | `sections/pixel-strip/` | Drawn to a canvas. On the dotted paper ground as of 2026-08-26 — it was the last band of bare `--surface` white and read as a separate section bolted to the end |
@@ -137,6 +137,26 @@ build and a second read of `SAEL Home v2.dc.html` through the design MCP:
   date under its own top edge, which is what the client was seeing. `rail-reveal-slack`
   absorbs the transform in end padding it takes straight back out of the flow.
 
+**Revised a third time on 2026-08-26**, against a ten-step section sequence from the
+client naming each section and its ground. Six of the ten already matched. Two were
+fixed, and they are the same two the client had ruled on six days earlier:
+
+- **Our Endeavour now precedes Solutions**, and **Solutions is on `black-dots`** — both
+  restoring `SAEL Home v2.dc.html`'s own arrangement, and both explicitly withdrawing the
+  2026-08-20 calls recorded in rows 5 and 6 above. The ground flip is eight token swaps
+  and no new token: `paper-dots` → `black-dots`, `<Eyebrow>` `deep` → `bright`,
+  `<DisplayHeading>` `paper` → `dark`, `text-body-soft` → `text-on-dark-soft`,
+  `<RailArrows>` `paper` → `dark`, `border-hairline-paper` → `border-hairline-dark`,
+  `text-meta-paper` → `text-on-dark-muted`, and the plate title's `text-ink` **deleted**
+  rather than swapped — `<Section>` sets the ground's full-strength ink itself, so naming
+  it at the call site was duplication on either ground.
+- **The other two deviations were ruled deliberate by the client** and are not outstanding
+  work: the Timeline stays unbuilt, and the pixel strip stays where it is rather than
+  moving into the footer.
+
+Both the comparison and the remediation plan are in
+`docs/homepage-section-sequence-review.md`.
+
 Also landed inside this item, as `features/05` intends: the content repository slice
 (`src/lib/content/`) with its mock and API adapters behind `getContentRepository()`,
 now carrying `getCapacityStats()` and `getNewsItems()`.
@@ -170,6 +190,7 @@ Delivery order. Items FE-02 → FE-04 are the critical path; nothing below FE-04
 
 | ID | Item | Feature doc | Reads |
 |---|---|---|---|
+| FE-25 | Design-system reconciliation — guidelines vs. the as-built homepage | `design-reconciliation.md` | `design-guidelines.md` |
 | FE-05 | Content repository + mock data layer | `features/05-content-repository.md` | `content-model.md`, `api-contracts.md` |
 | FE-06 | About Us | `features/06-about-us.md` | `design-guidelines.md`, `responsive-strategy.md` |
 | FE-07 | Our Team | `features/07-our-team.md` | `content-model.md` |
@@ -190,6 +211,45 @@ Delivery order. Items FE-02 → FE-04 are the critical path; nothing below FE-04
 | FE-22 | SEO, redirects, sitemap, robots | `features/22-seo-and-redirects.md` | `accessibility-and-seo.md` |
 | FE-23 | Backend API cutover (mock → Spring Boot) | `features/23-api-integration-cutover.md` | `content-model.md`, `api-contracts.md` |
 | FE-24 | Performance & accessibility hardening pass | `features/24-hardening-pass.md` | `accessibility-and-seo.md`, `responsive-strategy.md` |
+
+### FE-25 — landed
+
+Listed first because it **precedes FE-06**, not because it is the next thing to start. All
+of it has landed; the row stays until it is moved to Done alongside FE-04.
+Opened after FE-04 revealed that `design-guidelines.md` named ~80 tokens against the 231
+`theme.css` actually declares, so the document a new page is supposed to build from
+described a homepage that no longer existed. Its spec is **`design-reconciliation.md`**
+rather than a `features/NN-*.md` — it reconciles an existing document instead of
+specifying a new surface, so there is nothing for a feature doc to hold that the ledger
+does not already hold better.
+
+**Landed as of 2026-08-26.** `design-guidelines.md` is realigned against `565a3dc` and is
+authoritative again; the guardrail now enforces all four of `/CLAUDE.md` §2.2's value
+rules (**C-5**), and the magic-number drift it was written to stop has been cleared
+(**C-4**). Ten further fixes are in — **C-1**, **C-3**, **C-6 … C-12**. The full suite is
+green.
+
+**`ui/card.tsx` was rewritten, not just adopted** (**C-1**). Its spec described a boxed,
+elevated card that v2 had removed, and it had no call sites, so the page's own shape — a
+hairline, an inset, an accent that fills across the hairline — became the primitive.
+`news-carousel` and `business-tiles` both consume it. Proved inert element-by-element.
+Side effect for a later ruling: `ui/tile-shape.tsx` now has no call site, and three tokens
+are stranded with it.
+
+**C-2 closed by declining adoption** (2026-08-26). `ui/section-heading.tsx` cannot be
+adopted by the homepage: four of the seven heading sections are an `<Eyebrow>` and nothing
+else, and the other three wrap every element in its own `<Reveal>` so they cascade — which
+a primitive rendering three siblings in one `<div>` cannot express. Its two consumers,
+`error.tsx` and `not-found.tsx`, use it exactly as intended, so it was retained unchanged
+and the finding recorded as a **documented non-defect**. What the three sections genuinely
+shared — the gradient-clipped `--text-display` heading — was extracted as
+**`ui/display-heading.tsx`** and all three migrated. Proved inert by two clean builds with
+a byte-identical stylesheet.
+
+**Nothing outstanding.** All twelve code fixes are done and the full suite is green.
+**A session opening FE-06 should read `design-reconciliation.md` §9 first** — a handoff
+covering the primitives, the ground/ramp rule, the `FONT_SIZES` trap, the magic-number
+guardrail and the toolchain.
 
 ---
 

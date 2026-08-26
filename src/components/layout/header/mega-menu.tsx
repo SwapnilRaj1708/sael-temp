@@ -90,8 +90,8 @@ export function MegaMenu({
       className={cn(
         'fixed inset-0 -z-10 hidden overflow-y-auto lg:block',
         'bg-(image:--gradient-mega)',
-        'supports-[backdrop-filter]:backdrop-blur-[30px]',
-        'supports-[backdrop-filter]:backdrop-saturate-[1.4]',
+        'supports-[backdrop-filter]:backdrop-blur-mega',
+        'supports-[backdrop-filter]:backdrop-saturate-(--saturate-glass)',
         'transition-opacity duration-(--duration-mega) motion-reduce:transition-none',
         open ? 'opacity-100' : 'pointer-events-none opacity-0',
       )}
@@ -117,7 +117,7 @@ export function MegaMenu({
                 <p
                   className={cn(
                     'border-mega-head-rule mb-5 flex items-baseline gap-2 border-b pb-3.5',
-                    'text-label font-bold',
+                    'text-mega-head',
                   )}
                 >
                   <span aria-hidden="true" className="text-badge opacity-50">
@@ -174,7 +174,7 @@ export function MegaMenu({
         </nav>
       </Container>
 
-      <p className="pb-flow text-center text-badge tracking-[0.25em] text-body-soft uppercase">
+      <p className="pb-flow text-center text-badge tracking-strapline text-body-soft uppercase">
         Sustainable &amp; Affordable Energy for Life
       </p>
     </div>

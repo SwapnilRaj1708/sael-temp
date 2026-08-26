@@ -267,18 +267,36 @@
   --text-body-sm--line-height: 1.5;
   --text-body-sm--font-weight: 400;
 
-  /* 14 → 16, uppercase */
+  /* 14 → 16 */
   --text-label: clamp(0.875rem, 0.8462rem + 0.1282vw, 1rem);
   --text-label--line-height: 1.35;
   --text-label--letter-spacing: 0.0625em;
   --text-label--font-weight: 400;
 
+  /* The mega menu's column headings — the six section names above the rule.
+   *
+   * --text-label's metrics at 700. Its own token rather than a weight override
+   * at the call site, and rather than a change to --text-label, which the
+   * footer's headings also take at 400: a column head is a different role that
+   * happens to share a size, and that is what a token is for. Named for the
+   * role, beside --color-mega-head-rule. Minted 2026-08-26 (C-3). */
+  --text-mega-head: clamp(0.875rem, 0.8462rem + 0.1282vw, 1rem);
+  --text-mega-head--line-height: 1.35;
+  --text-mega-head--letter-spacing: 0.0625em;
+  --text-mega-head--font-weight: 700;
+
   /* Fixed 16. Below lg the nav is a drawer rendered at --text-h3, so this
-   * token only ever applies at one size. docs/responsive-strategy.md §4. */
+   * token only ever applies at one size. docs/responsive-strategy.md §4.
+   *
+   * 700, corrected 2026-08-26 (C-3). It had declared 400 while its only
+   * consumer — the masthead CTA — overrode it to 700 at the call site, which
+   * design-guidelines.md §4 has documented as "--text-nav at 700" throughout.
+   * The token was simply wrong. The bar's six links are --text-nav-item and
+   * were never affected. */
   --text-nav: 1rem;
   --text-nav--line-height: 1;
   --text-nav--letter-spacing: 0.0125em;
-  --text-nav--font-weight: 400;
+  --text-nav--font-weight: 700;
 
   /* The six links in the middle of the masthead, and only those.
    *
@@ -397,6 +415,16 @@
   --text-card-title--letter-spacing: -0.01em;
   --text-card-title--font-weight: 400;
 
+  /* Tracking, where a role needs a value its size token does not carry.
+   *
+   * The mega menu's strapline is the one such role: it takes --text-badge's
+   * size but is set far wider than that token's own 0.0214em. Kept as an
+   * exact-equivalent token rather than folded into --text-meta, because
+   * --text-meta is a different size, tracking and line height — that swap is a
+   * visual change and is not this fix's to make. See C-4 / D-2 in
+   * docs/design-reconciliation.md. */
+  --tracking-strapline: 0.25em;
+
   /* ---------------------------------------------------------------------
    * Spacing — docs/design-guidelines.md §3
    * ------------------------------------------------------------------ */
@@ -440,6 +468,26 @@
   --spacing-stack: clamp(0.75rem, 0.5769rem + 0.7692vw, 1.5rem); /* 12 → 24 */
   --spacing-gap-grid: clamp(1rem, 0.7837rem + 0.9615vw, 1.9375rem); /* 16 → 31 */
 
+  /* The two steps below --spacing-stack, added 2026-08-26 (C-11).
+   *
+   * Before these, anything tighter than 12px had nowhere to go and fell back to
+   * Tailwind's generic 4px scale — which is how a card ended up padded `p-4` in
+   * one section and `p-5 lg:p-6` in another, with nothing to arbitrate between
+   * them. `--spacing-inset` is the padding inside a card or panel;
+   * `--spacing-tight` is an icon or inline gap. docs/design-guidelines.md §3.
+   *
+   * Neither name collides with Tailwind's `inline-*` display utilities — see
+   * the note on --spacing-flow for why that check is not optional. */
+  --spacing-inset: clamp(1rem, 0.8846rem + 0.5128vw, 1.5rem); /* 16 → 24 */
+  --spacing-tight: clamp(0.5rem, 0.4423rem + 0.2564vw, 0.75rem); /* 8 → 12 */
+
+  /* The gap between a card's body and its footer — the rule above a "Know More",
+   * not padding inside the card's edge. Same curve as --spacing-inset, and that
+   * is deliberate: the two read as one rhythm rather than two. It is named apart
+   * because it is flow, so a future card asks for the gap it means rather than
+   * borrowing the inset. docs/design-guidelines.md §3. */
+  --spacing-card-flow: clamp(1rem, 0.8846rem + 0.5128vw, 1.5rem); /* 16 → 24 */
+
   /* The WCAG floor for a touch target. docs/responsive-strategy.md §5. */
   --spacing-touch: 2.75rem; /* 44 */
 
@@ -449,6 +497,12 @@
    * bare `vw` is only safe inside a clamp, and only in this file.
    * docs/responsive-strategy.md §3. */
   --spacing-nav-gap: clamp(0.25rem, 1vw, 1.125rem); /* 4 → 18 */
+  /* The masthead logo above lg. Below it the mark drops to `h-8` (32px), which
+   * is the design's mobile height and already a step on the spacing scale.
+   * docs/design-guidelines.md §4. Named `logo` and not `logo-height`: Tailwind
+   * mints an `inline-logo` utility from this, which collides with nothing —
+   * check any new spacing token the same way. See the note on --spacing-flow. */
+  --spacing-logo: 2.625rem; /* 42 */
 
   /* The narrow axis of a hero dot's hit area. WCAG 2.5.8's 24px minimum,
    * used where a 44px square would space a row of controls apart rather than
@@ -682,6 +736,18 @@
    * filtering. See components/ui/card.tsx. */
   --drop-shadow-tile: 0 12px 22px rgb(20 24 32 / 0.1);
   --drop-shadow-tile-hover: 0 26px 40px rgb(20 24 32 / 0.16);
+
+  /* ---------------------------------------------------------------------
+   * Backdrop blur — docs/design-guidelines.md §4
+   *
+   * Two surfaces are painted on glass and they are not the same glass: the
+   * masthead sits over whatever the page is scrolled to and needs only enough
+   * blur to keep a nav label legible, while the mega menu covers the viewport
+   * and has to render the page behind it as texture rather than content.
+   * `--blur-*` is a Tailwind namespace, so these also drive `backdrop-blur-*`.
+   * ------------------------------------------------------------------ */
+  --blur-header: 22px;
+  --blur-mega: 30px;
 
   /* ---------------------------------------------------------------------
    * Breakpoints — docs/responsive-strategy.md §2
@@ -1058,6 +1124,48 @@
   --reveal-shift: 1.75rem; /* 28 */
   --duration-cross-fade: 1100ms; /* hero slide cross-fade */
   --duration-parallax: 500ms; /* hero parallax follow, ease-out */
-}
 
-/*
+  /* ---------------------------------------------------------------------
+   * Stacking order — docs/design-guidelines.md §4
+   *
+   * Three fixed layers, and the order between them is the whole point: the
+   * drawer covers the bar it was opened from, and the skip link clears both
+   * because a keyboard user who cannot see where focus went has no way back.
+   * Written as a scale rather than three numbers at three call sites, which
+   * is how the third one ends up underneath the first.
+   *
+   * Consumed with `z-(--z-header)` — Tailwind v4 has no z-index namespace, so
+   * these cannot be @theme tokens.
+   * ------------------------------------------------------------------ */
+  --z-header: 100;
+  --z-drawer: 110;
+  --z-skip-link: 120;
+
+  /* ---------------------------------------------------------------------
+   * Filter and transform amounts
+   *
+   * Tailwind has no theme namespace for saturate, brightness or scale, and
+   * `translate-*` reads the spacing scale, which these distances are not on.
+   * All are consumed functionally — `brightness-(--brightness-cta-hover)`.
+   * ------------------------------------------------------------------ */
+
+  /* Paired with --blur-header / --blur-mega; the design saturates both panes
+   * by the same amount, so one token serves both. */
+  --saturate-glass: 1.4;
+
+  /* The primary CTA's hover. A filter rather than a second gradient, so the
+   * button lifts without the stops having to be restated. */
+  --brightness-cta-hover: 1.08;
+
+  /* Hover lifts. Small enough that the layout is unchanged — the design is the
+   * design — but enough to answer the pointer. Both are `translate`, so they
+   * composite without touching layout. */
+  --lift-card: 5px; /* news card */
+  --lift-social: 3px; /* footer social button */
+
+  /* A goal card's photograph is held slightly over-size at rest so it has room
+   * to move on hover without an edge coming into frame. Under reduced motion
+   * it simply stays at the resting value. */
+  --scale-goal-rest: 1.02;
+  --scale-goal-hover: 1.06;
+}

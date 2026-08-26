@@ -138,7 +138,7 @@ export function MobileNav() {
             // backdrop-filter to an inner layer rather than to itself,
             // precisely so this `fixed` panel still resolves against the
             // viewport — see header.tsx.
-            'fixed inset-0 z-[110] flex flex-col overflow-y-auto bg-surface',
+            'fixed inset-0 z-(--z-drawer) flex flex-col overflow-y-auto bg-surface',
             'pb-section-y',
             // The slide is decoration on an already-open panel, so under
             // reduced motion it simply appears. See styles/animations.css.

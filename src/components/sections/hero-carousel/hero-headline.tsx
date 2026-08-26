@@ -110,7 +110,7 @@ export function HeroHeadline({ slide, isActive }: HeroHeadlineProps) {
                     // painted with the full ramp on each line rather than one
                     // gradient stretched across both.
                     'gradient-text',
-                    '[-webkit-box-decoration-break:clone] [box-decoration-break:clone]',
+                    '[box-decoration-break:clone] [-webkit-box-decoration-break:clone]',
                     highlightClassName,
                   ]
                 : [

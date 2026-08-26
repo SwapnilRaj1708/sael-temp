@@ -5,6 +5,20 @@ import { cn } from '@/lib/utils/cn';
  * The chamfered business-tile surface — a rectangle with its bottom-right
  * corner cut away.
  *
+ * **Built, no current consumer — retained for future surfaces.** *(Ruled
+ * 2026-08-26.)* The v2 homepage replaced the business tiles with ledger rows
+ * and `ui/card.tsx` no longer wraps this (**C-1**), so nothing on the site
+ * renders it and only `/dev/design-system` still shows it. It is kept
+ * deliberately, on the same reasoning as `ui/date-badge.tsx`: this is a
+ * correctly-built primitive **between consumers**, not dead code. The chamfer
+ * is a distinctive SAEL form that a later page may well want, and the hard part
+ * — getting it to survive `clip-path` without an SVG — is already solved here.
+ *
+ * `--drop-shadow-tile`, `--drop-shadow-tile-hover` and `--lift-card` are
+ * **retained-dormant** alongside it. See docs/design-reconciliation.md §5, and
+ * note the distinction drawn there: those tokens describe a form that still
+ * exists and is merely unused, not a surface the client cancelled.
+ *
  * **Drawn in CSS. Do not import `rtile-*.svg`.** Those files are a single path
  * with `preserveAspectRatio="none"`, so stretching one to a tall mobile tile
  * turns its corner radii into ellipses, and its `fill` is hardcoded where a

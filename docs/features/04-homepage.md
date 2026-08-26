@@ -29,18 +29,88 @@ Both repository calls are individually wrapped — a news failure renders `<Empt
 
 ## Section order
 
-1. Hero carousel
-2. Stats band
-3. About SAEL
-4. Our Business
-5. Our Presence
-6. Solutions banner
-7. Our Strength
-8. Vision timeline
-9. SDG marquee
-10. Our Goals
-11. In the News
-12. Pixel strip divider
+**The authority is the client's ten-step section sequence of 2026-08-26**, reproduced
+below. It names each section *and* its ground, and it is the current running order of
+`src/app/page.tsx`. It is recorded in `docs/frontend-progress.md` and reconciled against
+the build, deviation by deviation, in `docs/homepage-section-sequence-review.md` §1.
+
+**The twelve numbered sections further down are the original specification** and their
+numbering is left exactly as written, so a reference to "§8" still resolves. That list is
+*not* the page. Where the two disagree, **the sequence wins.**
+
+### The sequence — and what renders it
+
+| Step | Client's sequence | Ground (client) | On the page | Component | Spec § |
+|---|---|---|---|---|---|
+| 1 | Hero | Black | `<HeroCarousel>` | `sections/hero-carousel/` | §1 |
+| 2 | About SAEL | White | `<IntroSplit>` | `sections/intro-split/` | §3 |
+| 3 | Business Portfolio | Black | `<BusinessTiles>` | `sections/business-tiles/` | §4 **+ §2** |
+| 4 | Power Portfolio | Black | `<PresenceMap>` | `sections/presence-map/` | §5 |
+| 5 | Our Endeavours | White | `<EndeavourSplit>` | `sections/endeavour-split/` | **none** |
+| 6 | Solutions | Black | `<SolutionsCarousel>` | `sections/solutions-carousel/` | §6 |
+| 7 | Our Goals | Black | `<GoalsGrid>` | `sections/goals-grid/` | §10 |
+| 8 | Timeline | Image bleed / neutral | **not built** | — | §8 |
+| 9 | News | White | `<NewsCarousel>` | `sections/news-carousel/` | §11 |
+| — | *not in the sequence* | — | `<PixelStrip>` | `sections/pixel-strip/` | §12 |
+| 10 | Footer | Carbon grey + inverted pixel elements | `<Footer>` | `components/layout/footer/` | — (FE-03) |
+
+The grounds as actually built, in the same order: `black` · `paper-dots` · `black-dots` ·
+`black-dots` · `paper-dots` · `black-dots` · `black-dots` · *(absent)* · `paper-dots` ·
+`ground-dots-paper` · `--color-footer-bg`. Every section but the hero carries the dot grid.
+
+### Where the sequence and this document do not line up
+
+- **Step 3 absorbs §2.** The capacity figures §2 specifies as a standalone `<StatsBand>`
+  are instead the largest element on each Business Portfolio row. `page.tsx` joins
+  `getCapacityStats()` onto the tile copy; there is no separate band, and no `<StatsBand>`.
+- **Step 4 is §5 renamed twice.** "Our Presence" in this document, "Power Portfolio" in the
+  sequence, "Our Current Power Portfolio" as the heading on the page.
+- **Step 5 is specified nowhere.** Our Endeavours is in the sequence and on the page, but
+  has no entry in this document and no feature doc of its own; its only other trace in
+  `docs/` is two tokens in `design-guidelines.md` (`--endeavour-max-w`,
+  `--aspect-endeavour`). It came across from the client's PDF. **A documentation gap, not a
+  section to be removed.** Note also that §7's title — "Adoption of clean and affordable
+  energy projects" — appears verbatim inside its first paragraph; whether §7 and this are
+  one section under two names is unconfirmed, and neither the PDF nor the prototype is in
+  the repo to settle it. The client's sequence says **"Our Endeavours"**, plural; the
+  eyebrow on the page is singular. Ruled incidental — no copy change.
+- **Step 6 is not §6's component.** §6 specifies `<FeatureBanner>`, one full-bleed image
+  with a gradient caption plaque. What shipped is a rail of four 4:3 plates, plaque gone,
+  rebuilt to `SAEL Home v2` on 2026-08-20. It moved *after* Our Endeavours and onto the
+  black ground on 2026-08-26.
+- **Step 8 is the one unbuilt step.** Deferred by the client on 2026-08-20 and accepted as
+  deliberate on 2026-08-26. Two things need answering before it is picked up: *which*
+  timeline (§8's scroll-pinned vision timeline and v2 §08 are different screens), and what
+  "image bleed / neutral" means as a ground — `<Section>` has no such variant.
+- **Steps 7 and 9 are not §10's and §11's components either.** §10's `<GoalsTriad>` — three
+  grey cards that gradient on hover — shipped as `goals-grid/`, three photographic cards a
+  hairline apart inside a hairline frame on black. §11's `<NewsGrid>` shipped as a rail
+  rather than a grid. It remains the one homepage surface fed by the repository.
+- **The pixel strip is in no step.** It sits between News and Footer, and the sequence asks
+  the *footer* for inverted pixel elements instead. Both were accepted as deliberate on
+  2026-08-26: the strip stays, the footer's pixels are not outstanding work.
+
+### Specified here, absent from the sequence and the page
+
+| Spec § | Section | State |
+|---|---|---|
+| §2 | Stats band | Absorbed into step 3. |
+| §7 | Our Strength | Not started. In neither the client's PDF nor v2 — **ask before building** (and see step 5 above). |
+| §9 | SDG marquee | Skipped, confirmed by the client on 2026-08-05. |
+
+### The component names below are mostly not the ones that shipped
+
+Eleven of the twelve sections below name a component (§12 names none). **Seven of those
+eleven do not exist as code.** Their directories were scaffolded at the start of FE-04 and
+are still empty — `.gitkeep` and nothing else:
+
+`stats-band/` · `feature-banner/` · `strength-split/` · `vision-timeline/` ·
+`sdg-marquee/` · `goals-triad/` · `news-grid/`
+
+So searching for `<GoalsTriad>` or `<NewsGrid>` finds nothing; the built equivalents are
+`goals-grid/` and `news-carousel/` in the table above. The four named components that do
+exist are §1, §3, §4 and §5. (`page-hero/` is an eighth empty scaffold, which this document
+does not name at all.)
 
 ---
 

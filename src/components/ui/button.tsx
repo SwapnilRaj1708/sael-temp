@@ -36,7 +36,8 @@ const button = cva(
     variants: {
       variant: {
         /** The gradient CTA. Square by design — --radius-none. */
-        primary: 'rounded-none bg-(image:--gradient-cta) text-white hover:brightness-[1.08]',
+        primary:
+          'rounded-none bg-(image:--gradient-cta) text-white hover:brightness-(--brightness-cta-hover)',
         /** Text plus an underline on hover. For a secondary action. */
         ghost:
           'rounded-none text-brand-red hover:text-accent-hover hover:underline underline-offset-4',

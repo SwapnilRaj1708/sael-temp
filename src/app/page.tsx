@@ -109,8 +109,8 @@ export default async function HomePage() {
       <IntroSplit {...aboutSael} snap />
       <BusinessTiles eyebrow="Business Portfolio" tiles={tiles} snap />
       <PresenceMap {...presenceSummary} sites={presenceSites} snap />
-      <SolutionsCarousel {...solutions} snap />
       <EndeavourSplit {...ourEndeavour} snap />
+      <SolutionsCarousel {...solutions} snap />
       <GoalsGrid {...ourGoals} snap />
       <NewsCarousel title="In the News" items={news} snap />
       <PixelStrip />

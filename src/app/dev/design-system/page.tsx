@@ -304,28 +304,37 @@ export default function DesignSystemPage() {
       <Section>
         <SectionHeading eyebrow="Primitives" title="Card, TileShape, DateBadge" />
         <div className="mt-flow grid grid-cols-1 gap-gap-grid md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <div className="aspect-[16/10] bg-surface-alt" />
-            <div className="flex flex-col gap-stack p-6">
+          <Card as="article" accentClassName="bg-brand-red" className="flex-col">
+            <div className="mt-3.5 aspect-news-thumb bg-surface-alt" />
+            <div className="flex flex-col gap-stack pt-card-flow">
               <DateBadge date="2026-06-10T20:30:00Z" />
-              <h3 className="text-h3">
+              <h3 className="text-card-title">
                 A news card headline that runs long enough to wrap onto several lines
               </h3>
             </div>
           </Card>
 
-          <Card variant="tile" className="aspect-[2]">
-            <div className="flex h-full flex-col justify-end gap-stack p-6">
-              <h3 className="text-h3">Solar power generation</h3>
-              <p className="text-body-sm text-body-soft">
-                The chamfered tile, drawn in CSS rather than a stretched SVG.
+          <Card
+            as="article"
+            ground="dark"
+            inset="block"
+            accentClassName="bg-brand-red"
+            className="flex-col bg-surface-black px-inset"
+          >
+            <div className="flex flex-col gap-stack">
+              <h3 className="text-card-title text-white">Solar power generation</h3>
+              <p className="text-body-sm text-on-dark-soft">
+                The same card on the dark ground — `ground=&quot;dark&quot;` swaps the hairline,
+                `inset=&quot;block&quot;` closes the bottom edge. Hover either to fill the accent.
               </p>
             </div>
           </Card>
 
-          <TileShape className="aspect-[2] p-6">
+          <TileShape className="aspect-plate p-6">
             <p className="text-body-sm text-body-soft">
-              TileShape on its own, without the Card&rsquo;s elevation or hover lift.
+              TileShape, the pre-v2 chamfered surface.{' '}
+              <strong>No call site on the site itself</strong> — v2 replaced the business tiles with
+              ledger rows, and &lt;Card&gt; no longer wraps it. Kept for a ruling, not in use.
             </p>
           </TileShape>
         </div>

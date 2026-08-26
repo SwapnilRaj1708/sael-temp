@@ -32,7 +32,10 @@ import { PixelScatter } from './scatter';
  */
 export function PixelStrip() {
   return (
-    <div aria-hidden="true" className="ground-dots-paper relative h-pixel-strip w-full overflow-hidden">
+    <div
+      aria-hidden="true"
+      className="relative h-pixel-strip w-full overflow-hidden ground-dots-paper"
+    >
       <PixelScatter />
     </div>
   );

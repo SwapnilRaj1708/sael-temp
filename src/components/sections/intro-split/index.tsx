@@ -1,5 +1,6 @@
 import type { StaticImageData } from 'next/image';
 import { Button } from '@/components/ui/button';
+import { DisplayHeading } from '@/components/ui/display-heading';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { MediaFrame } from '@/components/ui/media-frame';
 import { Reveal } from '@/components/ui/reveal';
@@ -65,15 +66,10 @@ export function IntroSplit({ eyebrow, title, body, cta, media, snap = false }: I
       background="paper-dots"
       className={cn('flex items-center', snap && 'min-h-viewport snap-start')}
     >
-      <div
-        className={cn(
-          'grid w-full items-center gap-flow',
-          'lg:grid-cols-12 lg:gap-x-gap-grid',
-        )}
-      >
+      <div className={cn('grid w-full items-center gap-flow', 'lg:grid-cols-12 lg:gap-x-gap-grid')}>
         {/* Heading first in the DOM: it is the section's <h2>, and on a phone
             it should be read before the artwork it introduces. */}
-        <div className="lg:col-start-2 lg:col-span-5">
+        <div className="lg:col-span-5 lg:col-start-2">
           {/* The eyebrow does not animate. It is the section's label rather
               than its content — it wants to be there already, so that what
               moves reads as the section filling in beneath a fixed heading
@@ -91,15 +87,9 @@ export function IntroSplit({ eyebrow, title, body, cta, media, snap = false }: I
               weight, which is the difference between the section reading as
               editorial and reading as a product page.
             */}
-            <h2
-              className={cn(
-                'mt-stack max-w-(--hero-measure)',
-                'bg-(image:--gradient-eyebrow-deep) gradient-text',
-                'text-display',
-              )}
-            >
+            <DisplayHeading ground="paper" className="mt-stack max-w-(--hero-measure)">
               {title}
-            </h2>
+            </DisplayHeading>
           </Reveal>
 
           <Reveal order={4} className="mt-flow">
@@ -133,7 +123,7 @@ export function IntroSplit({ eyebrow, title, body, cta, media, snap = false }: I
             The artwork's own transparent margin means it does not read as
             flush against the gutter even though its box now reaches it, so the
             symmetry is given up where it shows least. */}
-        <Reveal order={3} className="w-full lg:col-start-7 lg:col-span-6">
+        <Reveal order={3} className="w-full lg:col-span-6 lg:col-start-7">
           <MediaFrame
             image={media.image}
             alt={media.alt}

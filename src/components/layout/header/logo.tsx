@@ -35,7 +35,7 @@ export function Logo({ className, priority = false }: LogoProps) {
         alt={siteConfig.name}
         priority={priority}
         sizes="(min-width: 64rem) 170px, 130px"
-        className="h-8 w-auto lg:h-[42px]"
+        className="h-8 w-auto lg:h-logo"
       />
     </Link>
   );

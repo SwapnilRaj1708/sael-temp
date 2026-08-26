@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import type { StaticImageData } from 'next/image';
 import { CountUp } from '@/components/ui/count-up';
+import { DisplayHeading } from '@/components/ui/display-heading';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { MediaFrame } from '@/components/ui/media-frame';
 import { Reveal } from '@/components/ui/reveal';
@@ -179,7 +180,7 @@ export function PresenceMap({
                       aria-hidden="true"
                       className={cn(
                         'absolute top-1/2 left-1/2 size-map-pin -translate-x-1/2 -translate-y-1/2',
-                        'rounded-xs bg-white',
+                        'rounded-none bg-white',
                         'transition-transform duration-(--duration-micro)',
                         'group-focus-within:scale-175 group-hover:scale-175',
                         'motion-reduce:transition-none',
@@ -222,15 +223,9 @@ export function PresenceMap({
 
           <div className="w-full max-w-(--map-copy-w)">
             <Reveal order={3}>
-              <h2
-                className={cn(
-                  'max-w-(--hero-measure)',
-                  'bg-(image:--gradient-heading-bright) gradient-text',
-                  'text-display',
-                )}
-              >
+              <DisplayHeading ground="dark" className="max-w-(--hero-measure)">
                 {heading}
-              </h2>
+              </DisplayHeading>
             </Reveal>
 
             {/* The footprint label, demoted to a caption over the figures — in

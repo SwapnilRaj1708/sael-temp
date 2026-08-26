@@ -1,4 +1,5 @@
 import { Container } from '@/components/ui/container';
+import { DisplayHeading } from '@/components/ui/display-heading';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { MediaFrame } from '@/components/ui/media-frame';
 import { Rail } from '@/components/ui/rail/rail';
@@ -24,11 +25,17 @@ export type { SolutionSlide, SolutionsCarouselProps } from './types';
  * The plaque is gone with the composition that needed it, and so is the
  * section's licence to be taller than a screen — four smaller plates fit.
  *
- * **On paper, where the design draws it on black.** The client's call on
- * 2026-08-20: the dark ground is kept for the Business Portfolio and Our
- * Goals, and this section stays with the light sections either side of it so
- * the page does not alternate on every scroll. Everything else here is the
- * design's, with the ramps swapped for the ones that carry on paper.
+ * **On black, where the design draws it.** It was built on paper by the
+ * client's call on 2026-08-20 — the dark ground reserved for the Business
+ * Portfolio and Our Goals, this section keeping company with the light ones
+ * either side of it so the page did not alternate on every scroll. That call
+ * was withdrawn on 2026-08-26, along with the one that put this section ahead
+ * of Our Endeavour: the client's section sequence names this ground Black and
+ * restores v2's own order, which gives the page back its alternation.
+ *
+ * Nothing about the flip is bespoke. Every ramp here is the declared dark
+ * counterpart of the paper token it replaced, so no token was minted for it.
+ * docs/homepage-section-sequence-review.md §5.2 has the pairing table.
  *
  * A Server Component, apart from the rail's arrows. The photography, the
  * captions and the heading block are all rendered here and handed to
@@ -45,7 +52,7 @@ export function SolutionsCarousel({
   return (
     <Section
       data-snap-section
-      background="paper-dots"
+      background="black-dots"
       fullBleed
       spacing="tight"
       className={cn('flex items-center', snap && 'min-h-viewport snap-start')}
@@ -54,7 +61,7 @@ export function SolutionsCarousel({
         <div className="flex w-full flex-col gap-flow">
           <Container className="flex flex-col gap-stack">
             <Reveal order={0}>
-              <Eyebrow tone="deep">{eyebrow}</Eyebrow>
+              <Eyebrow tone="bright">{eyebrow}</Eyebrow>
             </Reveal>
 
             {/*
@@ -65,7 +72,11 @@ export function SolutionsCarousel({
               docs/design-guidelines.md §2.
 
               The ramp is clipped to the letterforms, as the design has it.
-              `--gradient-eyebrow-deep` and not the bright one: this is paper.
+              `ground="dark"` resolves to `--gradient-heading-bright`, which is
+              the heading's own on-black ramp and *not*
+              `--gradient-eyebrow-bright` — that one belongs to the label above
+              it. The primitive keeps the two straight; writing the classes by
+              hand is where they get crossed.
 
               **The heading has the row to itself**, by the client's decision
               on 2026-08-25. It used to share a line with the sentence that
@@ -75,9 +86,7 @@ export function SolutionsCarousel({
               that needed it and the heading runs the content width.
             */}
             <Reveal order={2}>
-              <h2 className="bg-(image:--gradient-eyebrow-deep) gradient-text text-display">
-                {title}
-              </h2>
+              <DisplayHeading ground="dark">{title}</DisplayHeading>
             </Reveal>
 
             {/* Underneath it, the sentence at the left edge and the paging
@@ -100,7 +109,7 @@ export function SolutionsCarousel({
                   full content width, uncapped means a single sentence stretched
                   over 1600px. */}
               <Reveal order={3}>
-                <p className="max-w-(--measure) text-body [text-wrap:pretty] text-body-soft">
+                <p className="max-w-(--measure) text-body [text-wrap:pretty] text-on-dark-soft">
                   {lead}
                 </p>
               </Reveal>
@@ -111,7 +120,7 @@ export function SolutionsCarousel({
               <RailArrows
                 previousLabel="Previous plant"
                 nextLabel="Next plant"
-                tone="paper"
+                tone="dark"
                 className="self-end md:shrink-0 md:self-auto"
               />
             </div>
@@ -135,9 +144,13 @@ export function SolutionsCarousel({
                       className="aspect-plate w-full"
                     />
 
-                    <figcaption className="mt-4 border-t border-hairline-paper pt-3.5">
-                      <p className="text-plate-title text-ink">{slide.place}</p>
-                      <p className="mt-1.5 text-meta text-meta-paper uppercase">
+                    <figcaption className="mt-4 border-t border-hairline-dark pt-3.5">
+                      {/* No colour class: <Section background="black-dots">
+                          already sets the ground's full-strength ink, and
+                          naming it again here is the duplication the paper
+                          build carried. */}
+                      <p className="text-plate-title">{slide.place}</p>
+                      <p className="mt-1.5 text-meta text-on-dark-muted uppercase">
                         {slide.descriptor}
                       </p>
                     </figcaption>

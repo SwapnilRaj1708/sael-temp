@@ -116,9 +116,9 @@ export function GoalsGrid({ title, goals, snap = false }: GoalsGridProps) {
                   pending={`goals/${goal.id}`}
                   className="absolute inset-0"
                   imageClassName={cn(
-                    'scale-[1.02] transition-transform duration-(--duration-reveal)',
-                    'group-hover:scale-[1.06] motion-reduce:transition-none',
-                    'motion-reduce:group-hover:scale-[1.02]',
+                    'scale-(--scale-goal-rest) transition-transform duration-(--duration-reveal)',
+                    'group-hover:scale-(--scale-goal-hover) motion-reduce:transition-none',
+                    'motion-reduce:group-hover:scale-(--scale-goal-rest)',
                   )}
                 />
 
@@ -139,7 +139,7 @@ export function GoalsGrid({ title, goals, snap = false }: GoalsGridProps) {
                 <div
                   className={cn(
                     'relative flex w-full flex-col items-center justify-center',
-                    'p-5 text-center text-white lg:p-6',
+                    'p-inset text-center text-white',
                   )}
                 >
                   {/* The mark and the name stay put and are carried upward by

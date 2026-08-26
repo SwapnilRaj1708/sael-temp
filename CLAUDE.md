@@ -26,6 +26,39 @@ These are hard rules. If a task appears to require breaking one, stop and ask.
 6. **URL parity with the legacy site.** Routes, trailing slashes and the canonical host must match the old site exactly. SEO equity depends on it. See `docs/accessibility-and-seo.md`.
 7. **One In Progress item at a time.** See §3.
 
+### What rule 2 enforces
+
+`pnpm verify:guardrails` implements **all four** clauses in rule 2, plus the gutter rule.
+Its `VALUE_CHECKS` are:
+
+| Check | Status |
+|---|---|
+| No raw hex colour outside `theme.css` | enforced |
+| No `rgb()` / `rgba()` / `hsl()` literal outside `theme.css` | enforced |
+| No bare `vw` outside `theme.css` (and `lib/utils/image-sizes.ts`) | enforced |
+| `<Container>` is the only source of horizontal page padding | enforced |
+| No magic pixel numbers | enforced **since 2026-08-26** |
+
+**How the magic-number check works.** It matches a Tailwind arbitrary value whose contents
+**begin with a digit** — `/\b[a-z][a-zA-Z-]*-\[-?\d[^\]]*\]/`. Anchoring on the leading
+digit is what makes a broad allowlist unnecessary: it admits composed values
+(`pt-[calc(var(--a)+var(--b))]` — a token being *used*), arbitrary properties
+(`[clip-path:…]` — no `utility-` prefix) and variant brackets (`supports-[…]`,
+`data-[…]`), all of which start with something other than a digit. Grid tracks are the one
+carve-out, via the check's `except` field, because `1fr` is a ratio no token could express.
+
+**Why it exists.** Before it landed, every Tailwind arbitrary value passed the build —
+`h-[42px]`, `z-[100]`, `backdrop-blur-[22px]`, `translate-y-[5px]`, `tracking-[0.25em]`.
+That gap was the single cause of the dimension drift found in FE-04, and the sharpest part
+of it was that most of those literals encoded a number `docs/design-guidelines.md` already
+specified; they were written by hand only because no token had been minted for them. The
+drift was cleared in the same pass (**C-4**), and the check now stops it recurring.
+
+Both the check and the FE-04 cleanup are recorded as **C-5** and **C-4** in
+`docs/design-reconciliation.md`. If a value genuinely cannot be expressed as a token, say
+why in the diff rather than reaching for `eslint-disable`-style escapes — there are none
+here, and the check is meant to be argued with, not bypassed.
+
 ---
 
 ## 3. Session ritual — the progress tracker

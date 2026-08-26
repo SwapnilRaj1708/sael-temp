@@ -39,7 +39,7 @@ export function HeroCopy({ slides, activeIndex }: HeroCopyProps) {
         'lg:grid-cols-12 lg:items-center',
       )}
     >
-      <div className="flex min-w-0 flex-col justify-end lg:col-start-7 lg:col-span-6 lg:justify-center">
+      <div className="flex min-w-0 flex-col justify-end lg:col-span-6 lg:col-start-7 lg:justify-center">
         {/* The marks. Decorative at every size — the headline carries the
             meaning — so the whole stack is hidden from assistive technology
             rather than each image carrying an empty alt. */}
@@ -52,7 +52,7 @@ export function HeroCopy({ slides, activeIndex }: HeroCopyProps) {
               sizes={SIZES_HERO_SYMBOL}
               pending={slide.symbol.pending}
               className={cn(
-                '[grid-area:1/1] aspect-square h-hero-icon w-auto bg-transparent',
+                'aspect-square h-hero-icon w-auto bg-transparent [grid-area:1/1]',
                 'transition-opacity duration-(--duration-cross-fade) motion-reduce:transition-none',
                 index === activeIndex ? 'opacity-100' : 'opacity-0',
               )}
