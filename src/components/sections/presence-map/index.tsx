@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import type { StaticImageData } from 'next/image';
 import { CountUp } from '@/components/ui/count-up';
+import { Eyebrow } from '@/components/ui/eyebrow';
 import { MediaFrame } from '@/components/ui/media-frame';
 import { Reveal } from '@/components/ui/reveal';
 import { Section } from '@/components/ui/section';
@@ -24,6 +25,14 @@ export interface PresenceSite {
 }
 
 export interface PresenceMapProps {
+  /**
+   * The section label, above everything — "Portfolio".
+   *
+   * Required rather than optional: every section on the page carries one
+   * and this is the last that did not, so there is no caller left that
+   * would want the opt-out. See the note on the component.
+   */
+  eyebrow: string;
   /** The section's display heading, right of the map. */
   heading: string;
   /** Broken over two lines in the design; supplied pre-split. */
@@ -41,6 +50,13 @@ export interface PresenceMapProps {
 /**
  * "Our Current Power Portfolio" — the dotted India map and its project sites.
  * docs/features/04 §5, rebuilt to `SAEL Home v2`.
+ *
+ * **It carries a section label now, and the design does not.** `SAEL Home v2`
+ * opens its "04 Power Portfolio" screen straight onto the display heading —
+ * this was the one section on the page without the small tracked label above
+ * it, and it read as the odd one out for exactly that reason. Added at the
+ * client's request on 2026-08-26. `bright`, the tone the other two sections
+ * on the black ground take, so the three read as a set.
  *
  * **Map left, copy right.** The previous build centred the map and hung the
  * footprint label and its two figures over the artwork at percentage offsets,
@@ -87,6 +103,7 @@ export interface PresenceMapProps {
  *    touch.
  */
 export function PresenceMap({
+  eyebrow,
   heading,
   title,
   primaryStat,
@@ -102,116 +119,121 @@ export function PresenceMap({
       spacing="tight"
       className={cn('flex items-center', snap && 'min-h-viewport snap-start')}
     >
-      <div
-        className={cn(
-          'flex w-full flex-col items-center gap-flow',
-          'lg:flex-row lg:items-center lg:justify-center',
-        )}
-      >
-        <Reveal
-          order={0}
-          role="group"
-          aria-label="Map of SAEL project sites across India"
-          className="relative aspect-map-india w-full max-w-map shrink-0"
-        >
-          <MediaFrame
-            image={map.image}
-            alt=""
-            sizes={SIZES_MAP}
-            pending="map/dotted-map"
-            className="absolute inset-0 bg-transparent"
-            // The landmass has to sit inside its box whole — a `cover` crop
-            // would take the coasts off, and every pin below is positioned
-            // against the artwork's own coordinates.
-            imageClassName="object-contain"
-          />
-
-          {sites.map((site, index) => {
-            // The tooltip grows away from whichever edge the pin is nearest,
-            // so it can never be clipped by the map's box. Decided here rather
-            // than measured at runtime, because the coordinates are static.
-            const towardsLeft = site.x > MAP_VIEWBOX.width * 0.55;
-            const towardsBottom = site.y < MAP_VIEWBOX.height * 0.3;
-
-            return (
-              <div
-                key={site.id}
-                className="group absolute size-0"
-                style={
-                  {
-                    left: `${String((site.x / MAP_VIEWBOX.width) * 100)}%`,
-                    top: `${String((site.y / MAP_VIEWBOX.height) * 100)}%`,
-                    '--anim-index': index,
-                  } as StyleWithVars
-                }
-              >
-                <button
-                  type="button"
-                  className="absolute size-touch -translate-x-1/2 -translate-y-1/2 cursor-pointer"
-                >
-                  <span className="sr-only">
-                    {site.name}, {site.description}
-                  </span>
-                  {/* The pin. A hard square, plus a halo that pulses out of it. */}
-                  <span
-                    aria-hidden="true"
-                    className={cn(
-                      'absolute top-1/2 left-1/2 size-map-pin -translate-x-1/2 -translate-y-1/2',
-                      'rounded-xs bg-white',
-                      'transition-transform duration-(--duration-micro)',
-                      'group-focus-within:scale-175 group-hover:scale-175',
-                      'motion-reduce:transition-none',
-                    )}
-                  />
-                  <span
-                    aria-hidden="true"
-                    className="anim-map-ping absolute top-1/2 left-1/2 size-map-pin -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
-                  />
-                </button>
-
-                <div
-                  aria-hidden="true"
-                  className={cn(
-                    'pointer-events-none absolute z-10 w-max bg-paper-alt px-3.5 py-2.5 shadow-tooltip',
-                    // Grows out of the pin as well as fading in, so the
-                    // callout reads as opening from the site rather than
-                    // appearing over it.
-                    'scale-90 opacity-0 transition duration-(--duration-micro)',
-                    'group-focus-within:scale-105 group-hover:scale-105',
-                    'motion-reduce:scale-100 motion-reduce:transition-none',
-                    'group-focus-within:opacity-100 group-hover:opacity-100',
-                    towardsLeft ? 'right-0 mr-4 origin-right' : 'left-0 ml-4 origin-left',
-                    towardsBottom ? 'top-0 mt-2' : 'bottom-0 mb-2',
-                  )}
-                >
-                  <p className="text-body-sm font-bold text-ink">{site.name}</p>
-                  <p className="mt-1 text-meta text-meta-paper uppercase">{site.description}</p>
-                  {site.href !== undefined && (
-                    <p className="mt-1 flex items-center gap-1.5 text-tile-note text-body-soft">
-                      <span className="size-1 rounded-full bg-body-soft" />
-                      Visit Location
-                    </p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+      <div className="flex w-full flex-col gap-flow">
+        <Reveal order={0}>
+          <Eyebrow tone="bright">{eyebrow}</Eyebrow>
         </Reveal>
 
-        <div className="w-full max-w-(--map-copy-w)">
-          <Reveal order={2}>
-            <h2
-              className={cn(
-                'max-w-(--hero-measure)',
-                'bg-(image:--gradient-heading-bright) gradient-text',
-                'text-display',
-              )}
-            >
-              {heading}
-            </h2>
+        <div
+          className={cn(
+            'flex w-full flex-col items-center gap-flow',
+            'lg:flex-row lg:items-center lg:justify-center',
+          )}
+        >
+          <Reveal
+            order={2}
+            role="group"
+            aria-label="Map of SAEL project sites across India"
+            className="relative aspect-map-india w-full max-w-map shrink-0"
+          >
+            <MediaFrame
+              image={map.image}
+              alt=""
+              sizes={SIZES_MAP}
+              pending="map/dotted-map"
+              className="absolute inset-0 bg-transparent"
+              // The landmass has to sit inside its box whole — a `cover` crop
+              // would take the coasts off, and every pin below is positioned
+              // against the artwork's own coordinates.
+              imageClassName="object-contain"
+            />
+
+            {sites.map((site, index) => {
+              // The tooltip grows away from whichever edge the pin is nearest,
+              // so it can never be clipped by the map's box. Decided here rather
+              // than measured at runtime, because the coordinates are static.
+              const towardsLeft = site.x > MAP_VIEWBOX.width * 0.55;
+              const towardsBottom = site.y < MAP_VIEWBOX.height * 0.3;
+
+              return (
+                <div
+                  key={site.id}
+                  className="group absolute size-0"
+                  style={
+                    {
+                      left: `${String((site.x / MAP_VIEWBOX.width) * 100)}%`,
+                      top: `${String((site.y / MAP_VIEWBOX.height) * 100)}%`,
+                      '--anim-index': index,
+                    } as StyleWithVars
+                  }
+                >
+                  <button
+                    type="button"
+                    className="absolute size-touch -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+                  >
+                    <span className="sr-only">
+                      {site.name}, {site.description}
+                    </span>
+                    {/* The pin. A hard square, plus a halo that pulses out of it. */}
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        'absolute top-1/2 left-1/2 size-map-pin -translate-x-1/2 -translate-y-1/2',
+                        'rounded-xs bg-white',
+                        'transition-transform duration-(--duration-micro)',
+                        'group-focus-within:scale-175 group-hover:scale-175',
+                        'motion-reduce:transition-none',
+                      )}
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="anim-map-ping absolute top-1/2 left-1/2 size-map-pin -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
+                    />
+                  </button>
+
+                  <div
+                    aria-hidden="true"
+                    className={cn(
+                      'pointer-events-none absolute z-10 w-max bg-paper-alt px-3.5 py-2.5 shadow-tooltip',
+                      // Grows out of the pin as well as fading in, so the
+                      // callout reads as opening from the site rather than
+                      // appearing over it.
+                      'scale-90 opacity-0 transition duration-(--duration-micro)',
+                      'group-focus-within:scale-105 group-hover:scale-105',
+                      'motion-reduce:scale-100 motion-reduce:transition-none',
+                      'group-focus-within:opacity-100 group-hover:opacity-100',
+                      towardsLeft ? 'right-0 mr-4 origin-right' : 'left-0 ml-4 origin-left',
+                      towardsBottom ? 'top-0 mt-2' : 'bottom-0 mb-2',
+                    )}
+                  >
+                    <p className="text-body-sm font-bold text-ink">{site.name}</p>
+                    <p className="mt-1 text-meta text-meta-paper uppercase">{site.description}</p>
+                    {site.href !== undefined && (
+                      <p className="mt-1 flex items-center gap-1.5 text-tile-note text-body-soft">
+                        <span className="size-1 rounded-full bg-body-soft" />
+                        Visit Location
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </Reveal>
 
-          {/* The footprint label, demoted to a caption over the figures — in
+          <div className="w-full max-w-(--map-copy-w)">
+            <Reveal order={3}>
+              <h2
+                className={cn(
+                  'max-w-(--hero-measure)',
+                  'bg-(image:--gradient-heading-bright) gradient-text',
+                  'text-display',
+                )}
+              >
+                {heading}
+              </h2>
+            </Reveal>
+
+            {/* The footprint label, demoted to a caption over the figures — in
               the PDF it was the heading, and v2 gives that job to the display
               line above. The rule is what separates the two, and it is a drawn
               element rather than a `border-t` because it is deliberately
@@ -222,28 +244,29 @@ export function PresenceMap({
               `<Eyebrow>`, and the client's 2026-08-25 note asks for the
               movement on all of them. Nothing else is needed: the class reads
               the `data-reveal` on the `<Reveal>` it is already inside. */}
-          <Reveal order={3} className="mt-flow">
-            <span
-              aria-hidden="true"
-              className="anim-underline block h-px w-(--map-rule-w) bg-hairline-grid"
-            />
-            <h3 className="mt-stack text-meta text-on-dark-faint uppercase">
-              {title[0]}
-              <br />
-              {title[1]}
-            </h3>
-          </Reveal>
+            <Reveal order={4} className="mt-flow">
+              <span
+                aria-hidden="true"
+                className="anim-underline block h-px w-(--map-rule-w) bg-hairline-grid"
+              />
+              <h3 className="mt-stack text-meta text-on-dark-faint uppercase">
+                {title[0]}
+                <br />
+                {title[1]}
+              </h3>
+            </Reveal>
 
-          {/* Tighter than the design's gap, at the client's request: the two
+            {/* Tighter than the design's gap, at the client's request: the two
               read as a pair rather than as two unrelated figures. */}
-          <Reveal order={4} className="mt-stack flex flex-wrap gap-stack">
-            <p className="text-stat-large tabular-nums text-white">
-              <CountUp value={primaryStat} />
-            </p>
-            <p className="text-stat-large tabular-nums text-white">
-              <CountUp value={secondaryStat} />
-            </p>
-          </Reveal>
+            <Reveal order={5} className="mt-stack flex flex-wrap gap-stack">
+              <p className="text-stat-large text-white tabular-nums">
+                <CountUp value={primaryStat} />
+              </p>
+              <p className="text-stat-large text-white tabular-nums">
+                <CountUp value={secondaryStat} />
+              </p>
+            </Reveal>
+          </div>
         </div>
       </div>
     </Section>

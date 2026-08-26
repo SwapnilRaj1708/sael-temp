@@ -43,13 +43,13 @@ instruction wins and the disagreement is recorded beside the token or component.
 |---|---|---|---|
 | 1 | Hero carousel | `sections/hero-carousel/` | **Rebuilt to v2.** One composition, not four: mark → red rule → headline in a single column, right half above `lg` and bottom-anchored below it. The six per-slide placement coordinates are gone. The progress bar pinned to the section's base runs **one full sweep per slide** — four segments, then a quarter-run per slide, then this (2026-08-22). Headline set at `--text-hero`, not v2's larger size — the client's call. Slide 2's crop is shifted right above `lg` so its subject clears the headline. Autoplay still does not pause on hover, only on keyboard focus |
 | 2 | About SAEL | `sections/intro-split/` | **Rebuilt to v2** on 2026-08-21, after being held back a day. The PDF's fixed 1280:528 stage and its whole `--about-*` coordinate set are gone; it is a twelve-column grid with a display heading, a rule and running copy beside the composite. Copy on columns 2–6 and artwork on 7–11, drawn in off the gutters rather than v2's 1–6 / 8–12 — the client's call |
-| 3 | Business portfolio | `sections/business-tiles/` | **Rebuilt to v2.** A ledger of four rows on the black dotted ground, not four centred tiles on a light one. Capacity figure is now the largest thing on the row. Solar Cell Manufacturing carries its own frosted-grey ground as the one upcoming business. Marks are at three quarters of v2's own `clamp(92px, 10vw, 176px)` — the design's curve, our scale (2026-08-22). The agri mark's per-row nudge was withdrawn the same day; `iconScale` survives unused for when it returns. The copy is capped at v2's 46ch so it wraps before it reaches the mark, and the gutter beside the mark was deliberately **not** reduced with the mark. Each mark is drawn on **its own aspect ratio**, not forced square: the four run 0.918 to 1.040, so a square box letterboxed each differently and left the agri-waste leaves visibly smallest. **And the mark is in flow**, a real column beside the copy, rather than absolutely positioned over the row with a right padding reserving space for it — an out-of-flow box whose only child is also out of flow has no content to size against, so its height came from `aspect-ratio` alone and kept resolving short, which is what was trimming the artwork. `--spacing-ledger-gutter` went with it; a `gap-x-flow` does that job now. Both 2026-08-24 |
-| 4 | Our Current Power Portfolio | `sections/presence-map/` | **Rebuilt to v2** on 2026-08-21, and the layout review it was waiting on is closed: map left, display heading with the footprint label and the two figures right, nothing positioned over the artwork any more. A centred flex row rather than v2's 1–6 / 8–12 grid: on a grid both halves are capped and the slack lands between them, which is what kept reading as a hole. The two figures sit a `--spacing-stack` apart and the rule over the footprint label is capped at `--map-rule-w` — all the client's calls, 2026-08-21 and -22. **The 751-subpath generated map is gone**, replaced by the client's supplied `dotted-map.svg`; the six site coordinates are mapped across from the old viewBox and **want a visual check** — see the note in `presence-map/dots.ts` |
+| 3 | Business portfolio | `sections/business-tiles/` | **Rebuilt to v2.** A ledger of four rows on the black dotted ground, not four centred tiles on a light one. Capacity figure is now the largest thing on the row. Solar Cell Manufacturing carries its own frosted-grey ground as the one upcoming business. Marks are at three quarters of v2's own `clamp(92px, 10vw, 176px)` — the design's curve, our scale (2026-08-22). The agri mark's per-row nudge was withdrawn the same day; `iconScale` survives unused for when it returns. The copy is capped at v2's 46ch so it wraps before it reaches the mark, and the gutter beside the mark was deliberately **not** reduced with the mark. Each mark is drawn on **its own aspect ratio**, not forced square: the four run 0.918 to 1.040, so a square box letterboxed each differently and left the agri-waste leaves visibly smallest. **And the mark is in flow**, a real column beside the copy, rather than absolutely positioned over the row with a right padding reserving space for it — an out-of-flow box whose only child is also out of flow has no content to size against, so its height came from `aspect-ratio` alone and kept resolving short, which is what was trimming the artwork. `--spacing-ledger-gutter` went with it; a `gap-x-flow` does that job now. Both 2026-08-24. **All of that box is gone as of 2026-08-26**: the mark is a plain `<Image>` at a width with `h-auto`, so it draws at its own proportions with nothing to letterbox and nothing to clip, and `iconScale`, `--aspect-icon-mark` and the `<MediaFrame>` around it went with it. The four PNGs were re-cut the same day — see the revision note below |
+| 4 | Our Current Power Portfolio | `sections/presence-map/` | **Rebuilt to v2** on 2026-08-21, and the layout review it was waiting on is closed: map left, display heading with the footprint label and the two figures right, nothing positioned over the artwork any more. A centred flex row rather than v2's 1–6 / 8–12 grid: on a grid both halves are capped and the slack lands between them, which is what kept reading as a hole. The two figures sit a `--spacing-stack` apart and the rule over the footprint label is capped at `--map-rule-w` — all the client's calls, 2026-08-21 and -22. **The 751-subpath generated map is gone**, replaced by the client's supplied `dotted-map.svg`; the six site coordinates are mapped across from the old viewBox and **want a visual check** — see the note in `presence-map/dots.ts`. Carries a **"Portfolio"** section label as of 2026-08-26 — v2's own screen has none, so this is a deliberate departure at the client's request |
 | 5 | Solutions | `sections/solutions-carousel/` | **Rebuilt to v2** — four 4:3 plates a hairline apart, each captioned underneath; the gradient plaque is gone. Kept **before** Our Endeavour, where v2 puts it after, and set on the light ground where v2 sets it on black. Both the client's calls on 2026-08-20 |
 | 6 | Our Endeavour | `sections/endeavour-split/` | Unchanged. Left as-is at the client's request on 2026-08-20 |
 | 7 | Our Goals | `sections/goals-grid/` | **Rebuilt to v2** — three cards a hairline apart inside a hairline frame, on black. **The resting state shows the photograph untreated**: the scrim arrives with the pointer, along with the description. The three marks are the client's own artwork as of 2026-08-21, inverted to white at the call site; the `lucide-react` stand-ins are gone. Sized 40 → 56px, then ~4.5x that on 2026-08-22, then halved again to 60 → 126px on 2026-08-24 against the client's revised artwork — the mark is the card's subject, not an icon over a title. **Two sets of marks are in `src/assets/images/`**: `*-goal.svg`, which is what is wired up, and a later `*-icon.svg` set. Confirm which is current before this ships |
 | 8 | In the News | `sections/news-carousel/` | **Rebuilt to v2.** The card lost its box — a hairline it hangs from, the date above a 5:4 thumbnail, the accent filling across the rule on hover. Still the one homepage surface fed by the repository |
-| 9 | Pixel strip | `sections/pixel-strip/` | Unchanged — drawn to a canvas |
+| 9 | Pixel strip | `sections/pixel-strip/` | Drawn to a canvas. On the dotted paper ground as of 2026-08-26 — it was the last band of bare `--surface` white and read as a separate section bolted to the end |
 | — | Timeline (v2 §08) | — | **Not built.** Deferred by the client on 2026-08-20; to be revisited |
 | — | SDG marquee (`features/04` §9) | — | **Skipped**, confirmed by the client on 2026-08-05: not to be built for now |
 | — | Our Strength (§7), vision timeline (§8) | — | Not started. Neither appears in the client's PDF — ask before building either |
@@ -75,13 +75,67 @@ Landed alongside the v2 revision:
   arrows in the heading row rather than over the artwork, and one component cannot
   render its own part into a sibling's layout.
 - New primitives: `ui/arrow-glyph.tsx`, and a `micro` size on `<Button>`. `<Eyebrow>`
-  gained the `bright` and `deep` tones; `<FlankedEyebrow>` gained `rules="leading"`;
+  gained the `bright` and `deep` tones; `<FlankedEyebrow>` gained `rules="leading"` (and was
+  deleted again on 2026-08-26 — see below);
   `<Section>` gained the `black`, `black-dots`, `paper` and `paper-dots` grounds.
 - Tokens with no consumer left after the revision were removed (the hero dot sizes,
   the light-ground figure colours, the solutions plaque gradient, the always-on goals
   scrim, the tile type scale, the About stage's coordinates, the map's dot ramp).
   `lib/utils/cn.ts`'s `FONT_SIZES` list was updated to match — a `--text-*` token
   missing from it is silently discarded by `cn()`.
+
+**Revised again on 2026-08-25 and -26**, against the client's review of the deployed
+build and a second read of `SAEL Home v2.dc.html` through the design MCP:
+
+- **The masthead's outer bar is v2's, turned over into the light.** A flat 68px at every
+  width (the `lg` step to 84px is gone — v2 draws one height), `blur(22px) saturate(1.4)`,
+  one flat translucent veil at v2's 0.70 → 0.86 in place of the vertical gradient, the
+  hairline at its 0.09 → 0.13, its `.3s` transition, and its 8px scroll threshold in place
+  of 80. **No shadow at any scroll position** — v2 draws none, so `--shadow-header` and
+  `--gradient-header` went with it. Only the structure crossed over, never the hue: the
+  design's bar is dark and this one stays light, which is the client's explicit call.
+- **The six nav links are v2's middle section**, read off the deployed design rather than
+  guessed: `--text-nav-item` at 11px/700/0.18em uppercase, no pill, a
+  `clamp(4px, 1vw, 18px)` gap. `--color-nav-pill` and `--radius-nav-pill` went with the
+  pill. The CTA is deliberately *not* moved — it still takes `--text-nav`, which is why
+  there are now two nav type tokens. The current-page rule is kept; v2 has no equivalent
+  and a prototype can afford that, a site cannot.
+- **Section labels lost the leading dash and gained an underline that draws itself in.**
+  `<FlankedEyebrow>` is deleted — it existed only to draw that dash — and `<Eyebrow>` now
+  carries the rule itself, on by default, in the label's own ramp, so picking a tone picks
+  both. The rule is CSS reading the `data-reveal` on the `<Reveal>` it already sits in, so
+  it replays with everything else and costs no script.
+- **The dot grid is one utility now** (`ground-dots-paper` / `ground-dots-dark` in
+  globals.css, colour and image and cell size travelling together) and covers **every
+  section but the hero**, the pixel strip included. The dot carries a token radius shared
+  by both grounds and a half-pixel of feather, so it survives a zoom-out that used to
+  erase it — verified 33% → 300%; below 33% it goes, which is the cost of the alphas
+  coming down. Those alphas are ~0.4x their original weight after the first pass rendered
+  them roughly three times too heavy: the radius went up for the zoom fix and the alpha
+  went up alongside it, and the two multiply.
+- **The Business Portfolio marks are plain `<Image>`s.** `<MediaFrame>` is for a photograph
+  filling a box its parent sized, so using it for a mark meant undoing it three times over
+  — a computed aspect ratio, `object-contain`, `overflow-visible`. A static import already
+  carries the artwork's intrinsic size.
+- **The four business icon PNGs were re-cut** from the hero masters on 2026-08-26. The
+  originals were sliced through at the bottom edge — `icon-solar-module.png` ended in a
+  132px run of fully opaque artwork sitting *on* its last row — so the crop the client
+  reported was baked into the files and no CSS change could have fixed it. They now run
+  0.838 to 1.002. **The hero symbol filenames are crossed**: the lettering baked into the
+  masters proves `sael-icon-1` is the solar-energy mark and `-3` the cell mark, where the
+  hero slides pair them the other way round. The business icons are mapped by that
+  lettering; **the hero carousel is not, and wants a look before this ships.**
+- **Smaller, all client-requested:** the Solutions heading block stacks below `lg` and its
+  title spans a line of its own above the copy and the arrows (its right-hand column was
+  `flex-1`, whose `flex-basis: 0` meant it never wrapped — it was squeezed to a ~100px
+  column with its copy running off the side of a phone); an Our Goals card pushes its mark
+  and name up and brings the description in beneath a rule, rather than swapping one for
+  the other; the capacity figures count up on every pass into view.
+- **A rail can no longer scroll vertically.** `overflow-x: auto` drags `overflow-y` with it,
+  so the entrance transform on the cards still off the right-hand end left every rail 28px
+  scrollable *downward* — enough for one diagonal swipe on a phone to hide a news card's
+  date under its own top edge, which is what the client was seeing. `rail-reveal-slack`
+  absorbs the transform in end padding it takes straight back out of the flow.
 
 Also landed inside this item, as `features/05` intends: the content repository slice
 (`src/lib/content/`) with its mock and API adapters behind `getContentRepository()`,

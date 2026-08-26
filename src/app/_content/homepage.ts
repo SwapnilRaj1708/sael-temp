@@ -288,8 +288,12 @@ export const presenceSites = [
  * the contract out; it is not worth a method of its own today.
  */
 export const presenceSummary = {
-  // Not from the PDF: added at the client's request on 2026-08-05 so the
-  // section has a heading of its own. The footprint label below is the PDF's.
+  // Neither of the first two is from the PDF. The heading was added at the
+  // client's request on 2026-08-05 so the section has one of its own; the
+  // label on 2026-08-26, so it opens the way every other section does — the
+  // design's own screen has no label here. The footprint title below is the
+  // PDF's.
+  eyebrow: 'Portfolio',
   heading: 'Our Current Power Portfolio',
   map: { image: dottedMap },
   title: ['SAEL Pan India', 'Green Footprint'] as [string, string],
