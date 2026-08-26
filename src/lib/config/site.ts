@@ -49,7 +49,7 @@ export const siteConfig: SiteConfig = {
   registeredOffice: 'H. No. 44, Model Town, Firozpur, Guruharsahai, Punjab, India, 152022',
   cin: 'U40106PB2022PLC055755',
   telephone: '011-44910011',
-  email: TODO_CONTENT,
+  email: 'info@sael.co',
   social: {
     facebook: TODO_CONTENT,
     instagram: TODO_CONTENT,
