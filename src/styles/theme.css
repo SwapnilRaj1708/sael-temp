@@ -379,6 +379,24 @@
   --text-action--letter-spacing: 0.18em;
   --text-action--font-weight: 700;
 
+  /* 20 → 24. The business name on a ledger row — near enough twice --text-meta
+   * (11 → 12.5), which is what it was set at until 2026-08-27 when the client
+   * asked for the name to carry more of the row.
+   *
+   * **Sentence case, not uppercase, and that is what the size decided.** §2's
+   * uppercase list is closed at five roles; a sixth would have been this one.
+   * At label size the name was a label and --text-meta's 0.2em tracking was
+   * right for it. At twice that it is a heading, and it takes a heading's
+   * metrics — tight tracking, a line-height that closes up when the name wraps
+   * on a narrow screen. Uppercase at this size with 0.2em would also have run
+   * "Solar Module Manufacturing" past the width of its own column.
+   *
+   * Weight stays 700: prominence is the whole point of the change. */
+  --text-ledger-title: clamp(1.25rem, 1.1923rem + 0.2564vw, 1.5rem);
+  --text-ledger-title--line-height: 1.15;
+  --text-ledger-title--letter-spacing: -0.01em;
+  --text-ledger-title--font-weight: 700;
+
   /* 36 → 72. The capacity figure on a ledger row, which in the dark design is
    * the largest thing on the page after the hero headline — it is why the row
    * exists. --text-tile-figure (20 → 26) was sized for a figure sat beside a
@@ -504,6 +522,19 @@
    * check any new spacing token the same way. See the note on --spacing-flow. */
   --spacing-logo: 2.625rem; /* 42 */
 
+  /* The footer wordmark's box, beside the corporate address. 60 → 88.
+   *
+   * **Larger than it looks, because 38% of `sael-logo-dark.svg`'s height is
+   * empty.** The artwork's ink is 1293 × 329 inside a 1521.67 × 530.77
+   * viewBox — roughly symmetric padding the client's export bakes in. So the
+   * *drawn* wordmark here is 37 → 54px tall, which is what to compare against
+   * the masthead's 42px and against the 36 → 44px this logo had on its white
+   * plate until 2026-08-27. Set the box from the ink, not the other way round:
+   * `--spacing-logo`'s 42 applied here would draw a 26px wordmark.
+   *
+   * Re-measure if the client re-exports the file. */
+  --spacing-footer-logo: clamp(3.75rem, 3.3462rem + 1.7949vw, 5.5rem); /* 60 → 88 */
+
   /* The narrow axis of a hero dot's hit area. WCAG 2.5.8's 24px minimum,
    * used where a 44px square would space a row of controls apart rather than
    * hold them together. See components/sections/hero-carousel/hero-dots.tsx. */
@@ -549,8 +580,12 @@
    * was first drawn; the six beneath it are the solid band added on
    * 2026-08-05. The 18px gradient bar that used to sit under them was removed
    * at the client's request, and this lost its height with it. Change only in
-   * whole cells, and keep `SOLID_ROWS` in sections/pixel-strip/scatter.tsx in
-   * step. */
+   * whole cells, and keep `SOLID_ROWS` in
+   * sections/footer-pixel-strip/scatter.tsx in step.
+   *
+   * Still live after the page strip was retired on 2026-08-27: the footer
+   * strip is the consumer now. sections/_retired/pixel-strip/ also reads it,
+   * and is not what keeps it here. */
   --spacing-pixel-strip: 11.375rem; /* 182 = 26 rows of 7px */
 
   /* A news card on the homepage rail. Narrow enough that six sit across a
@@ -1029,6 +1064,33 @@
    * --gradient-eyebrow-bright at both ends: this is display type on the black
    * ground and it carries the section. */
   --gradient-heading-bright: linear-gradient(90deg, #7d6fd4 0%, #cf3f7f 52%, #ff4a4f 100%);
+
+  /* The four business marks' own ramps, for the ledger title's `gradient`
+   * variant — each row's name in the gradient its mark carries, so the name,
+   * the figure's accent and the artwork beside them are one object.
+   *
+   * **Sampled from the artwork, then lifted.** The marks are PNGs with the
+   * gradient baked in, so there was no CSS ramp to reuse: each one's stops
+   * were taken from `src/assets/images/business/*.png` by projecting its
+   * opaque pixels onto the principal axis of their colour cloud, which is the
+   * ramp the artwork actually runs along. The hues below are the artwork's.
+   *
+   * The **lightness is not**. Every mark ramps into a dark end — #47154c,
+   * #2f2b75, #184877, #174825 — which is artwork on a black ground, not text
+   * on one: those four sit at 1.4–2.1 against --color-surface-black, where
+   * large text needs 3. Each stop is raised in HSL, hue and saturation held,
+   * until it clears **3.5**. This is the same move --gradient-eyebrow-bright
+   * makes against --gradient-eyebrow-deep, for the same reason.
+   *
+   * **All four run dark end → bright end, left to right**, though the marks
+   * themselves do not agree on direction (solar and agri read brightest at
+   * their top-left). Four names in a 2×2 grid are a set in a way four separate
+   * marks are not, and a set that ramps two ways reads as a mistake. The hue
+   * path of each is untouched — only the order. */
+  --gradient-ledger-solar: linear-gradient(90deg, #a631b2 0%, #e0272c 52%, #f9e217 100%);
+  --gradient-ledger-cell: linear-gradient(90deg, #605ac3 0%, #a23f9c 52%, #df4196 100%);
+  --gradient-ledger-module: linear-gradient(90deg, #2369ae 0%, #0f8578 52%, #30be35 100%);
+  --gradient-ledger-agri: linear-gradient(90deg, #26763d 0%, #4c883e 52%, #f3eb31 100%);
 
   /* Section labels, clipped to their letterforms. `bright` is the on-dark
    * ramp; `deep` is the same travel darkened to carry on paper. Both are the

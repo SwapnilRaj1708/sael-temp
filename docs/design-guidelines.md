@@ -37,6 +37,14 @@ gains the spacing, radius, shadow and aspect tokens actually in use; §4 is amen
 header, the eyebrow, the rail and the card; §5 gains eight animations that had no recorded
 reduced-motion contract; §6 splits the `priority` rule.
 
+**Two rules added 2026-08-26, neither of which this document had ever stated.**
+§1 gains **"The site is dark by default"** — dark is the starting point for everything
+new, and a light-ground section must come from an explicit instruction rather than the
+implementer's judgement. §3 gains **"Section snap scrolling"**, the homepage's
+one-screenful-per-section behaviour: it was fully built and carefully reasoned in
+`globals.css`, but the only trace of it here was a half-clause in one token's usage note,
+so nothing told a new page how to opt in or what not to break.
+
 **Amended again 2026-08-26, after the code fixes landed.** §1's interaction-state
 exception is now a closed list rather than a clause; §2 gains a *Tracking* sub-section,
 `--text-mega-head`, a corrected weight on `--text-nav` and the first account of inline
@@ -44,6 +52,28 @@ emphasis (**C-3**); §3 gains `--spacing-inset`, `--spacing-tight` and `--spacin
 with two documented exclusions; **§4's Card spec was rewritten to the v2 primitive**
 (**C-1**) — the old boxed spec described a surface v2 had removed; §5 and §6 record the
 motion and imagery fixes as closed.
+
+**2026-08-27 — marks are not photographs.** §6 gains a rule separating the two, after the
+hero's slide marks were found centring themselves inside a square `<MediaFrame>`. It had
+already been decided once, locally, in the business ledger; writing it down is what stops it
+being decided a third time.
+
+**2026-08-27 — the page now snaps all the way down.** §3's "the page's tail is
+deliberately not snapped" is reversed: the last section's `scroll-margin-bottom: 150dvh`
+is gone and the footer is a snap target. The 2026-08-06 exception existed to stop the pixel
+strip being flung past unseen, and the strip has since become the footer's own top edge, so
+it was protecting a divider that no longer sits between the two. The opt-in table gains the
+footer's row, which explains why its alignment is a rule in `globals.css` and not a class.
+
+**2026-08-27 — the two behaviours that pace the page were only half-recorded.** §4 gains
+canonical specs for **`Reveal`** and **`CountUp`**. Both were built, both are load-bearing
+on the homepage, and both appeared here only as a single row in §5's animation table —
+enough to say what they animate, nothing about when to reach for them. §4 now carries the
+props, the replay-on-every-pass contract, the two-observer asymmetry both share, and the
+no-JS safety that `Reveal`'s script-applied hidden state exists to provide. With them, one
+rule this document had never stated: **a figure the design singles out counts up**, and if
+one figure in a row counts, every figure in that row counts. §8's new-page checklist and
+§5's two table rows now point at those specs instead of standing alone.
 
 Tokens belonging to cancelled or unbuilt surfaces are marked **deprecated** with a reason
 and a date rather than deleted. The full finding-by-finding ledger, the decisions taken
@@ -113,6 +143,55 @@ and the outstanding code fixes are in **`docs/design-reconciliation.md`**.
 | `--color-tile-surface` | `#E8E9EB` | ~~Chamfered business-tile fill~~ — **deprecated 2026-08-26**: v2 sets the tile rows straight on the section's own ground. Still consumed by `ui/tile-shape.tsx`, which is itself unused — see §4 |
 | `--color-footer-bg` | `#22262E` | Footer base. Cool slate, at the client's request **2026-08-22**; was `#3D4A48` |
 | `--color-footer-icon` | `#1A1E25` | Social icon glyph fill; was `#2F3D3A`. A shade deeper than the ground — it is painted on a white pill in the footer and on `--color-surface-alt` in the mobile drawer, so it has to be the dark end of the pair |
+
+### The site is dark by default
+
+**SAEL's website is a dark-theme site. Dark is the default, and everything new is built
+dark unless someone tells you otherwise.** *(Rule stated 2026-08-26.)*
+
+This is not a preference to weigh against others when you start a section — it is the
+starting point. A new page, a new section, a new component: assume
+`--color-surface-black` and the dot grid, `text-body-on-dark`, `Eyebrow tone="bright"`,
+`DisplayHeading ground="dark"`. If you find yourself reaching for the light ground, stop
+and check whether anyone actually asked for it.
+
+**Light is for highlighting, and it is not yours to choose.** A section may be set on the
+light ground where the design deliberately lifts it out of the surrounding dark — that is
+a real device and the built homepage uses it. But:
+
+> **Every light-ground section must come from an explicit instruction — the client's, or
+> the person running the session. Never decide it yourself.** If a spec does not say a
+> surface is light, it is dark. If you believe a surface reads better light, say so and
+> ask; do not build it light and flag it afterwards. An unrequested light section is a
+> design decision taken without authority, and it is much harder to notice in review than
+> a wrong colour, because nothing about it looks broken.
+
+**Where the built homepage stands**, for reference — five dark surfaces against four
+light, and each of the light ones was a specific instruction:
+
+| Section | Ground |
+|---|---|
+| Hero carousel | `black` |
+| Business portfolio | `black-dots` |
+| Current Power Portfolio | `black-dots` |
+| Solutions | `black-dots` |
+| Our Goals | `black-dots` |
+| About SAEL | `paper-dots` |
+| Our Endeavour | `paper-dots` |
+| In the News | `paper-dots` |
+| Pixel strip | `ground-dots-paper` — not a `<Section>` |
+
+Record the instruction beside any new light section, the way `frontend-progress.md`
+records the ones above. A ground with no recorded reason is the one a later session will
+"correct".
+
+> **Open point — `<Section>`'s own default is still `white`.** `defaultVariants` in
+> `ui/section.tsx` is `background: 'white'`, so a `<Section>` with no `background` renders
+> light. That predates this rule and now contradicts it. It is **not** changed here,
+> because `error.tsx`, `not-found.tsx` and the dev design-system page all rely on the
+> default and would flip to dark — a visual change to two real routes, which needs a
+> ruling rather than a refactor. **Until it is settled, pass `background` explicitly on
+> every new `<Section>`** and do not rely on the default at all.
 
 ### Grounds — "SAEL Home v2"
 
@@ -204,7 +283,7 @@ note, **2026-08-25**).
 | `--color-hero-track` | `rgb(255 255 255 / .16)` | Unfilled hero progress track |
 | `--color-tile-upcoming` | `rgb(255 255 255 / .07)` | "Upcoming" business row wash |
 | `--color-tile-upcoming-edge` | `rgb(255 255 255 / .13)` | ~~…its edge~~ — **deprecated 2026-08-26**: no consumer |
-| `--color-pixel-1` … `-6` | `#F5C000` `#F28C00` `#E8262A` `#B81F6A` `#7B2382` `#4632A0` | The pixel strip's six-stop ramp. **Live** — read at runtime by `pixel-strip/scatter.tsx` through `getPropertyValue()`, so no static reference exists and a search will wrongly call them dead |
+| `--color-pixel-1` … `-6` | `#F5C000` `#F28C00` `#E8262A` `#B81F6A` `#7B2382` `#4632A0` | The pixel strip's six-stop ramp. **Live** — read at runtime by `footer-pixel-strip/scatter.tsx` through `getPropertyValue()`, so no static reference exists and a search will wrongly call them dead. The reader was `pixel-strip/scatter.tsx` until that section was retired on 2026-08-27; the tokens did not go with it |
 
 **Business capacity figures.** Four colours, keyed to each business's mark rather than all
 four sharing brand red. These are the on-dark pair; a colour that clears 4.5:1 on a light
@@ -460,6 +539,87 @@ a legitimate design move; sharing a single token would have foreclosed it.
   beside a 4px bullet; `--spacing-tight` would take it to 8–12px, which is proportionally
   large next to a mark that size. Proportion to the adjacent object is the governing
   constraint here, not membership of the scale. Do not "fix" this to a token.
+
+### Section snap scrolling
+
+**On the homepage each section scrolls as one screenful.** The browser corrects where a
+scroll comes to rest so it lands on a section boundary. This is **CSS scroll-snap and
+nothing else** — a GSAP `Observer` that replaced scrolling with one-gesture-per-section
+paging was removed on 2026-08-06, because `preventDefault: true` is what makes paging work
+and it costs the browser's own momentum and rubber-banding on touch. Do not reintroduce a
+scroll-hijacking library. The full reasoning is in the comment above the rules in
+`src/styles/globals.css`.
+
+**How a page opts in — three parts, all three required:**
+
+| Where | What | Why |
+|---|---|---|
+| The page | Wrap the sections in `<div data-snap-sections>` | `globals.css` matches `html:has([data-snap-sections])`, so snapping is scoped to the page that wants it and the root layout never has to know which routes those are |
+| Each section | `data-snap-section` on the `<Section>` | Gets `scroll-snap-stop: always` |
+| Each section | A `snap?: boolean` prop, applied as `snap && 'min-h-viewport snap-start'` | The section is a screenful and aligns to the top. **The prop is how a section stays reusable** — the same component on a non-snapping page renders at its natural height |
+| The footer | `data-snap-section` on `<footer>`, with its `scroll-snap-align` set in `globals.css` | It is the last stop. The alignment cannot be a class on the footer: `<Footer>` is in the root layout and renders on every page, so `snap-start` there would be a property of the footer when it is really a property of *this page* snapping. A section can carry the class because it takes a `snap` prop and only a snapping page passes it |
+
+```tsx
+<div data-snap-sections>
+  <HeroCarousel slides={heroSlides} />
+  <IntroSplit {...aboutSael} snap />
+  …
+</div>
+```
+
+**Four decisions behind it, none of which should be changed casually:**
+
+1. **The document is the scroll container**, not a `height: 100dvh; overflow-y: scroll`
+   wrapper. A wrapper snaps just as well and breaks everything around it: mobile browsers
+   only collapse their address bar for the *document* scroller, `Home`/`End` and
+   find-in-page stop behaving, and the footer ends up inside the scrolling box.
+2. **`mandatory`, not `proximity`** — the client wants one scroll to land on the next
+   section every time. Mandatory is safe here because the spec handles the tall-section
+   case: a snap area larger than the snapport may rest anywhere that keeps it covering the
+   viewport (css-scroll-snap-1 §6.2), so a section taller than a screen scrolls freely
+   inside itself and snaps only at its own edges.
+3. **`scroll-snap-stop: always`** on every section, so a hard fling stops at the *next*
+   boundary rather than sailing through three.
+4. **`scroll-padding-top` is `--spacing-header`**, set on `html`, so a `snap-start` section
+   aligns *under* the fixed bar rather than behind it. **These two must stay in step** — a
+   change to the header height that does not reach the scroll padding puts every section's
+   top edge under the masthead.
+
+**The page snaps all the way down, footer included** — the client's decision on
+**2026-08-27**. Every section snaps, and then the footer snaps, and there is no longer a
+tail that behaves differently from the rest.
+
+> **This reverses a rule that stood here from 2026-08-06 to 2026-08-27, and the reversal is
+> not a change of mind.** The tail used to be ordinary scroll: the *last* section's snap
+> area was extended past the end of the document with `scroll-margin-bottom: 150dvh`,
+> making news-to-end one oversized area, which under point 2 above may rest anywhere that
+> covers the viewport. The reason was the pixel strip — snapping from news straight to the
+> footer flung a 182px divider past too fast to see. **The strip is now the footer's own
+> top edge** rather than a band between the two (see `sections/footer-pixel-strip/`), so
+> landing on the footer *is* landing on the strip, and the exception had nothing left to
+> protect. `scroll-margin-bottom` is gone; do not restore it without restoring a mid-page
+> divider first.
+
+**The footer needs no height rule.** At most widths it is shorter than the viewport, so its
+aligned position falls past the maximum scroll offset — which needs no handling, because
+snap positions are clamped to the scrollable range and the last stop is simply the end of
+the document with the footer fully in view. On a short viewport where the footer is taller
+than the screen, point 2 applies to it exactly as it does to the tall Solutions carousel.
+Both are correct; neither is a special case. **Do not give the footer `min-h-viewport`** to
+"make it a screenful" — that buys nothing and adds empty space at every width where the
+footer is already close to a screen tall.
+
+> **Sizing a snapping section.** `--spacing-viewport` is `calc(100dvh - var(--spacing-header))`
+> — one screenful below the fixed bar, consumed as `min-h-viewport`. It is a **minimum**,
+> not a fixed height: a section whose content needs more is allowed to be taller, and
+> point 2 above is what keeps that from breaking. Never set a fixed `height` on a section
+> to make it snap.
+
+> **Check a snapping section at 360px and at a short laptop viewport.** `dvh` is what makes
+> this survive a collapsing mobile address bar, and it is the value to reach for; `vh` is
+> not. A section that only just fits at 1920 will overflow its own snap area on a 768px-tall
+> screen, and the user then cannot reach the part that overflowed without the browser
+> pulling them to the next boundary.
 
 ### Component and section spacing
 
@@ -847,6 +1007,100 @@ changes length — and "Jun 1, 2026" and "December 31, 2026" are different lengt
 > card sets its date with `--text-meta` instead. The primitive is **kept, awaiting FE-18
 > (Newsroom)**, which is the obvious consumer. Do not delete it, and do not build a third
 > date treatment on About Us without checking here first.
+### Reveal — the scroll entrance
+
+`components/ui/reveal.tsx`. **This is how content arrives on this site.** Every section on
+the homepage is built on it, and a new section that renders its content plainly will look
+wrong next to one that does not — not because the entrance is decoration, but because the
+whole page is paced by it.
+
+`Reveal` **is the box**, not a wrapper around one: it takes the `className` the element
+would have had, so nothing extra lands in the layout tree and the component can carry a
+section's own positioning.
+
+| Prop | Type | Meaning |
+|---|---|---|
+| `order` | `number` (default `0`) | Stagger position. Each step delays the start by `--duration-reveal-step`, so a label lands before the heading and the heading before the copy |
+| `className` | `string` | Applied to the revealing element itself |
+
+**Spec:** `opacity 0→1` with `translateY(--reveal-shift)→0` over `--duration-reveal` on
+`--ease-entrance`, delayed `order × --duration-reveal-step`. Values from §3's motion
+tokens — never a raw `duration-*` and never a hand-written travel distance.
+
+Four behaviours a new page inherits and must not re-invent:
+
+- **It replays on every pass.** The client's decision, **2026-08-06** — it was once-only
+  before that. Two observers do the work and their asymmetry is deliberate: the *reveal*
+  observer fires 10% up from the bottom edge so content starts a beat after it appears;
+  the *reset* observer re-arms at the true viewport edge, only once the element is
+  **completely** off screen, because resetting at the reveal margin would visibly fade
+  content back out while it still sits in the bottom tenth of the screen.
+- **The hidden state is applied by script, never by the server.** The stylesheet only
+  hides an element once `<html>` carries `reveal-ready`, which the component adds on
+  mount. Ship `opacity: 0` in the HTML instead and a browser that never runs the bundle
+  shows a blank section for ever. **Do not "simplify" this into a static hidden state.**
+- **Anything already properly in view at mount is revealed synchronously**, before the
+  observer is wired, so it never flashes hidden for a frame. The threshold is 75% of the
+  viewport height, not the fold: every section on a snapping page starts resting exactly
+  *on* the fold, and a `top < innerHeight` test would reveal all of them at once and
+  animate none.
+- **Motion is gated in CSS**, and both the transition *and* the hidden state live inside
+  the `prefers-reduced-motion: no-preference` block — §5's standard, and the inversion of
+  it is the bug closed as **C-7**.
+
+**The eyebrow's rule rides the same attribute** rather than observing anything of its own;
+see `Eyebrow` above and `.anim-underline` in §5.
+
+`Reveal` is a client component by necessity, and it is the *only* client boundary most
+sections need — the section around it stays a Server Component. /CLAUDE.md §5.
+
+### CountUp — the figure ticker
+
+`components/ui/count-up.tsx`. Counts a figure up from zero as it scrolls into view, every
+time it does.
+
+> **The rule: a figure the design singles out counts up.** If a section sets a number at
+> `--text-stat-large`, `--text-ledger-figure`/`-long`, or any other display-scale type
+> whose job is to be *the* thing in its row, it is wrapped in `<CountUp>`. Wrapping one
+> figure in a row and not its neighbour is the failure this rule exists to prevent — a row
+> of figures must animate as a row. Numbers set in body copy, in a table, in a date or in
+> a label do **not** count up; the treatment marks a headline figure, and applying it to
+> ordinary numbers spends the emphasis it exists to create.
+
+| Prop | Type | Meaning |
+|---|---|---|
+| `value` | `string` | The finished string exactly as it should read — `"3625 MW + 5 GW"`, `"164.9 MW"` |
+| `durationMs` | `number` (default `1500`) | Milliseconds for the whole run |
+
+**Spec:** every digit run inside `value` counts from zero to its target over `durationMs`
+on ease-out cubic, triggered on intersection 10% up from the bottom edge — the same margin
+`Reveal` uses, so a figure and the block around it arrive together.
+
+- **It animates the numbers inside a string, not a number.** These figures are
+  pre-formatted by the business: `"3625 MW + 5 GW"` is two quantities and two units in one
+  value, and `content-model.md` §2 is explicit that the frontend must not compose them. So
+  the string is split on its digit runs, each run counts independently, and the text
+  between them — units, separators, the `+` — is emitted verbatim and never animates.
+- **Decimals are preserved.** `"164.9"` counts in tenths and lands on `164.9`. Rounding it
+  to `165` would print a figure the company does not publish.
+- **Every figure takes the same time, whatever it counts to**, so a row finishes together
+  instead of the small numbers landing first and the ledger settling in pieces.
+- **The width is reserved by the final string** — the finished value renders underneath,
+  invisible but taking its full box, with the ticker over it. Without that, a counter
+  growing from one digit to four drags its whole row along with it. **Pair it with
+  `tabular-nums`** so the digits do not jitter as they change.
+- **Reduced motion prints the value and stops**, gated in JS by `useReducedMotion()` — not
+  in CSS, because the intermediate values are generated in script. Assistive technology
+  always gets the final string: `aria-hidden` on the ticker, the real value in `sr-only`.
+- **The figure is real content, not decoration.** Where `IntersectionObserver` is missing
+  it counts immediately and never re-arms — a card reading `0 MWp` because a callback
+  never arrived is worse than one that never animated. A null figure from the repository
+  renders the row without it rather than printing a zero.
+
+**Live consumers:** the business ledger's capacity figures (`business-tiles`) and the two
+footprint figures over the map (`presence-map`). Both sections are Server Components apart
+from this one client leaf.
+
 
 ---
 
@@ -873,13 +1127,13 @@ Eight behaviours the v2 homepage introduced. Contracts below are **as implemente
 
 | Name | Spec | Where | `prefers-reduced-motion` |
 |---|---|---|---|
-| `.anim-reveal` | `opacity 0→1` + `translateY(--reveal-shift)→0`, `--duration-reveal`, staggered `--duration-reveal-step` per `--reveal-order` | Every section, via `ui/reveal.tsx` | **Disable** — content simply present. Both the transition *and* the hidden state live inside the media query |
+| `.anim-reveal` | `opacity 0→1` + `translateY(--reveal-shift)→0`, `--duration-reveal`, staggered `--duration-reveal-step` per `--reveal-order` | **Every section**, via `ui/reveal.tsx` — full spec in §4 | **Disable** — content simply present. Both the transition *and* the hidden state live inside the media query |
 | `.anim-underline` | `scaleX(0→1)` from a left origin, `--duration-underline`, same stagger | The rule under a section eyebrow | **Disable** — rule drawn at full width |
 | `.anim-track-fill` | `clip-path: inset(0 100% 0 0) → inset(0)`, linear over the slide interval | Hero progress bar | **Disable** — bar reads as simply filled |
 | `.anim-map-ping` | `scale(1)→scale(2.6)`, `opacity .55→0`, 2.6s infinite, offset `--anim-index × 420ms` so pins do not pulse in lockstep | Map pin halo | **Disable** — halo absent; the solid pin underneath is always there |
 | `.anim-drawer-in` | `translateX(100%)→0`, 280ms `--ease-entrance` | Mobile nav drawer | **Disable** — drawer already open when it renders; the slide is decoration on top |
 | `.anim-mega-col` | `opacity 0→1` + `translateY(--reveal-shift)→0`, `--duration-mega`, staggered `--duration-mega-step` per `--mm-index` | Mega-menu columns | **Disable** — columns present as soon as the panel opens |
-| `CountUp` | Figures count from zero over 1500ms, ease-out cubic, triggered on first intersection | Business capacity figures, map stats | **Disable** — final value printed immediately. Gated in JS by `useReducedMotion()`, not CSS |
+| `CountUp` | Every digit run in the string counts from zero over 1500ms, ease-out cubic, on intersection 10% up from the bottom edge; replays on every pass | **Every highlighted figure**, via `ui/count-up.tsx` — full spec and the rule for when a figure counts are in §4 | **Disable** — final value printed immediately. Gated in JS by `useReducedMotion()`, not CSS |
 | Card lift & media zoom | `translateY` on the card at `--duration-card`; `scale(1.06)` on its photograph | News cards, goal cards, rail arrows | **Disable transition**; goal cards keep a `scale(1.02)` resting nudge, which is a state change rather than motion |
 
 > **`.anim-mega-col` was corrected on 2026-08-26 (C-7)** and now matches this table. It
@@ -912,6 +1166,9 @@ Standards:
   - **Hero slide 1 marks both of its art-directed crops.** A 2.34:1 landscape squeezed into a 4:5 portrait frame loses its subject, so each breakpoint ships its own crop — and `next/image` cannot express a media-conditioned `<picture>` source. Marking one and lazy-loading the other protects LCP at one breakpoint and wrecks it at the other. The cost is that one of the two is preloaded and never painted, which is accepted.
   - **The masthead logo keeps `priority`.** It is a small PNG, above the fold on *every* page, and on a text-led route it is a legitimate LCP candidate in its own right.
   - Nothing else does. A fourth `priority` on a page needs a reason written next to it.
+- **A mark is not a photograph, and does not go in a `<MediaFrame>`.** *(Rule added 2026-08-27, after the same call was made twice.)* The frame primitive exists for a photograph filling a box its parent sized; a mark, logo or icon is artwork with proportions of its own. Draw it as a plain `<Image>` from its static import, constrained on **one** axis with the other `auto` — `h-auto w-ledger-icon` in the business ledger, `h-hero-icon w-auto` in the hero. The import already carries the intrinsic width and height, so nothing has to be measured, letterboxed or cropped.
+  - **The failure it prevents is silent mis-alignment.** A square frame around a mark that is not square leaves slack, and `object-contain` splits that slack evenly — so the mark centres itself inside a box the layout thinks is full. Where several marks share a row or a stack and their ratios differ, each one centres at a *different* offset, and nothing in the markup says so. The hero's four marks run 0.65 to 0.92 wide-to-tall and drifted up to 24px against each other as the carousel cross-faded; the client asked for them flush left on **2026-08-27**, and removing the box was the fix rather than `object-left`, because a box with no slack has nothing to align.
+  - **Centring inside a square is fine where it is the design.** The Our Goals marks sit in `size-goal-icon` with `object-contain` and are *meant* to be centred — the card's whole content is. The rule is about a box the design does not ask for, not about every square.
 - Cut-out PNGs (`engineer.png`, `solar-plant.png`) keep transparency — do not convert to JPEG. See `asset-inventory.md`.
 
 ---
@@ -940,16 +1197,19 @@ Standards:
 The homepage is the reference implementation. Before starting a route, read this section,
 then the feature doc for the item that is **In Progress** in `frontend-progress.md`.
 
-1. **Take the ground first.** A v2 section sits on `--color-paper` or
-   `--color-surface-black` with its matching dot grid, and its eyebrow tone follows
-   (`deep` on paper, `bright` on black). Getting this pair wrong is the fastest way to
-   look off-system.
+1. **Take the ground first, and the ground is dark.** The site is a dark-theme site and
+   dark is the default — `--color-surface-black` with its dot grid, `text-body-on-dark`,
+   `Eyebrow tone="bright"`, `DisplayHeading ground="dark"`. **A light section must come
+   from an explicit instruction and is never your call**; if the spec does not say a
+   surface is light, it is dark. Ask rather than build it light and flag it after. §1.
+   Pass `background` explicitly — do not rely on `<Section>`'s default, which is still
+   `white` and is an open point in §1.
 2. **`<Container>` is the only horizontal padding on the page.** A full-bleed section opts
    out by not rendering one and puts a `<Container>` around its inner text instead. A
    guardrail fails the build if any other file sets `px-gutter`.
 3. **Reach for a primitive before writing a surface.** `src/components/ui/` already holds
    `Button`, `Container`, `Eyebrow`, `SectionHeading`, `Card`, `MediaFrame`, `Reveal`,
-   `Rail`, `ArrowGlyph`, `DateBadge`, `Accordion`, `Pagination`, `EmptyState`. **`Card` is
+   `Rail`, `ArrowGlyph`, `DateBadge`, `Accordion`, `Pagination`, `EmptyState`, `CountUp`. **`Card` is
    the one to start from for any hairline-and-inset surface** — it was adopted by both
    homepage consumers on 2026-08-26. `SectionHeading` (**C-2**) and `DateBadge` are still
    unused on the homepage; that is a defect being fixed, not a licence to hand-roll
@@ -960,7 +1220,18 @@ then the feature doc for the item that is **In Progress** in `frontend-progress.
 5. **A new `--text-*` token also goes in `FONT_SIZES`** in `src/lib/utils/cn.ts`. §2.
 6. **Wrap section content in `<Reveal>`** with ascending `order` so it cascades, and let
    the eyebrow's rule ride the same attribute rather than observing anything of its own.
-7. **Check it at 360px before you check it at 1920.** `responsive-strategy.md` §4.
+   A section that renders its content plainly reads as broken next to one that does not.
+   §4. **And wrap every headline figure in `<CountUp>`** — if the design sets a number at
+   display scale to make it the thing in its row, it counts up, and so does every other
+   figure in that row. §4.
+7. **If the page snaps, opt in in three places** — `<div data-snap-sections>` around the
+   sections, `data-snap-section` on each `<Section>`, and a `snap?: boolean` prop applied
+   as `snap && 'min-h-viewport snap-start'` so the component stays usable on a page that
+   does not snap. §3. The footer is already opted in and needs nothing from a new page.
+   Snapping is CSS only; do not reach for a scroll-hijacking library.
+8. **Check it at 360px before you check it at 1920.** `responsive-strategy.md` §4. For a
+   snapping section, check a short laptop viewport too — a section that only just fits at
+   1920 will overflow its own snap area at 768px tall.
 
 > **Magic numbers used to accumulate; since 2026-08-26 they cannot.**
 > `pnpm verify:guardrails` enforces five rules — no raw hex, no `rgb()`/`hsl()`, no bare

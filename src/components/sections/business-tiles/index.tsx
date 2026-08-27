@@ -1,4 +1,5 @@
 import Image, { type StaticImageData } from 'next/image';
+import { cva } from 'class-variance-authority';
 import { ArrowGlyph } from '@/components/ui/arrow-glyph';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -19,11 +20,58 @@ import { cn } from '@/lib/utils/cn';
  */
 const LONG_FIGURE_CHARS = 9;
 
+/**
+ * The two title treatments the client asked to compare on 2026-08-27. Both are
+ * live code; **switching between them is the one word below.**
+ *
+ *  - `plain`    the name on its own line at --text-ledger-title, in the row's
+ *               quiet on-dark colour. The size is the whole of the change.
+ *  - `gradient` the same line, with the row's mark gradient clipped to the
+ *               letterforms, so the name, its capacity figure and the artwork
+ *               beside them all carry one colour.
+ *
+ * Neither is commented out, deliberately. A commented-out variant is not
+ * type-checked, not linted and not covered by `pnpm verify:guardrails`, so it
+ * rots quietly until the day someone uncomments it; these two both compile
+ * every build, and the guardrails see both. Flipping the constant is the same
+ * one-line edit either way.
+ */
+const TITLE_VARIANT: 'plain' | 'gradient' = 'gradient';
+
+/**
+ * The business name on a ledger row.
+ *
+ * **One line that wraps only when it has to.** The name used to be supplied
+ * pre-split as a two-element tuple and joined with a `<br>`, which forced the
+ * break at every width; it is one string now and the browser decides. The
+ * column carries `min-w-0`, so on a narrow screen the name wraps rather than
+ * pushing the mark off the row, and `text-wrap: balance` splits it evenly when
+ * it does instead of leaving one word stranded.
+ *
+ * The gradient variant reads --ledger-title-gradient, which each tile sets to
+ * its own mark's ramp — see `titleGradientClassName` on BusinessTile. The
+ * property is set on every row in both variants and simply goes unread in
+ * `plain`, which is what keeps this a variant lookup rather than a conditional
+ * threaded through the row.
+ */
+const ledgerTitle = cva('text-ledger-title [text-wrap:balance]', {
+  variants: {
+    variant: {
+      plain: 'text-on-dark-faint',
+      gradient: 'bg-(image:--ledger-title-gradient) gradient-text',
+    },
+  },
+});
+
 export interface BusinessTile {
   id: string;
   icon: StaticImageData | null;
-  /** Broken over two lines in the design; supplied pre-split. */
-  title: [string, string];
+  /**
+   * The business name, as one string. Set on a single line and wrapped by the
+   * browser only where the column is too narrow for it — it was a pre-split
+   * `[string, string]` broken with a `<br>` until 2026-08-27.
+   */
+  title: string;
   /** Rendered as a superscript after the title. Marks "upcoming". */
   titleMarker?: string;
   description: string;
@@ -46,6 +94,13 @@ export interface BusinessTile {
    */
   ruleClassName: string;
   /**
+   * Sets `--ledger-title-gradient` to this business's mark ramp, for the
+   * `gradient` title variant — `[--ledger-title-gradient:var(--gradient-ledger-solar)]`.
+   * A class rather than a raw gradient so the colour stays in the token
+   * layer, the same way `figureClassName` does. /CLAUDE.md §2.
+   */
+  titleGradientClassName: string;
+  /**
    * Marks the row as not yet operational, which gives it its own ground — the
    * frosted grey the masthead takes over a white page, moved onto the black
    * one. Every other row sits on the section itself.
@@ -66,10 +121,14 @@ export interface BusinessTilesProps {
  * **A ledger, not a grid of cards.** The earlier build set four centred tiles
  * on a light ground with the figure tucked in beside the business name. v2
  * sets the same four as rows on the black ground: a hairline across the top,
- * the business named small and quiet above a capacity figure that is the
- * largest thing on the page after the hero headline, its mark at the row's
- * right edge, and the copy running underneath. The figure is why the row
- * exists, and the row is now laid out to say so.
+ * the business named above a capacity figure that is the largest thing on the
+ * page after the hero headline, its mark at the row's right edge, and the copy
+ * running underneath. The figure is why the row exists, and the row is now
+ * laid out to say so.
+ *
+ * The name was set small and quiet until 2026-08-27, when the client asked for
+ * it to carry more of the row. It is one line at roughly twice the size now,
+ * in one of two treatments — see TITLE_VARIANT below.
  *
  * The figures still come from the repository, not from this file and not from
  * the page's static content — they change as plants commission and the
@@ -146,12 +205,23 @@ export function BusinessTiles({ eyebrow, tiles, snap = false }: BusinessTilesPro
                       floor is its content's min-content width until you say
                       otherwise. */}
                   <div className="flex min-w-0 flex-1 flex-col">
-                    <h3 className="text-meta text-on-dark-faint uppercase">
-                      {tile.title[0]}
-                      <br />
-                      {tile.title[1]}
+                    <h3
+                      className={cn(
+                        ledgerTitle({ variant: TITLE_VARIANT }),
+                        tile.titleGradientClassName,
+                      )}
+                    >
+                      {tile.title}
+                      {/* Its own colour, not the heading's. Under the gradient
+                        variant the heading is `color: transparent` with the
+                        ramp clipped to its letterforms, and a child with no
+                        colour of its own inherits the transparency without
+                        inheriting the background — so an unstyled marker
+                        would simply vanish. */}
                       {tile.titleMarker !== undefined && (
-                        <sup className="text-tile-marker">{tile.titleMarker}</sup>
+                        <sup className="text-tile-marker text-on-dark-faint">
+                          {tile.titleMarker}
+                        </sup>
                       )}
                     </h3>
 

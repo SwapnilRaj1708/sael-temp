@@ -8,13 +8,13 @@ import heroImageMobile1 from '@/assets/images/hero/hero-image-mobile-1.jpg';
 import heroImageMobile2 from '@/assets/images/hero/hero-image-mobile-2.jpg';
 import heroImageMobile3 from '@/assets/images/hero/hero-image-mobile-3.jpg';
 import heroImageMobile4 from '@/assets/images/hero/hero-image-mobile-4.jpg';
-import heroImage2 from '@/assets/images/hero/hero-image-2.jpg';
-import heroImage3 from '@/assets/images/hero/hero-image-3.jpg';
-import heroImage4 from '@/assets/images/hero/hero-image-4.jpg';
-import saelIcon1 from '@/assets/images/hero/sael-icon-1.png';
-import saelIcon2 from '@/assets/images/hero/sael-icon-2.png';
-import saelIcon3 from '@/assets/images/hero/sael-icon-3.png';
-import saelIcon4 from '@/assets/images/hero/sael-icon-4.png';
+import heroImage2 from '@/assets/images/hero/hero-image-2.png';
+import heroImage3 from '@/assets/images/hero/hero-image-3.png';
+import heroImage4 from '@/assets/images/hero/hero-image-4.png';
+import saelIcon1 from '@/assets/images/hero/cropped-sael-icon-1.png';
+import saelIcon2 from '@/assets/images/hero/cropped-sael-icon-2.png';
+import saelIcon3 from '@/assets/images/hero/cropped-sael-icon-3.png';
+import saelIcon4 from '@/assets/images/hero/cropped-sael-icon-4.png';
 import solBhadra from '@/assets/images/solutions/sol-bhadra.jpg';
 import solKishangarh from '@/assets/images/solutions/sol-kishangarh.jpg';
 import solMizoram from '@/assets/images/solutions/sol-mizoram.jpg';
@@ -173,7 +173,7 @@ export const businessTiles = [
   {
     id: 'solar-generation',
     icon: iconSolarGeneration,
-    title: ['Solar Energy', 'Generation'] as [string, string],
+    title: 'Solar Energy Generation',
     description:
       'SAEL develops and operates large-scale solar power plants, generating clean, ' +
       'affordable energy across India and advancing the nation’s renewable transition.',
@@ -181,11 +181,12 @@ export const businessTiles = [
     ctaLabel: 'Know more about solar energy generation',
     figureClassName: 'text-figure-solar-bright',
     ruleClassName: 'bg-figure-solar-bright',
+    titleGradientClassName: '[--ledger-title-gradient:var(--gradient-ledger-solar)]',
   },
   {
     id: 'cell-manufacturing',
     icon: iconCellManufacturing,
-    title: ['Solar Cell', 'Manufacturing'] as [string, string],
+    title: 'Solar Cell Manufacturing',
     // The design marks this business as upcoming, and the footnote on the
     // capacity figure explains what the asterisk means.
     titleMarker: '*',
@@ -196,6 +197,7 @@ export const businessTiles = [
     ctaLabel: 'Know more about solar cell manufacturing',
     figureClassName: 'text-figure-cell-bright',
     ruleClassName: 'bg-figure-cell-bright',
+    titleGradientClassName: '[--ledger-title-gradient:var(--gradient-ledger-cell)]',
     // The one business that is not yet operational, so it takes its own
     // ground in the ledger. The client's call on 2026-08-20.
     upcoming: true,
@@ -203,7 +205,7 @@ export const businessTiles = [
   {
     id: 'module-manufacturing',
     icon: iconModuleManufacturing,
-    title: ['Solar Module', 'Manufacturing'] as [string, string],
+    title: 'Solar Module Manufacturing',
     description:
       'We produce bifacial solar modules engineered for performance, durability and ' +
       'long-term reliability across diverse operating environments.',
@@ -211,11 +213,12 @@ export const businessTiles = [
     ctaLabel: 'Know more about solar module manufacturing',
     figureClassName: 'text-figure-module-bright',
     ruleClassName: 'bg-figure-module-bright',
+    titleGradientClassName: '[--ledger-title-gradient:var(--gradient-ledger-module)]',
   },
   {
     id: 'agri-waste',
     icon: iconAgriWaste,
-    title: ['Agri Waste', 'to Energy'] as [string, string],
+    title: 'Agri Waste to Energy',
     description:
       'We convert agricultural residue into clean energy, reducing stubble burning and ' +
       'emissions while creating value for farming communities.',
@@ -223,6 +226,7 @@ export const businessTiles = [
     ctaLabel: 'Know more about agri waste to energy',
     figureClassName: 'text-figure-agri-bright',
     ruleClassName: 'bg-figure-agri-bright',
+    titleGradientClassName: '[--ledger-title-gradient:var(--gradient-ledger-agri)]',
     // The leaves carried a +12% nudge against the other three marks until
     // 2026-08-22. All four are drawn at one width now, each at its own
     // height — see the mark in sections/business-tiles.

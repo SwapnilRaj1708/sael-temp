@@ -3,7 +3,6 @@ import { BusinessTiles, type BusinessTile } from '@/components/sections/business
 import { EndeavourSplit } from '@/components/sections/endeavour-split';
 import { GoalsGrid } from '@/components/sections/goals-grid';
 import { NewsCarousel } from '@/components/sections/news-carousel';
-import { PixelStrip } from '@/components/sections/pixel-strip';
 import { HeroCarousel } from '@/components/sections/hero-carousel';
 import { IntroSplit } from '@/components/sections/intro-split';
 import { PresenceMap } from '@/components/sections/presence-map';
@@ -113,7 +112,6 @@ export default async function HomePage() {
       <SolutionsCarousel {...solutions} snap />
       <GoalsGrid {...ourGoals} snap />
       <NewsCarousel title="In the News" items={news} snap />
-      <PixelStrip />
     </div>
   );
 }

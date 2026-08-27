@@ -78,13 +78,19 @@ Content is fixed and lives in `src/lib/content/static/footer.ts`.
 
 ### Structure (per prototype and live site)
 
-1. **Top row:** SAEL white logo left; four social icon buttons right (Facebook, Instagram, LinkedIn, X) — 44px circles, white fill, `--color-footer-icon` glyph, hover lifts 3px.
+1. **Top row:** four social icon buttons, right (Facebook, Instagram, LinkedIn, X) — 44px
+   circles, white fill, `--color-footer-icon` glyph, hover lifts 3px.
+   > **The wordmark left this row on 2026-08-27** and now sits beside the corporate block
+   > (point 3), at the client's request. It had been the colour PNG on a **white plate**,
+   > because the only artwork was a gradient over a *black* strapline and could not sit on
+   > `--color-footer-bg`; `sael-logo-dark.svg` is drawn for a dark ground, so the plate went
+   > with the move. The socials keep the right-hand side they already had.
 2. **Link grid, 4 columns:**
    - *Know More* — About Us, Our Team, Contact Us, Newsroom, Career
    - *Solutions* — Solar Energy, Waste To Energy, Module Manufacturing, Solar Cell Manufacturing
    - *Sustainability* — Story of Our Influence, Our Key ESG Metrics, Our Core Beliefs
    - *Investors* — Corporate Governance, Financials & Reports, Notifications, Investor Contact
-3. **Corporate block** — present on the live site, absent from the prototype. **Include it**, it is legally useful:
+3. **Corporate block** — present on the live site, absent from the prototype. **Include it**, it is legally useful. **The wordmark sits at the right-hand end of this row** as of 2026-08-27, address left; below `md` the two stack, address first:
    > SAEL INDUSTRIES LIMITED
    > Registered Office: H. No. 44, Model Town, Firozpur, Guruharsahai, Punjab, India, 152022
    > CIN: U40106PB2022PLC055755

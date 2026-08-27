@@ -50,11 +50,17 @@ export const siteConfig: SiteConfig = {
   cin: 'U40106PB2022PLC055755',
   telephone: '011-44910011',
   email: 'info@sael.co',
+  // social: {
+  //   facebook: TODO_CONTENT,
+  //   instagram: TODO_CONTENT,
+  //   linkedin: TODO_CONTENT,
+  //   x: TODO_CONTENT,
+  // },
   social: {
-    facebook: TODO_CONTENT,
-    instagram: TODO_CONTENT,
-    linkedin: TODO_CONTENT,
-    x: TODO_CONTENT,
+    facebook: 'www.facebook.com/saelindustries',
+    instagram: 'www.instagram.com/saelindustries',
+    linkedin: 'www.linkedin.com/company/saelindustries',
+    x: 'www.x.com/saelindustries',
   },
 };
 

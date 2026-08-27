@@ -96,6 +96,7 @@ sael-web/
     │   │   │   └── nav-config.ts
     │   │   └── footer/index.tsx
     │   ├── sections/                # page sections; content-agnostic, typed props
+    │   │   └── _retired/           # no longer rendered; kept, lint-blocked from import
     │   │   ├── hero-carousel/
     │   │   ├── stats-band/
     │   │   ├── intro-split/

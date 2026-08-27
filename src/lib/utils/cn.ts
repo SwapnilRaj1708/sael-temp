@@ -29,6 +29,7 @@ const FONT_SIZES = [
   'action',
   'badge',
   'meta',
+  'ledger-title',
   'ledger-figure',
   'ledger-figure-long',
   'plate-title',

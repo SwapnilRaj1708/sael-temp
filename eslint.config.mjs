@@ -9,8 +9,10 @@ import tseslint from 'typescript-eslint';
  *  1. No component or page may import a concrete content repository — only the
  *     `getContentRepository()` factory from `@/lib/content`.
  *  2. Nothing outside `src/lib/config/env.ts` may read `process.env`.
+ *  3. Nothing may import a retired section from
+ *     `components/sections/_retired/` — see that folder's README.
  *
- * Both are asserted by `pnpm verify:guardrails`.
+ * All three are asserted by `pnpm verify:guardrails`.
  */
 
 const RESTRICTED_CONTENT_IMPORTS = {
@@ -26,6 +28,19 @@ const RESTRICTED_CONTENT_IMPORTS = {
         'Import getContentRepository() from "@/lib/content" instead. Components and pages must not know which repository implementation is active — see /CLAUDE.md §6.',
     },
   ],
+};
+
+/**
+ * Retired sections are kept so the work is recoverable, not so it can be
+ * reached — the folder is inside `src/` only so it stays type-checked. Making
+ * an import fail is what keeps "retired" a property of the build rather than a
+ * comment someone has to notice. To bring one back, move it out of `_retired/`;
+ * the rule keys on the path, so nothing else changes.
+ */
+const RESTRICTED_RETIRED_IMPORTS = {
+  group: ['@/components/sections/_retired', '@/components/sections/_retired/**'],
+  message:
+    'This section is retired and is not rendered anywhere. Read src/components/sections/_retired/README.md — if you genuinely need it back, move it out of _retired/ rather than importing it from there.',
 };
 
 const RESTRICTED_PROCESS_ENV = [
@@ -61,14 +76,23 @@ const eslintConfig = defineConfig([
       },
     },
     rules: {
-      'no-restricted-imports': ['error', RESTRICTED_CONTENT_IMPORTS],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [...RESTRICTED_CONTENT_IMPORTS.patterns, RESTRICTED_RETIRED_IMPORTS],
+        },
+      ],
       'no-restricted-properties': ['error', ...RESTRICTED_PROCESS_ENV],
     },
   },
   {
-    // The data layer is allowed to reference its own implementations.
+    // The data layer is allowed to reference its own implementations. It is
+    // not allowed to reach into _retired/, so that group is restated rather
+    // than the whole rule switched off.
     files: ['src/lib/content/**'],
-    rules: { 'no-restricted-imports': 'off' },
+    rules: {
+      'no-restricted-imports': ['error', { patterns: [RESTRICTED_RETIRED_IMPORTS] }],
+    },
   },
   {
     // The single sanctioned reader of process.env.

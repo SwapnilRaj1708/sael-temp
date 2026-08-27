@@ -163,6 +163,17 @@ const LINT_CASES = [
     rule: 'no-restricted-imports',
   },
   {
+    name: 'lint: importing a retired section is blocked',
+    file: 'restricted-retired-import.ts',
+    source: [
+      "import { PixelStrip } from '@/components/sections/_retired/pixel-strip';",
+      '',
+      'export const strip = PixelStrip;',
+      '',
+    ].join('\n'),
+    rule: 'no-restricted-imports',
+  },
+  {
     name: 'lint: reading process.env outside config/env.ts is blocked',
     file: 'restricted-process-env.ts',
     source: 'export const source = process.env.CONTENT_SOURCE;\n',

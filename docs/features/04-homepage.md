@@ -51,7 +51,7 @@ numbering is left exactly as written, so a reference to "§8" still resolves. Th
 | 7 | Our Goals | Black | `<GoalsGrid>` | `sections/goals-grid/` | §10 |
 | 8 | Timeline | Image bleed / neutral | **not built** | — | §8 |
 | 9 | News | White | `<NewsCarousel>` | `sections/news-carousel/` | §11 |
-| — | *not in the sequence* | — | `<PixelStrip>` | `sections/pixel-strip/` | §12 |
+| — | *not in the sequence* | — | `<FooterPixelStrip>` | `sections/footer-pixel-strip/` | §12. **In the footer, not on the page**, since 2026-08-27 — rendered by `layout/footer/footer.tsx` as its first child, mirrored so its solid edge is the footer's top edge. `<PixelStrip>` is retired to `sections/_retired/` |
 | 10 | Footer | Carbon grey + inverted pixel elements | `<Footer>` | `components/layout/footer/` | — (FE-03) |
 
 The grounds as actually built, in the same order: `black` · `paper-dots` · `black-dots` ·

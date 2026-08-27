@@ -1,12 +1,15 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import logo from '@/assets/images/sael-logo.png';
-import { SOCIAL_ICONS } from '@/components/icons/social';
+import logoDark from '@/assets/images/sael-logo-dark.svg';
+// import { SOCIAL_ICONS } from '@/components/icons/social';
 import { FooterLinks } from '@/components/layout/footer/footer-links';
+import { FooterPixelStrip } from '@/components/sections/footer-pixel-strip';
 import { Container } from '@/components/ui/container';
 import { siteConfig, TODO_CONTENT } from '@/lib/config/site';
-import { LEGAL_LINKS, SOCIAL_LINKS } from '@/lib/content/static/footer';
-import { cn } from '@/lib/utils/cn';
+import { LEGAL_LINKS
+  // , SOCIAL_LINKS 
+} from '@/lib/content/static/footer';
+// import { cn } from '@/lib/utils/cn';
 
 /**
  * The site footer. A Server Component; only the accordions inside
@@ -28,6 +31,14 @@ import { cn } from '@/lib/utils/cn';
  *
  * The corporate block is present on the live site but not the prototype. §3
  * says include it, and it is legally useful.
+ *
+ * **`data-snap-section` makes it the last stop on a snapping page.** It is the
+ * same attribute every homepage section carries, and it is inert everywhere
+ * else — globals.css scopes both snap rules to `html:has([data-snap-sections])`,
+ * which only the homepage renders. The footer became a snap target on
+ * 2026-08-27, when the client asked for the page to behave the same from top
+ * to bottom; the tail scrolled normally before that. See the comment above the
+ * rules in globals.css.
  */
 export function Footer() {
   // Computed per render, never hardcoded — a stale copyright year is a small
@@ -36,30 +47,23 @@ export function Footer() {
   const hasEmail = siteConfig.email !== TODO_CONTENT;
 
   return (
-    <footer className="bg-footer-bg text-white">
+    <footer data-snap-section className="bg-footer-bg text-white">
+      {/* First child, so the strip's solid edge is the footer's top edge.
+          Full-bleed and outside <Container> — it is a band across the whole
+          width, not content that sits on the page gutter. */}
+      <FooterPixelStrip />
       <Container>
         <div className="py-section-y">
-          {/* Top row — wordmark and socials */}
-          <div className="mb-flow flex flex-col items-center gap-flow md:flex-row md:items-end md:justify-between">
-            {/* The colour logo on a white plate, rather than the wordmark set
-                as text. The artwork is a purple→red gradient over a black
-                strapline and cannot sit on --color-footer-bg directly; giving
-                it its own light surface is what the client asked for and is
-                also how the mark is meant to be used. The strapline is baked
-                into the artwork, so it is not repeated in text. */}
-            <Link
-              href="/"
-              className="inline-flex rounded-card bg-surface px-5 py-3 shadow-card-hover"
-              aria-label={`${siteConfig.name} — home`}
-            >
-              <Image
-                src={logo}
-                alt={siteConfig.name}
-                sizes="170px"
-                className="h-9 w-auto lg:h-11"
-              />
-            </Link>
-
+          {/* Top row — socials.
+              The wordmark used to open this row on a white plate, because the
+              only artwork was a purple→red gradient over a *black* strapline
+              and could not sit on --color-footer-bg. `sael-logo-dark.svg`
+              arrived on 2026-08-27 drawn for a dark ground, so the plate had
+              nothing left to do, and the client moved the wordmark down beside
+              the corporate block. The socials keep the right-hand side they
+              already had — `justify-end` rather than `justify-between`, which
+              with one child left would have swung them across to the left. */}
+          {/* <div className="mb-flow flex justify-center md:justify-end">
             {SOCIAL_LINKS.length > 0 && (
               <ul className="flex list-none items-center gap-3">
                 {SOCIAL_LINKS.map((social) => {
@@ -86,37 +90,56 @@ export function Footer() {
                 })}
               </ul>
             )}
-          </div>
+          </div> */}
 
           <FooterLinks />
 
-          {/* Corporate block */}
-          <address className="mt-flow text-body-sm text-on-dark-soft not-italic">
-            <span className="block font-bold text-white">{siteConfig.legalName}</span>
-            <span className="block">Registered Office: {siteConfig.registeredOffice}</span>
-            <span className="block">CIN: {siteConfig.cin}</span>
-            <span className="block">
-              Telephone:{' '}
-              <a
-                href={`tel:${siteConfig.telephone.replace(/[^\d+]/g, '')}`}
-                className="hover:text-white"
-              >
-                {siteConfig.telephone}
-              </a>
-              {' · '}
-              Email:{' '}
-              {hasEmail ? (
-                // Plain mailto. The legacy site Cloudflare-obfuscates this;
-                // obfuscation does not stop scrapers and does break assistive
-                // technology. features/03 §3.
-                <a href={`mailto:${siteConfig.email}`} className="hover:text-white">
-                  {siteConfig.email}
+          {/* Corporate block — the address, with the wordmark beside it.
+              Stacks below md, address first: that is DOM order, reading order
+              and the order the client asked for, so nothing has to be
+              re-ordered visually. `items-start` keeps the wordmark on the same
+              left edge as the address it belongs to rather than stretching or
+              centring it; from md the two take opposite ends of the row and
+              centre against each other. */}
+          <div className="mt-flow flex flex-col items-start gap-flow md:flex-row md:items-center md:justify-between">
+            {/* `min-w-0` so the registered-office line wraps inside the row
+                rather than pushing the wordmark off it — a flex item's floor is
+                its content's min-content width until you say otherwise. */}
+            <address className="min-w-0 text-body-sm text-on-dark-soft not-italic">
+              <span className="block font-bold text-white">{siteConfig.legalName}</span>
+              <span className="block">Registered Office: {siteConfig.registeredOffice}</span>
+              <span className="block">CIN: {siteConfig.cin}</span>
+              <span className="block">
+                Telephone:{' '}
+                <a
+                  href={`tel:${siteConfig.telephone.replace(/[^\d+]/g, '')}`}
+                  className="hover:text-white"
+                >
+                  {siteConfig.telephone}
                 </a>
-              ) : (
-                siteConfig.email
-              )}
-            </span>
-          </address>
+                {' · '}
+                Email:{' '}
+                {hasEmail ? (
+                  // Plain mailto. The legacy site Cloudflare-obfuscates this;
+                  // obfuscation does not stop scrapers and does break assistive
+                  // technology. features/03 §3.
+                  <a href={`mailto:${siteConfig.email}`} className="hover:text-white">
+                    {siteConfig.email}
+                  </a>
+                ) : (
+                  siteConfig.email
+                )}
+              </span>
+            </address>
+
+            {/* No `sizes`: `next/image` serves an SVG as-is — there is no
+                srcset to steer, and one raster width to pick would be the
+                wrong one. `w-auto` lets the file's own ratio set the width, so
+                nothing is squeezed. */}
+            <Link href="/" className="shrink-0" aria-label={`${siteConfig.name} — home`}>
+              <Image src={logoDark} alt={siteConfig.name} className="h-footer-logo w-auto" />
+            </Link>
+          </div>
 
           <hr className="mt-flow border-hairline-dark" />
 

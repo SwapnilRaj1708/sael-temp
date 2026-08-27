@@ -65,7 +65,7 @@ Rules:
 | Prototype path | Repository path | Format | Notes |
 |---|---|---|---|
 | `uploads/pasted-1784663527717-0.png` | `src/assets/images/sael-logo.png` | PNG | **Interim, by decision on 2026-08-04.** See below. |
-| *(footer variant)* | `src/assets/images/sael-logo-white.svg` | SVG | **Not supplied.** Live site: `sael-white-logo.svg` — *blocks the FE-03 footer* |
+| *(footer variant)* | `src/assets/images/sael-logo-dark.svg` | SVG | **Supplied 2026-08-27**, and the first vector of the wordmark we have. Drawn for a dark ground: white strapline, the SAEL wordmark on its own red→purple gradient. Consumed by the footer at `--spacing-footer-logo`. **38% of its height is empty** — the ink is 1293 × 329 inside a 1521.67 × 530.77 viewBox — so size the box from the ink, and re-measure if it is re-exported |
 | — | `public/images/og-image.png` | PNG | 1200×630. Live site has `sael-thumbnail.png`. |
 | — | `public/favicon.ico` + `icon.png` + `apple-icon.png` | — | Generate from the logo mark |
 
@@ -256,8 +256,11 @@ Items the client must supply before the relevant tracker item can complete:
       the OTF. See that folder's README.
 - [x] ~~Business tile icon SVGs~~ — supplied, mapped above. Lettering still to
       resolve.
-- [ ] SAEL logo as **SVG**, colour variant — deferred, PNG in use meanwhile
-- [ ] SAEL logo, **white** variant — *blocks the FE-03 footer*
+- [ ] SAEL logo as **SVG**, colour variant — deferred, PNG in use meanwhile in the
+      masthead. `sael-logo-dark.svg` is a vector of the same wordmark and may be
+      the answer here too; it has not been checked against a light ground
+- [x] ~~SAEL logo, **white** variant~~ — supplied 2026-08-27 as
+      `sael-logo-dark.svg`, which unblocked the footer
 - [ ] Business tile icons **without baked-in lettering** — *blocks FE-04 tiles*
 - [ ] DIN webfont licence confirmation — *blocks launch*
 - [ ] A cut of DIN containing `₹` (U+20B9) — absent from every supplied file
