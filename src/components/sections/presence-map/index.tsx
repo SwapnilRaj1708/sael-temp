@@ -12,17 +12,68 @@ import { MAP_VIEWBOX } from './dots';
 
 type StyleWithVars = CSSProperties & Record<`--${string}`, string | number>;
 
+/**
+ * The map's four legends — and they are the four businesses, which is why the
+ * ledger's accents are what colours them.
+ *
+ * The client's map draws each as an icon beside its figure, with a legend
+ * strip under the map decoding the four. **We render the legend's name in
+ * place of its icon**, at the client's request on 2026-08-27: an icon needs
+ * the strip to be readable at all, and the strip needs four more assets and a
+ * row the section has no space for. The name says the same thing and needs
+ * nothing decoded.
+ */
+export type SiteMetric = 'solar-ipp' | 'module-assembly' | 'solar-cell' | 'agri-waste';
+
+export interface PresenceSiteFigure {
+  metric: SiteMetric;
+  /** Value and unit together, as the client publishes them — "298 MW", "5 GW". */
+  value: string;
+}
+
 export interface PresenceSite {
   id: string;
-  /** "Jalore (Rajasthan)" */
+  /** "Rajasthan" */
   name: string;
-  /** "298 MW" */
-  description: string;
+  /**
+   * What the state contributes, one entry per legend it appears under. A state
+   * carries between one and three; the client's map has none with four.
+   */
+  figures: PresenceSiteFigure[];
   /** Point in the map artwork's own viewBox — see `MAP_VIEWBOX`. */
   x: number;
   y: number;
   /** Renders the design's "Visit Location" link when supplied. */
   href?: string;
+}
+
+/** The legend names, verbatim from the client's map. */
+const METRIC_LABEL: Record<SiteMetric, string> = {
+  'solar-ipp': 'Solar Energy Generation',
+  'module-assembly': 'Solar Module Manufacturing',
+  'solar-cell': 'Solar Cell Manufacturing',
+  'agri-waste': 'Agri Waste to Energy',
+};
+
+/**
+ * Each legend in its business's own accent, so a figure on the map and the
+ * same business's row in the ledger read as one colour.
+ *
+ * **The `-deep` four, not the `-bright` four the ledger itself uses.** The
+ * callout sits on `--color-paper-alt` and the ledger sits on black; the bright
+ * accents fail contrast badly on paper. Same hues, ground-appropriate weight —
+ * see the note on the tokens.
+ */
+const METRIC_CLASS: Record<SiteMetric, string> = {
+  'solar-ipp': 'text-figure-solar-deep',
+  'module-assembly': 'text-figure-module-deep',
+  'solar-cell': 'text-figure-cell-deep',
+  'agri-waste': 'text-figure-agri-deep',
+};
+
+/** "298 MW Solar IPP Projects; 89.4 MW Agri Waste-to-Energy Projects" */
+function describeSite(site: PresenceSite): string {
+  return site.figures.map((figure) => `${figure.value} ${METRIC_LABEL[figure.metric]}`).join('; ');
 }
 
 export interface PresenceMapProps {
@@ -173,7 +224,7 @@ export function PresenceMap({
                     className="absolute size-touch -translate-x-1/2 -translate-y-1/2 cursor-pointer"
                   >
                     <span className="sr-only">
-                      {site.name}, {site.description}
+                      {site.name}: {describeSite(site)}
                     </span>
                     {/* The pin. A hard square, plus a halo that pulses out of it. */}
                     <span
@@ -195,7 +246,8 @@ export function PresenceMap({
                   <div
                     aria-hidden="true"
                     className={cn(
-                      'pointer-events-none absolute z-10 w-max bg-paper-alt px-3.5 py-2.5 shadow-tooltip',
+                      'pointer-events-none absolute z-10 w-max max-w-(--map-tip-w)',
+                      'bg-paper-alt px-3.5 py-2.5 shadow-tooltip',
                       // Grows out of the pin as well as fading in, so the
                       // callout reads as opening from the site rather than
                       // appearing over it.
@@ -208,7 +260,26 @@ export function PresenceMap({
                     )}
                   >
                     <p className="text-body-sm font-bold text-ink">{site.name}</p>
-                    <p className="mt-1 text-meta text-meta-paper uppercase">{site.description}</p>
+                    {/* One row per legend the state appears under: the figure
+                        as it is published, then the legend's name in that
+                        business's accent. The figure keeps --text-meta, the
+                        role it already had here; the name takes the quieter
+                        --text-tile-note, which is the footnote-on-a-figure
+                        role and is not one of the five uppercase ones — at
+                        --text-meta's 0.2em tracking "In-house Module Assembly
+                        Capacity" would be half the map wide. §2. */}
+                    <ul className="flex list-none flex-col gap-0">
+                      {site.figures.map((figure) => (
+                        <li key={figure.metric} className="flex items-end justify-between gap-2">
+                          <span className="text-meta tracking-normal text-meta-paper uppercase">
+                            {figure.value}
+                          </span>{' '}
+                          <span className={cn('text-tile-note', METRIC_CLASS[figure.metric])}>
+                            {METRIC_LABEL[figure.metric]}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
                     {site.href !== undefined && (
                       <p className="mt-1 flex items-center gap-1.5 text-tile-note text-body-soft">
                         <span className="size-1 rounded-full bg-body-soft" />

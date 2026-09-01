@@ -6,35 +6,44 @@ import { cn } from '@/lib/utils/cn';
 type StyleWithVars = CSSProperties & Record<`--${string}`, string | number>;
 
 export interface HeroProgressProps {
-  /** One label per slide — the headline the segment goes to. */
+  /** One label per slide — the headline the dot goes to. */
   labels: string[];
   activeIndex: number;
   onSelect: (index: number) => void;
   /** Drives the fill: it runs only while autoplay is actually advancing. */
   isPlaying: boolean;
-  /** Dwell per slide, and the duration of one full sweep of the bar. */
+  /** Dwell per slide, and the duration of one fill. */
   intervalMs: number;
 }
 
 /**
- * The countdown across the whole carousel, and the control that selects a
- * slide.
+ * The progress dots, and the control that selects a slide. HERO-SPEC.md §6.
  *
- * **One bar, one full sweep per slide.** It started as four segments filling
- * one after another, then briefly as a quarter-width run per slide that read
- * as one continuous pass across the cycle. The client settled it on
- * 2026-08-22: the bar crosses the whole width once per image, resets, and
- * crosses it again for the next. So the bar is a countdown on the slide you
- * are looking at, not on the carousel.
+ * A row of rails centred 34px up from the hero's bottom edge: 6px each, the
+ * active one grown to 34px, with the autoplay countdown running across it in
+ * red. **The active rail is the fainter of the two** — 0.30 against 0.45 — and
+ * that is the spec's, not a slip: the red fill has to read against it, and a
+ * bright rail under a bright fill shows no progress.
  *
- * The bar is pinned to the base of the section, which is the point of it: the
- * hero is exactly one viewport tall, so a bar on its bottom edge is on screen
- * the whole time the hero is.
+ * > This replaced a full-bleed progress *bar* pinned to the section's base on
+ * > 2026-08-27. That bar was `SAEL Home v2`'s; the dots are the approved
+ * > designer build's and are what the spec specifies. `--color-hero-track`,
+ * > `--spacing-hero-track`, `--gradient-hero-fill` and the `fxTrack` keyframe
+ * > were the bar's and now have no consumer; they are marked in place rather
+ * > than deleted, per design-guidelines §Change log. `--spacing-hero-progress`
+ * > is the exception — it was the bar's height and is now the dot row's touch
+ * > target, which is the same 44px doing the same job.
  *
- * The controls are four transparent buttons laid over the bar, one per slide.
- * Each is a quarter of the viewport wide and --spacing-hero-progress (44px,
- * the WCAG floor) tall, with nothing above or below to mis-hit.
- * docs/responsive-strategy.md §5.
+ * **The button is 44px tall and the rail is drawn inside it, bottom-aligned.**
+ * §6 makes the dot itself the `<button>`, which would be a 6px-tall control;
+ * `docs/responsive-strategy.md` §Hero has always required the opposite —
+ * "min 44px touch target (visual dot stays small, hit area padded)" — and this
+ * is that, with `--spacing-hero-progress`.
+ *
+ * `items-end` rather than a centred rail is what keeps the spec exact: the
+ * row's bottom edge is §6's 34px, so bottom-aligning the rail leaves it
+ * precisely 34px up and grows the hit area *upward* into empty frame.
+ * Centring it would have lifted every rail 19px off the spec's baseline.
  *
  * `animation-play-state` is set inline because it is genuinely runtime state:
  * the fill freezes where it is while the carousel is paused and resumes from
@@ -51,33 +60,17 @@ export function HeroProgress({
 
   return (
     <div
-      // The backdrops above are `pointer-events-none` so that a drag anywhere
-      // on the hero reaches the swipe handler; the bar has to opt back in.
-      className="pointer-events-auto absolute inset-x-0 bottom-0 z-3"
+      // The slide layers above are `pointer-events-none` so that a drag
+      // anywhere on the hero reaches the swipe handler; the dots opt back in.
+      className={cn(
+        'pointer-events-auto absolute inset-x-0 bottom-hero-dot-inset z-7',
+        'flex justify-center gap-hero-dot-gap',
+      )}
     >
-      <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-hero-track bg-hero-track">
-        <span
-          // Re-keyed per slide, which is what restarts the sweep from empty
-          // rather than leaving it sat full where the last slide finished.
-          key={activeIndex}
-          className={cn('anim-track-fill block h-full w-full', 'bg-(image:--gradient-hero-fill)')}
-          style={
-            {
-              '--slide-duration': `${String(intervalMs)}ms`,
-              animationPlayState: isPlaying ? 'running' : 'paused',
-            } as StyleWithVars
-          }
-        />
-      </div>
+      {labels.map((label, index) => {
+        const isCurrent = index === activeIndex;
 
-      {/* One column per slide. Driven by the data rather than a `grid-cols-4`
-          class, so adding or removing a slide cannot leave the controls out of
-          step with the bar underneath them. */}
-      <div
-        className="relative grid"
-        style={{ gridTemplateColumns: `repeat(${String(count)}, minmax(0, 1fr))` }}
-      >
-        {labels.map((label, index) => (
+        return (
           <button
             key={label}
             type="button"
@@ -85,11 +78,35 @@ export function HeroProgress({
               onSelect(index);
             }}
             aria-label={`Show slide ${String(index + 1)} of ${String(count)}: ${label}`}
-            aria-current={index === activeIndex ? 'true' : undefined}
-            className="h-hero-progress cursor-pointer"
-          />
-        ))}
-      </div>
+            aria-current={isCurrent ? 'true' : undefined}
+            className="flex h-hero-progress cursor-pointer items-end"
+          >
+            <span
+              className={cn(
+                'relative block h-hero-dot overflow-hidden rounded-pill',
+                'transition-all duration-(--duration-dot) motion-reduce:transition-none',
+                isCurrent ? 'w-hero-dot-active bg-hero-dot-active' : 'w-hero-dot bg-hero-dot',
+              )}
+            >
+              {isCurrent && (
+                <span
+                  // Re-keyed per slide, which is what restarts the fill from
+                  // empty rather than leaving it sat full where the last slide
+                  // finished.
+                  key={activeIndex}
+                  className="anim-dot-fill absolute inset-y-0 left-0 block bg-hero-dot-fill"
+                  style={
+                    {
+                      '--slide-duration': `${String(intervalMs)}ms`,
+                      animationPlayState: isPlaying ? 'running' : 'paused',
+                    } as StyleWithVars
+                  }
+                />
+              )}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }

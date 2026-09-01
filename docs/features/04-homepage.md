@@ -114,6 +114,11 @@ does not name at all.)
 
 ---
 
+> **Superseded for the hero by `docs/HERO-SPEC.md` (2026-08-27).** Where §1 below and the
+> spec disagree on the hero's frame, placement, dots or headline treatment, the spec wins —
+> it is the approved designer build, and its numbers are final. §1 is kept for the copy,
+> the slide order and the asset names, which the spec does not restate.
+
 ## 1. `<HeroCarousel>` — `sections/hero-carousel/`
 
 Client component (interaction + timers). The single most complex piece on the page.
@@ -220,7 +225,9 @@ Notes:
 Server component. Heading "Our Presence" plus the India map.
 
 - Image at `min(42vw, 820px)` above `lg`, full container width below.
-- **A list of the states of operation is required at every breakpoint** — `sr-only` above `lg`, visible below, because the baked-in labels are illegible on mobile. `{{TODO: content — client to supply the list of states}}`. The live site says 11 states; get the names.
+- ~~**A list of the states of operation is required at every breakpoint**~~ — the names arrived on **2026-08-27** in `SAEL-Numbers and data.pdf` page 2, and the section now pins all eleven, each with its capacity figures. Every pin carries its state and figures in an `sr-only` span, so the list exists at every breakpoint for assistive technology.
+  > **Still open below `lg`, and it is the same point the original bullet made.** The figures are reachable only by hover or focus, and a touch device has neither — the map is a picture with invisible data on a phone. The names being known does not fix that; a visible list or an always-open layout below `lg` is still owed, and is not in this change.
+- **Each pin lists one row per legend**: the figure as published, then the legend's name in that business's accent — `Solar IPP Projects`, `In-house Module Assembly Capacity`, `Solar Cell Manufacturing`, `Agri Waste-to-Energy Projects`. The client's map marks these with icons and decodes them in a strip beneath; the client asked on **2026-08-27** for the name in place of the icon, which removes the need for the strip. Colours are the ledger's four accents in their `-deep` variants, because the callout is on paper and the ledger is on black.
 - `alt` describes the information, not the picture: "SAEL's operational presence across 11 Indian states".
 - See `asset-inventory.md` §6 for the vector-rebuild option.
 

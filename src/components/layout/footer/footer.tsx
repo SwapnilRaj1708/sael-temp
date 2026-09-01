@@ -1,15 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import logoDark from '@/assets/images/sael-logo-dark.svg';
-// import { SOCIAL_ICONS } from '@/components/icons/social';
+import { SOCIAL_ICONS } from '@/components/icons/social';
 import { FooterLinks } from '@/components/layout/footer/footer-links';
 import { FooterPixelStrip } from '@/components/sections/footer-pixel-strip';
 import { Container } from '@/components/ui/container';
 import { siteConfig, TODO_CONTENT } from '@/lib/config/site';
-import { LEGAL_LINKS
-  // , SOCIAL_LINKS 
-} from '@/lib/content/static/footer';
-// import { cn } from '@/lib/utils/cn';
+import { LEGAL_LINKS, SOCIAL_LINKS } from '@/lib/content/static/footer';
+import { cn } from '@/lib/utils/cn';
 
 /**
  * The site footer. A Server Component; only the accordions inside
@@ -53,45 +51,21 @@ export function Footer() {
           width, not content that sits on the page gutter. */}
       <FooterPixelStrip />
       <Container>
-        <div className="py-section-y">
-          {/* Top row — socials.
-              The wordmark used to open this row on a white plate, because the
-              only artwork was a purple→red gradient over a *black* strapline
-              and could not sit on --color-footer-bg. `sael-logo-dark.svg`
-              arrived on 2026-08-27 drawn for a dark ground, so the plate had
-              nothing left to do, and the client moved the wordmark down beside
-              the corporate block. The socials keep the right-hand side they
-              already had — `justify-end` rather than `justify-between`, which
-              with one child left would have swung them across to the left. */}
-          {/* <div className="mb-flow flex justify-center md:justify-end">
-            {SOCIAL_LINKS.length > 0 && (
-              <ul className="flex list-none items-center gap-3">
-                {SOCIAL_LINKS.map((social) => {
-                  const Icon = SOCIAL_ICONS[social.platform];
-                  return (
-                    <li key={social.platform}>
-                      <a
-                        href={social.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={cn(
-                          'rounded-pill bg-white text-footer-icon',
-                          'inline-flex size-touch items-center justify-center',
-                          'transition-transform duration-(--duration-micro)',
-                          'hover:-translate-y-(--lift-social) focus-visible:-translate-y-(--lift-social)',
-                          'motion-reduce:transform-none',
-                        )}
-                      >
-                        <Icon className="size-5" />
-                        <span className="sr-only">{social.label} — opens in a new tab</span>
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div> */}
+        {/* **Tightened on 2026-08-27** — the client found the footer too tall
+            on desktop. Everything below is padding and gaps; no row was
+            re-laid-out and the strip above is untouched, both by their ask.
+            Roughly 155px comes off at 1920 and 68px at 360.
 
+            The top padding is the asymmetric one, and deliberately: the strip
+            above dissolves *downward*, so its lowest rows are nearly empty and
+            the content already has 100px-odd of visual air over it. The bottom
+            has nothing below it but the viewport edge, so it keeps more.
+
+            The link rows are the obvious remaining target and are **not** to be
+            touched: five links at `min-h-touch` is 220px of the column, and
+            that 44px is `responsive-strategy.md` §5's floor for every
+            interactive element, not slack. */}
+        <div className="pt-flow pb-flow">
           <FooterLinks />
 
           {/* Corporate block — the address, with the wordmark beside it.
@@ -101,7 +75,7 @@ export function Footer() {
               left edge as the address it belongs to rather than stretching or
               centring it; from md the two take opposite ends of the row and
               centre against each other. */}
-          <div className="mt-flow flex flex-col items-start gap-flow md:flex-row md:items-center md:justify-between">
+          <div className="mt-flow flex flex-col items-start gap-stack md:flex-row md:items-center md:justify-between">
             {/* `min-w-0` so the registered-office line wraps inside the row
                 rather than pushing the wordmark off it — a flex item's floor is
                 its content's min-content width until you say otherwise. */}
@@ -141,10 +115,18 @@ export function Footer() {
             </Link>
           </div>
 
-          <hr className="mt-flow border-hairline-dark" />
+          <hr className="mt-stack border-hairline-dark" />
 
-          {/* Legal bar */}
-          <div className="mt-stack flex flex-col items-center gap-stack text-body-sm text-on-dark-soft md:flex-row md:justify-between">
+          {/* Legal bar — copyright, legal links, and the socials.
+              **The socials had a row of their own above the link grid until
+              2026-08-27**, and after the wordmark moved down to the corporate
+              block that row held four icons and 68px of nothing else. Folding
+              them in here costs no height: the bar was already 44px tall
+              because its own links carry `min-h-touch`, which is exactly what
+              a social button is. `flex-wrap` because three items is one more
+              than this row was built for, and at md they would otherwise
+              squeeze rather than break. */}
+          <div className="mt-stack flex flex-col items-center gap-stack text-body-sm text-on-dark-soft md:flex-row md:flex-wrap md:justify-between">
             <p>
               © {year} {siteConfig.name} | All Rights Reserved
             </p>
@@ -153,13 +135,40 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="inline-flex min-h-touch items-center hover:text-white"
+                    className="inline-flex min-h-touch items-center transition-colors duration-(--duration-micro) hover:text-brand-red-bright"
                   >
                     {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
+
+            {SOCIAL_LINKS.length > 0 && (
+              <ul className="flex list-none items-center gap-3">
+                {SOCIAL_LINKS.map((social) => {
+                  const Icon = SOCIAL_ICONS[social.platform];
+                  return (
+                    <li key={social.platform}>
+                      <a
+                        href={social.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(
+                          'rounded-pill bg-white text-footer-icon',
+                          'inline-flex size-touch items-center justify-center',
+                          'transition-transform duration-(--duration-micro)',
+                          'hover:-translate-y-(--lift-social) focus-visible:-translate-y-(--lift-social)',
+                          'motion-reduce:transform-none',
+                        )}
+                      >
+                        <Icon className="size-5" />
+                        <span className="sr-only">{social.label} — opens in a new tab</span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
         </div>
       </Container>

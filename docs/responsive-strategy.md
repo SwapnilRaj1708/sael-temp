@@ -84,10 +84,10 @@ This table is normative. Each row is an acceptance criterion for that section.
 ### Hero carousel
 | | |
 |---|---|
-| **≥ lg** | `aspect-ratio: 2.34/1`. Per-slide `textX/textY/iconX/iconY` positioning as in the prototype. Mouse parallax active. |
+| **≥ lg** | `aspect-ratio: 2.34/1`. Per-slide `textX/textY/iconX/iconY` positioning as in the prototype. Mouse parallax active. **Built to `docs/HERO-SPEC.md` as of 2026-08-27, which is where the numbers are.** `SAEL Home v2` had replaced this row with a viewport-tall box and one shared content column for a month; the spec restores exactly what this table always said. |
 | **< lg** | `aspect-ratio: 4/5` (portrait). **Abandon per-slide absolute positioning entirely** — headline is bottom-anchored, left-aligned, full width inside `--gutter`, over a bottom-up scrim `linear-gradient(0deg, rgba(8,10,14,.85) 0%, transparent 60%)`. Background icon scales to 42vw and sits top-right at 12% opacity, purely decorative. |
 | **Both** | Swipe/drag to change slide on touch. Dots remain, min 44px touch target (visual dot stays small, hit area padded). Autoplay pauses when the section is out of the viewport (`IntersectionObserver`) and on user interaction. |
-| **Type** | Hero H1 clamps 28px → 58px. At 360px, 28px/1.15 over 4 lines is the worst case — verify the longest headline ("Generating clean energy by investing in advanced technology and systems") does not exceed 5 lines. |
+| **Type** | Hero H1 clamps 32px → 58px (`HERO-SPEC.md` §3e; it was 28px until 2026-08-27). At 360px, 28px/1.15 over 4 lines is the worst case — verify the longest headline ("Generating clean energy by investing in advanced technology and systems") does not exceed 5 lines. |
 
 ### Stats band
 | | |

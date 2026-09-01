@@ -1,112 +1,113 @@
 import Image from 'next/image';
+import type { CSSProperties } from 'react';
 import { Container } from '@/components/ui/container';
 import { SIZES_HERO_SYMBOL } from '@/lib/utils/image-sizes';
 import { cn } from '@/lib/utils/cn';
 import { HeroHeadline } from './hero-headline';
 import type { HeroSlide } from './types';
 
+/** `style` that also carries custom properties, without an `any` cast. */
+type StyleWithVars = CSSProperties & Record<`--${string}`, string | number>;
+
 export interface HeroCopyProps {
-  slides: HeroSlide[];
-  activeIndex: number;
+  slide: HeroSlide;
+  isActive: boolean;
 }
 
 /**
- * The hero's content column: the slide's mark, a short red rule, the headline.
+ * One slide's mark and headline, at that slide's own coordinates.
+ * HERO-SPEC.md §3d and §3e.
  *
- * **One column for all four slides, not one per slide.** The earlier design
- * placed each headline and mark at its own coordinates in the frame, so a
- * slide was a whole composition and the four cross-faded as units.
- * `SAEL Home v2` has a single composition — the column sits in the right-hand
- * half above `lg` and spans the width below it — so what changes between
- * slides is only the mark and the words. Both are stacked in a single grid
- * cell and cross-faded in place, which is also what keeps the red rule
- * between them still while they change.
+ * **Per slide, not one column for all four.** Each slide places its mark and
+ * its words somewhere different in the frame — §2's `iconX/iconY/textX/textY`
+ * — so a slide is a whole composition again, as it was before `SAEL Home v2`
+ * collapsed the four into a single right-hand column. The wrapper that
+ * cross-fades them lives in `index.tsx`, so nothing here has to know about
+ * `opacity`.
  *
- * Stacking in one cell rather than swapping the mounted child is deliberate:
- * the stack is as tall as its tallest member at all times, so a longer
- * headline arriving does not move the rule, the mark, or the section's height.
+ * **The percentages are of the hero box, and that is what `lg:static` below is
+ * for.** The `<Container>` is `absolute inset-0` under `lg`, where it is the
+ * bottom-anchored mobile column and needs to fill the slide; from `lg` it goes
+ * `static`, which stops it being a positioning context, so the two absolute
+ * children resolve their percentages against the slide wrapper — the hero —
+ * exactly as §2 specifies. It keeps `px-gutter` either way, which is why this
+ * is a Container at all: it is the only sanctioned source of page padding, and
+ * the mobile column sits on the page gutter like everything else.
  *
- * Below `lg` the column is bottom-anchored rather than centred — that is the
- * design's own mobile arrangement, and it is what leaves the photograph's
- * subject visible above the copy. docs/responsive-strategy.md §4.
+ * Positions arrive as CSS custom properties rather than classes. A Tailwind
+ * arbitrary value holding a raw percentage — `left-[12%]` — is exactly what
+ * `pnpm verify:guardrails` rejects, and rightly: these are per-slide *data*,
+ * and /CLAUDE.md §5 sanctions `style` for a custom property carrying one.
+ *
+ * **Below `lg` the spec is silent** and the `SAEL Home v2` arrangement stands:
+ * mark, a short red rule, then the headline, bottom-anchored over a portrait
+ * crop. See the note in `index.tsx`.
  */
-export function HeroCopy({ slides, activeIndex }: HeroCopyProps) {
+export function HeroCopy({ slide, isActive }: HeroCopyProps) {
+  const { placement, symbol } = slide;
+
   return (
     <Container
+      style={
+        {
+          '--hero-icon-x': `${String(placement.iconX)}%`,
+          '--hero-icon-y': `${String(placement.iconY)}%`,
+          '--hero-text-x': `${String(placement.textX)}%`,
+          '--hero-text-y': `${String(placement.textY)}%`,
+        } as StyleWithVars
+      }
       className={cn(
-        'relative z-2 grid min-h-viewport items-end gap-gap-grid',
+        'absolute inset-0 flex flex-col justify-end',
         'pt-hero-pad-top pb-hero-pad-bottom',
-        'lg:grid-cols-12 lg:items-center',
+        // From lg it lays nothing out and positions nothing — see above.
+        'lg:static lg:block lg:py-0',
       )}
     >
-      <div className="flex min-w-0 flex-col justify-end lg:col-span-6 lg:col-start-7 lg:justify-center">
-        {/* The marks. Decorative at every size — the headline carries the
-            meaning — so the whole stack is hidden from assistive technology
-            rather than each image carrying an empty alt.
+      {/* Decorative at every size: the headline carries the meaning. Both
+          halves of that — `alt=""` keeps it out of the accessible name,
+          `aria-hidden` keeps the node out of the tree.
+          docs/design-guidelines.md §6.
 
-            **Each mark is drawn at its own proportions, in no box.** A plain
-            <Image> at a height with `w-auto`, not a <MediaFrame>: the frame
-            primitive exists for a photograph filling a box its parent sized,
-            and the four marks are not that. They are cropped to their own
-            artwork and run 0.65 to 0.92 wide-to-tall, so a square frame gave
-            each of them a different amount of slack, and `object-contain`
-            split that slack evenly — which is what left them centred, and
-            each one centred at a *different* offset, so the mark also shifted
-            sideways as the carousel cross-faded. Left-aligning inside the box
-            would have fixed the symptom; giving them no box to be aligned in
-            means there is no slack to distribute. The client asked for them
-            flush left on 2026-08-27.
-
-            The same call, for the same reason, as the business ledger's marks
-            — see the note in sections/business-tiles. A static import already
-            carries the artwork's intrinsic width and height, so a height and
-            `w-auto` is all it takes.
-
-            The height is shared, which is what matters for the stack: all four
-            are `h-hero-icon`, so the cross-fade never changes the column's
-            height. `justify-items-start` puts every left edge on the same
-            line, and they are stacked in one grid area. */}
-        <div aria-hidden="true" className="mb-stack grid justify-items-start">
-          {slides.map((slide, index) => {
-            const stacked = cn(
-              '[grid-area:1/1]',
-              'transition-opacity duration-(--duration-cross-fade) motion-reduce:transition-none',
-              index === activeIndex ? 'opacity-100' : 'opacity-0',
-            );
-
-            // No artwork, so no intrinsic shape to draw at. The placeholder
-            // falls back to a square — the frame's own behaviour — because a
-            // stand-in for an unsupplied asset has no proportions of its own
-            // to honour. docs/asset-inventory.md §9.
-            return slide.symbol.image === null ? (
-              <span
-                key={slide.id}
-                data-pending={slide.symbol.pending}
-                className={cn('aspect-square h-hero-icon bg-inert/10', stacked)}
-              />
-            ) : (
-              <Image
-                key={slide.id}
-                src={slide.symbol.image}
-                alt=""
-                sizes={SIZES_HERO_SYMBOL}
-                className={cn('h-hero-icon w-auto', stacked)}
-              />
-            );
-          })}
-        </div>
-
-        <div
+          Drawn at its own proportions, width-constrained with `h-auto`, per
+          §3d's `width: <iconSize>; height: auto`. No box around it and nothing
+          to letterbox — see the marks rule in design-guidelines §6. */}
+      {symbol.image !== null && (
+        <Image
+          src={symbol.image}
+          alt=""
           aria-hidden="true"
-          className="mb-stack h-hero-rule-h w-hero-rule-w shrink-0 bg-brand-red"
+          sizes={SIZES_HERO_SYMBOL}
+          className={cn(
+            'mb-stack h-auto w-hero-icon drop-shadow-hero-icon lg:w-hero-icon-lg',
+            // §3d: centred on its coordinates, and drifting further with the
+            // pointer than the photograph behind it.
+            'lg:absolute lg:top-(--hero-icon-y) lg:left-(--hero-icon-x) lg:mb-0',
+            'lg:transition-transform lg:duration-(--duration-parallax) lg:ease-out',
+            'lg:[transform:translate(calc(-50%+var(--parallax-x,0)*var(--hero-parallax-symbol)),calc(-50%+var(--parallax-y,0)*var(--hero-parallax-symbol)))]',
+          )}
         />
+      )}
 
-        <div className="grid">
-          {slides.map((slide, index) => (
-            <HeroHeadline key={slide.id} slide={slide} isActive={index === activeIndex} />
-          ))}
-        </div>
-      </div>
+      {/* The short red rule under the mark. Part of the mobile arrangement
+          only — HERO-SPEC.md's composition has no rule in it. */}
+      <div
+        aria-hidden="true"
+        className="mb-stack h-hero-rule-h w-hero-rule-w shrink-0 bg-brand-red lg:hidden"
+      />
+
+      <HeroHeadline
+        slide={slide}
+        isActive={isActive}
+        className={cn(
+          // §3e: `left` is the headline's left edge, `top` its vertical
+          // centre, and it drifts *against* the pointer — hence the negative
+          // multiplier in --hero-parallax-text.
+          'lg:absolute lg:top-(--hero-text-y) lg:left-(--hero-text-x)',
+          placement.textWidthClassName,
+          'lg:transition-transform lg:duration-(--duration-parallax) lg:ease-out',
+          'lg:[transform:translate(calc(var(--parallax-x,0)*var(--hero-parallax-text)),calc(-50%+var(--parallax-y,0)*var(--hero-parallax-text)))]',
+        )}
+      />
     </Container>
   );
 }

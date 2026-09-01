@@ -167,8 +167,13 @@ a full-screen mega menu in place of the per-item dropdowns (`nav-dropdown.tsx` i
 gone). `features/03` §2 describes the old bar and is now the stale document.
 
 Outstanding content, all rendering as `{{TODO: content}}` or flagged: hero `alt` ×4,
-the page meta description, Kurnool's capacity, the map's "Visit Location" URLs, and
-whether Patiala belongs on the map. The news items' `href` all point at `/newsroom/`
+the page meta description, and the map's "Visit Location" URLs. **Kurnool's capacity and
+the Patiala question are closed** — the map was rebuilt on 2026-08-27 from
+`SAEL-Numbers and data.pdf` page 2, which pins eleven *states* rather than six sites, and
+neither site is among them. Two things about that map still want the client: which legend
+each figure belongs to (derived from page 1's totals, not read from the icons — the
+reasoning is in `_content/homepage.ts`), and why the Solar IPP figures sum to 9090 MW
+where the same PDF's page 1 says 8.3 GWp. The news items' `href` all point at `/newsroom/`
 because no per-article URLs were supplied, and two of their dates are in the future —
 both are the client's own design, transcribed rather than corrected. `alt` text for
 Solutions, Our Endeavour, About SAEL and the news thumbnails is written and wants a

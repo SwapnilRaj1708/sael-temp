@@ -221,15 +221,17 @@
     /* `--anim-index` is set per word by the component; `backwards` holds the
      * from-state through the delay so nothing flashes in before its turn. */
     .anim-word-in {
-      animation: fxWord 700ms var(--ease-entrance) backwards;
+      animation: fxWord 700ms var(--ease-word) backwards;
       animation-delay: calc(var(--anim-index, 0) * 55ms);
     }
 
+    /* `both`, per HERO-SPEC.md §5. No delay: the panels are a single gesture
+     * on load, not a stagger, and the `--anim-index` this used to read was
+     * never set on them. */
     .anim-letterbox {
       display: block;
       transform-origin: top;
-      animation: fxLetter 1s var(--ease-letterbox) forwards;
-      animation-delay: calc(var(--anim-index, 0) * 55ms);
+      animation: fxLetter 1s var(--ease-letterbox) both;
     }
 
     /* `--slide-duration` comes from the carousel, so the fill and the slide

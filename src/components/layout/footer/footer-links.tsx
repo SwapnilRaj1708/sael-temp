@@ -19,8 +19,17 @@ import { cn } from '@/lib/utils/cn';
 
 function FooterAnchor({ link }: { link: FooterLink }) {
   const className = cn(
+    // 44px for a finger, 32 for a mouse. Five links at 44 was 220px of a
+    // column the client twice called too tall; `hover-hover:` is the only
+    // place it is safe to trade, and 32 still clears WCAG 2.5.8 AA. See the
+    // token, and docs/responsive-strategy.md §5.
     'text-body-sm inline-flex min-h-touch items-center text-body-on-dark',
-    'transition-colors duration-(--duration-micro) hover:text-white',
+    'hover-hover:min-h-touch-fine',
+    // Red on hover, matching the ledger's "Know More" and the news card's
+    // "Read More" — the client's ask on 2026-08-27. `-bright`, not
+    // `--color-brand-red`, which fails contrast on this ground; see the token.
+    'transition-colors duration-(--duration-micro)',
+    'hover:text-brand-red-bright focus-visible:text-brand-red-bright',
   );
 
   // /career/ is a route handler that redirects off-site, so it is a plain
@@ -43,7 +52,7 @@ export function FooterLinks() {
       <div className="hidden gap-gap-grid md:grid md:grid-cols-2 lg:grid-cols-4">
         {FOOTER_GROUPS.map((group) => (
           <div key={group.title}>
-            <h2 className="mb-stack text-label text-white">{group.title}</h2>
+            <h2 className="mb-tight text-label text-white">{group.title}</h2>
             <ul className="flex list-none flex-col">
               {group.links.map((link) => (
                 <li key={link.href}>

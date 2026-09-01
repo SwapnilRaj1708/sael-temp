@@ -266,6 +266,16 @@ export function BusinessTiles({ eyebrow, tiles, snap = false }: BusinessTilesPro
                         // button and are removed, because here the action is a
                         // bare label with an arrow.
                         'border-0 pt-card-flow hover:bg-transparent',
+                        // Red on hover, like the news card's "Read More". On
+                        // the *group*, not on itself, so the label turns with
+                        // the arrow beside it — <ArrowGlyph> already travels on
+                        // `group-hover`, and the two firing on different
+                        // triggers is what would read as broken. The row is one
+                        // link, so hovering anywhere on it is hovering this.
+                        // No `transition-*` here: the Button base already sets
+                        // `transition`, and adding one would have tailwind-merge
+                        // drop the base for the narrower class.
+                        'group-focus-within:text-brand-red-bright group-hover:text-brand-red-bright',
                         "after:absolute after:inset-0 after:content-['']",
                       )}
                     >
