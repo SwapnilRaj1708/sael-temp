@@ -52,7 +52,9 @@ export function FooterLinks() {
       <div className="hidden gap-gap-grid md:grid md:grid-cols-2 lg:grid-cols-4">
         {FOOTER_GROUPS.map((group) => (
           <div key={group.title}>
-            <h2 className="mb-tight text-label text-white">{group.title}</h2>
+            <h2 className="mb-tight text-label text-white underline underline-offset-8">
+              {group.title}
+            </h2>
             <ul className="flex list-none flex-col">
               {group.links.map((link) => (
                 <li key={link.href}>
@@ -73,7 +75,7 @@ export function FooterLinks() {
               value={group.title}
               headingAs="h2"
               title={
-                <span key={group.title} className="text-label">
+                <span key={group.title} className="text-label underline underline-offset-8">
                   {group.title}
                 </span>
               }
