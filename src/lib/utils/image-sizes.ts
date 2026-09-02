@@ -34,12 +34,22 @@ export const SIZES_FULL_BLEED = '100vw';
 export const SIZES_HERO_SYMBOL = '(min-width: 64rem) 12.95vw, 18.5vw';
 
 /**
- * The About SAEL composite. Half the content column at `lg` and above, close
- * to full width below it, both inside the page gutter. One image — the client
- * supplies the artwork assembled, so there is no separate figure layer to
- * hint at any more.
+ * The About SAEL photograph — the layer masked into the chamfered shape. Half
+ * the content column at `lg` and above, close to full width below it, both
+ * inside the page gutter. The shape is inset 2.5% a side inside that box,
+ * which is inside the rounding these figures already carry.
  */
 export const SIZES_ABOUT_MEDIA = '(min-width: 64rem) 44vw, 88vw';
+
+/**
+ * The About SAEL cut-out — the figure standing in front of the shape.
+ *
+ * `--about-cutout-w` is 37% of the shape, and the shape is 95% of the box the
+ * hint above describes, so this is 0.37 x 0.95 of those figures: 15.5vw and
+ * 31vw, rounded outward. The two must move together — change
+ * `--about-cutout-w` and this is the other half of that change.
+ */
+export const SIZES_ABOUT_CUTOUT = '(min-width: 64rem) 16vw, 32vw';
 
 /**
  * A card on the solutions rail. `--spacing-solution-card` is

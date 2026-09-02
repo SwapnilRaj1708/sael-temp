@@ -937,16 +937,45 @@
     rgb(69 37 141 / 0.82) 94%
   );
 
-  /* No `--gradient-shape` here, deliberately. The About composite tinted an
-   * untreated photograph with a blended gradient overlay for two revisions;
-   * the client now supplies the artwork already colour-graded, so the token
-   * has no consumer and is gone rather than left to rot.
+  /* The About SAEL shape's grade. **Back, on 2026-09-01**: the note that stood
+   * here said the token had no consumer because the client supplied the
+   * composite assembled, and that if the 14 shapes were ever drawn as visible
+   * artwork it should return. That is exactly what happened — the client now
+   * supplies the three layers separately (shape, photograph, cut-out) and the
+   * grade is ours to apply again.
    *
-   * If the 14 decorative shapes are ever rendered as visible artwork, bring it
-   * back — docs/asset-inventory.md §10 still applies, and the ramp the design
-   * actually uses is the four-stop one in `SAEL Homepage v3.dc.html`
-   * (`#2b1b54 → #5c1a86 → #a5106b → #e0141f`), not the flatter three-stop
-   * version baked into 14.svg. */
+   * **This is `aboutSael/mask.svg`'s own ramp, transcribed** — not a ramp
+   * chosen here. The client supplied that file on 2026-09-02 to replace the
+   * derivation from `14.svg`, and its gradient is the design's answer to what
+   * this shape is coloured. `14.svg`'s flatter `#2b1b54 → #8a1e42 → #e01f2b`
+   * stood here for a day and is gone with it.
+   *
+   * **The angle and the stop positions are computed, not eyeballed.** The SVG
+   * declares `gradientUnits="userSpaceOnUse"` from `(973, 309.025)` to
+   * `(172.895, -61.934)` — a line 882 units long, at an angle, inside a
+   * 973 x 620 box. CSS sizes its gradient line to span the box instead, which
+   * for this angle is 1143.5 units, so the SVG's `0 / 0.327 / 1` land at
+   * `88.6% / 63.3% / 11.4%` of it. Reversed, because CSS runs blue-to-red where
+   * the SVG runs red-to-blue. The figures hold because the shape's box is
+   * always --about-shape-aspect; they would need recomputing if it were not. */
+  --gradient-shape: linear-gradient(114.87deg, #3035aa 11.4%, #8a1e42 63.3%, #fb3633 88.6%);
+
+  /* `aboutSael/mask.svg`'s silhouette as an alpha mask. The path verbatim; the
+   * only change is `fill`, from the file's gradient reference to opaque white,
+   * because a mask reads alpha and the ramp is --gradient-shape's job.
+   *
+   * **Supplied 2026-09-02, replacing a derivation from `14.svg`.** It is the
+   * same silhouette to the decimal — band at 63.7% across, 32.8% to 80.8%
+   * down, 7.9% corner radius — but drawn the way the design draws it, with the
+   * tall block on the left, and with the path tight to its viewBox. `14.svg`
+   * had it mirrored and padded ~21 units a side, so it needed a `rotate(180)`
+   * and a retightened viewBox to be usable. Both are gone, and so is the class
+   * of bug they invite.
+   *
+   * Inline rather than `url(../assets/…)`: a `url()` inside a custom property
+   * is an unparsed token stream, so whether the bundler rewrites the path to
+   * the emitted asset is not something to bet a silently-empty mask on. */
+  --mask-about-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 973 620'%3E%3Cpath fill='%23fff' d='M923.89 203.228H651.11C639.251 203.228 627.886 198.426 619.624 189.921L446.957 12.045C439.49 4.33514 429.196 0 418.463 0H49.1099C21.9883 0 0 21.9773 0 49.0853V570.915C0 598.023 21.9883 620 49.1099 620H280.659C291.145 620 301.192 615.857 308.631 608.476L405.122 512.775C412.561 505.395 422.608 501.252 433.094 501.252H923.89C951.012 501.252 973 479.274 973 452.166V252.313C973 225.205 951.012 203.228 923.89 203.228Z'/%3E%3C/svg%3E");
 
   /* "Our Endeavour" is one supplied image, so the only measurement left is
    * how wide it sits beside the copy. The panel gradient and the shape mask
@@ -1135,7 +1164,9 @@
    * rather than relying on the scrim alone. HERO-SPEC.md §3e. */
   --shadow-hero-text: 0 2px 26px rgb(0 0 0 / 0.5);
 
-  /* The About SAEL composite's own ratio — the supplied file's, 605 x 412.
+  /* The About SAEL artwork's own ratio — 605 x 412, which is the box the
+   * client's approved composite is drawn in and the frame every figure below
+   * is measured against.
    *
    * All that is left of what was a whole stage: `--about-stage-*`,
    * `--about-media-*`, `--about-heading-*` and `--about-body-*` placed four
@@ -1144,6 +1175,50 @@
    * plain twelve-column grid instead, so the coordinates have nothing left to
    * position and are gone. */
   --about-aspect: 605 / 412;
+
+  /* ---------------------------------------------------------------------
+   * The artwork's three layers, re-assembled in the browser (2026-09-01).
+   *
+   * The client supplies the shape, the photograph and the cut-out separately
+   * now, so the four figures below are the whole composition. They are all
+   * **proportions, not lengths** — nothing here is a pixel — which is what
+   * makes the arrangement identical at 360px and at 1920px.
+   *
+   * They are measured off `aboutSael/sardar-kid-cutout.png`, the composite
+   * the client approved, at its native 605 x 412. That file is now the
+   * *reference* rather than the artwork: if the assembly drifts, it is the
+   * thing to diff against.
+   * ------------------------------------------------------------------ */
+
+  /* The masked shape's own ratio — `aboutSael/mask.svg`'s viewBox, which its
+   * path fills exactly. The ratio the derivation from `14.svg` produced,
+   * 354.45 : 225.97, was the same picture to four decimal places (1.5686
+   * against 1.5694), so this swap moved nothing measurable in the layout.
+   * --gradient-shape's stop positions do assume it. */
+  --about-shape-aspect: 973 / 620;
+
+  /* How far the shape is held off the left and right edges of the artwork box.
+   *
+   * It is not decoration. Insetting the shape is what buys the vertical room
+   * for the cut-out to break the shape's top edge: the shape sits flush with
+   * the bottom of the artwork box, so narrowing it lowers its top edge, and
+   * 2.5% a side puts that edge at 11% down — which is where the composite
+   * puts it, with the boy's turban clearing it by a hair. Widen the shape and
+   * the head is clipped by the box. */
+  --about-shape-inset-x: 2.5%;
+
+  /* The cut-out, measured **against the shape**, not against the artwork box —
+   * it is positioned inside the shape's element, so one figure changing does
+   * not drag the other out of place.
+   *
+   * Width only: the figure's own aspect ratio supplies the height, so there is
+   * no second number here to fall out of step with the asset. It is taller
+   * than the shape (37% of 354.45:225.97 works out at 109% of the shape's
+   * height), which is the point — the boy stands in front of the shape and
+   * over its top edge. Its foot is the shape's foot, so `bottom: 0` in the
+   * component is the fourth figure and does not need a token. */
+  --about-cutout-x: -3.72%;
+  --about-cutout-w: 37.5%;
 
   /* How wide the composite is allowed to get, expressed as the width at which
    * it would be as tall as the design lets it be: `min(58vh, 520px)`, times

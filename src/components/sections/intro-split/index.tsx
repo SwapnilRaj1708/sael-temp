@@ -1,4 +1,4 @@
-import type { StaticImageData } from 'next/image';
+import Image, { type StaticImageData } from 'next/image';
 import { Button } from '@/components/ui/button';
 import { DisplayHeading } from '@/components/ui/display-heading';
 import { Eyebrow } from '@/components/ui/eyebrow';
@@ -6,7 +6,7 @@ import { MediaFrame } from '@/components/ui/media-frame';
 import { Reveal } from '@/components/ui/reveal';
 import { Section } from '@/components/ui/section';
 import { cn } from '@/lib/utils/cn';
-import { SIZES_ABOUT_MEDIA } from '@/lib/utils/image-sizes';
+import { SIZES_ABOUT_CUTOUT, SIZES_ABOUT_MEDIA } from '@/lib/utils/image-sizes';
 
 export interface IntroSplitProps {
   eyebrow?: string;
@@ -14,8 +14,20 @@ export interface IntroSplitProps {
   body: string;
   /** Absent in the client's design for the homepage; kept for reuse. */
   cta?: { label: string; href: string };
-  /** The composite artwork: shape, graded photograph and cut-out, assembled. */
-  media: { image: StaticImageData | null; alt: string };
+  /**
+   * The artwork, in the three layers the client supplies it in: the
+   * photograph that is masked into the chamfered shape, and the cut-out figure
+   * that stands in front of it. The shape itself is not an asset here — it is
+   * `--mask-about-shape`, so it costs no request and takes the grade.
+   */
+  media: {
+    /** Masked into the shape, graded by `--gradient-shape`. */
+    image: StaticImageData | null;
+    alt: string;
+    /** Stands in front of the shape, at its bottom-left. */
+    cutout: StaticImageData | null;
+    cutoutAlt: string;
+  };
   /** Opt into the homepage's section snapping. */
   snap?: boolean;
 }
@@ -50,14 +62,23 @@ export interface IntroSplitProps {
  * Below `lg` the grid collapses to ordinary flow — heading, artwork, body —
  * per docs/responsive-strategy.md §4.
  *
- * **The artwork is one supplied image, not a composite built here.** Earlier
- * versions assembled it in the browser: `14.svg`'s silhouette as a CSS mask, a
- * photograph clipped to it, a gradient tint over that, and the cut-out
- * positioned on top. Each step lost something — a browser can approximate the
- * duotone but never match it, because the ramp is applied per-tone by whoever
- * prepared the asset rather than as one linear sweep. The client now supplies
- * the finished composite, so all of that is gone. The same course
- * `<EndeavourSplit>` took.
+ * **The artwork is three layers assembled here, not one supplied image —
+ * again, as of 2026-09-01.** It was assembled in the browser once before, then
+ * replaced by a single graded PNG on the argument that a browser can
+ * approximate a duotone but never match it. The client has since supplied the
+ * layers separately, so it is assembled again, and the objection is answered
+ * rather than dodged: the grade is a `multiply` of --gradient-shape over a
+ * desaturated, lifted photograph, and the figures were fitted against
+ * `aboutSael/sardar-kid-cutout.png` — the composite that was approved, kept
+ * as the reference for the arrangement. Not for the colour, since 2026-09-02:
+ * the shape now arrives as `aboutSael/mask.svg` carrying its own ramp, which
+ * is brighter and bluer than the composite's, and that file wins.
+ *
+ * **Nothing in the assembly is a length.** The shape is a proportion of the
+ * artwork box, the cut-out is a proportion of the shape, and the shape's
+ * ratio is what decides how far down its top edge falls. So the arrangement
+ * is the same picture at 360px as at 1920px, and there is no breakpoint
+ * anywhere in it. docs/responsive-strategy.md §3.
  */
 export function IntroSplit({ eyebrow, title, body, cta, media, snap = false }: IntroSplitProps) {
   return (
@@ -93,7 +114,7 @@ export function IntroSplit({ eyebrow, title, body, cta, media, snap = false }: I
           </Reveal>
 
           <Reveal order={4} className="mt-flow">
-            <p className="max-w-(--ledger-measure) text-body [text-wrap:pretty] text-body-soft">
+            <p className="max-w-(--ledger-measure) text-body text-pretty text-body-soft">
               {body}
             </p>
             {cta !== undefined && (
@@ -124,17 +145,70 @@ export function IntroSplit({ eyebrow, title, body, cta, media, snap = false }: I
             flush against the gutter even though its box now reaches it, so the
             symmetry is given up where it shows least. */}
         <Reveal order={3} className="w-full lg:col-span-6 lg:col-start-7">
-          <MediaFrame
-            image={media.image}
-            alt={media.alt}
-            sizes={SIZES_ABOUT_MEDIA}
-            pending="aboutSael/sardar-kid-cutout"
-            className="mx-auto aspect-(--about-aspect) w-full max-w-(--about-media-max-w) bg-transparent"
-            // The chamfered silhouette has transparent corners around it, so
-            // the artwork must not be cropped to the box — `contain`, not
-            // `cover`.
-            imageClassName="object-contain"
-          />
+          {/* The artwork box. It holds nothing itself — its job is to be the
+              frame the shape is measured against, and to give the cut-out the
+              room above the shape that it needs in order to break its edge.
+              See --about-aspect and --about-shape-inset-x. */}
+          <div className="relative mx-auto aspect-(--about-aspect) w-full max-w-(--about-media-max-w)">
+            {/* The shape. Inset a fixed proportion left and right and flush
+                with the foot of the box, so its own ratio fixes its height and
+                therefore how far down its top edge sits. `overflow` stays
+                visible: the cut-out is positioned against this element and is
+                taller than it. */}
+            <div className="absolute inset-x-(--about-shape-inset-x) bottom-0 aspect-(--about-shape-aspect)">
+              {/*
+                The masked, graded photograph.
+
+                `isolate` is load-bearing. The grade is a `multiply` of
+                --gradient-shape over the picture, and without a stacking
+                context of its own that blend would reach through to the
+                section's paper ground and tint the page behind the shape.
+                The mask would in fact establish one on its own; saying so
+                explicitly is cheaper than relying on that.
+
+                The photograph is desaturated and lifted before the ramp
+                multiplies over it — grade the colour that is there and the
+                result muddies, and the lift is what stops `multiply` reading
+                as a dark wash rather than as a duotone. The figures match
+                `aboutSael/sardar-kid-cutout.png`, the composite the client
+                approved.
+              */}
+              <div
+                className={cn(
+                  'absolute inset-0 isolate',
+                  'mask-(--mask-about-shape) mask-no-repeat mask-size-[100%_100%]',
+                )}
+              >
+                <MediaFrame
+                  image={media.image}
+                  alt={media.alt}
+                  sizes={SIZES_ABOUT_MEDIA}
+                  pending="aboutSael/burning-crop"
+                  className="absolute inset-0"
+                  imageClassName="anim-about-settle brightness-120"
+                />
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-(image:--gradient-shape) mix-blend-multiply"
+                />
+              </div>
+
+              {/* The cut-out, in front. Positioned against the shape and sized
+                  as a proportion of it, so the two hold their arrangement at
+                  every width — there is no breakpoint here and there is not
+                  meant to be one. Width only: the figure's own ratio gives the
+                  height, and `h-auto` is what lets it, over the `height`
+                  attribute `next/image` writes from the import. */}
+              {media.cutout !== null && (
+                <Image
+                  src={media.cutout}
+                  alt={media.cutoutAlt}
+                  sizes={SIZES_ABOUT_CUTOUT}
+                  className="absolute bottom-0 left-(--about-cutout-x) h-auto w-(--about-cutout-w)"
+                />
+              )}
+            </div>
+          </div>
         </Reveal>
       </div>
     </Section>

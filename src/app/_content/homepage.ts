@@ -2,7 +2,8 @@ import iconAgriWaste from '@/assets/images/business/icon-agri-waste.png';
 import iconCellManufacturing from '@/assets/images/business/icon-solar-cell.png';
 import iconModuleManufacturing from '@/assets/images/business/icon-solar-module.png';
 import iconSolarGeneration from '@/assets/images/business/icon-solar-energy.png';
-import aboutComposite from '@/assets/images/aboutSael/sardar-kid-cutout.png';
+import aboutCutout from '@/assets/images/aboutSael/sardar-kid-cropped.png';
+import aboutPhoto from '@/assets/images/aboutSael/burning-crop.png';
 import heroModules from '@/assets/images/hero/hero-modules.jpg';
 import heroImageMobile1 from '@/assets/images/hero/hero-image-mobile-1.jpg';
 import heroImageMobile2 from '@/assets/images/hero/hero-image-mobile-2.jpg';
@@ -163,11 +164,16 @@ export const aboutSael: Omit<IntroSplitProps, 'snap'> = {
     'India’s leading renewable energy companies, we are dedicated to enhancing ' +
     'the energy landscape nationwide.',
   media: {
-    image: aboutComposite,
-    // Describes the artwork, not the section. Written from the image; it
-    // asserts nothing about the business, but it is still copy and wants a
-    // review.
-    alt: 'A young boy in a turban, against a field of burning crop stubble',
+    image: aboutPhoto,
+    // Two alts where there was one, because there are two images where there
+    // was one: the sentence that described the composite — "A young boy in a
+    // turban, against a field of burning crop stubble" — split at its comma,
+    // each half now describing the layer it belongs to. Nothing new is
+    // asserted. Both describe the artwork rather than the section, and both
+    // are still copy that wants a review.
+    alt: 'A field of burning crop stubble',
+    cutout: aboutCutout,
+    cutoutAlt: 'A young boy in a turban',
   },
 };
 

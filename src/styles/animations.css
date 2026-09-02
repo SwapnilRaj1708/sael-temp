@@ -30,6 +30,19 @@
   }
 }
 
+/* The About SAEL photograph, settling inside its shape as the section arrives.
+ * The hero's Ken Burns run the other way round: it starts wide and pushes in
+ * over the life of a slide, this one starts pushed in and off to one side and
+ * eases back to rest, because it is a reveal rather than an ambient drift. */
+@keyframes saelSettle {
+  from {
+    transform: scale(1.16) translate3d(2.5%, -1.5%, 0);
+  }
+  to {
+    transform: scale(1.02) translate3d(0, 0, 0);
+  }
+}
+
 /* Hero headline, one word at a time. */
 @keyframes fxWord {
   from {
@@ -163,6 +176,14 @@
     transform: scale(1);
   }
 
+  /* The rest state is the animation's *end* state, not `scale(1)`: the 2%
+     overscale is what keeps the photograph's edges outside the shape while it
+     moves, and a reduced-motion viewer should see the framing the section
+     settles into rather than a slightly different one. */
+  .anim-about-settle {
+    transform: scale(1.02);
+  }
+
   .anim-word-in {
     opacity: 1;
     transform: none;
@@ -216,6 +237,16 @@
   @media (prefers-reduced-motion: no-preference) {
     .anim-ken-burns {
       animation: saelKen 9s ease forwards;
+    }
+
+    /* Gated on the `Reveal` ancestor rather than running at mount. About SAEL
+       is the second section of the page, so an unconditional animation would
+       have finished long before anyone scrolled to it. `data-reveal` is set by
+       components/ui/reveal.tsx and re-armed every time the section leaves the
+       viewport, so the settle replays on each pass — which is the behaviour
+       the client asked of `Reveal` itself on 2026-08-06. */
+    [data-reveal='shown'] .anim-about-settle {
+      animation: saelSettle 2.4s var(--ease-entrance) both;
     }
 
     /* `--anim-index` is set per word by the component; `backwards` holds the

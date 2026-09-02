@@ -361,6 +361,7 @@ on the other.
 | `--gradient-mega-hot` | `linear-gradient(…)` | Mega-menu lit column |
 | `--gradient-date-chip` | `linear-gradient(90deg, #16357E, #2F8F3F)` | `<DateBadge variant="pill">` |
 | `--gradient-goal-reveal` | `linear-gradient(180deg, rgb(8 9 12 / .28) 0%, rgb(8 9 12 / .62) 46%, rgb(8 9 12 / .9) 100%)` | Goals card scrim. **On hover only** — at rest the photograph is shown untreated |
+| `--gradient-shape` | `linear-gradient(114.87deg, #3035AA 11.4%, #8A1E42 63.3%, #FB3633 88.6%)` | About SAEL shape. **Back on 2026-09-01**, **restated 2026-09-02** to `aboutSael/mask.svg`'s own ramp when the client supplied that file. `multiply` over a desaturated, `brightness-150` photograph. The angle and stops are the SVG's `userSpaceOnUse` line remapped onto a CSS one — computed, not eyeballed, and valid only while the box holds `--about-shape-aspect` |
 
 **Deprecated 2026-08-26** — declared, no consumer, kept rather than deleted:
 
@@ -694,8 +695,35 @@ given.
 | `--aspect-news-thumb` | **`5 / 4`** | News card thumbnail. **Amended 2026-08-26**: was `16 / 10` |
 | `--aspect-plate` | `4 / 3` | Solutions plate |
 | `--aspect-endeavour` | `511 / 488` | "Our Endeavour" artwork |
-| `--about-aspect` | `605 / 412` | About composite |
+| `--about-aspect` | `605 / 412` | About SAEL artwork box — the frame the three layers are measured in |
+| `--about-shape-aspect` | `973 / 620` | …the chamfered shape inside it — `aboutSael/mask.svg`'s viewBox, which its path fills exactly. **Was** `354.45 / 225.97`, `14.svg`'s path bounding box, until 2026-09-02; the same ratio to four decimals |
 | `--aspect-map-india` | `311.33 / 337.45` | Dotted India map viewBox |
+
+### The About SAEL artwork — assembled, 2026-09-01
+
+Three supplied layers, put together in the browser: `aboutSael/burning-crop.png`
+masked into `aboutSael/mask.svg`'s silhouette, graded by `--gradient-shape`, with
+`aboutSael/sardar-kid-cropped.png` standing in front of it.
+
+`mask.svg` arrived on **2026-09-02** and replaced a derivation from `14.svg`.
+Same silhouette to the decimal, but drawn in the design's orientation and tight
+to its viewBox, where `14.svg` is mirrored and padded ~21 units a side — so the
+`rotate(180)` and the retightened viewBox that stood in the token are gone. It
+also carries the ramp `--gradient-shape` now transcribes. **`14.svg` is not the
+source for this section any more**; treat `mask.svg` as the shape of record.
+
+**Every figure is a proportion.** There is no length and no breakpoint in the
+composition — it is the same picture at 360px as at 1920px, which is the whole
+reason it is expressed this way. `aboutSael/sardar-kid-cutout.png`, the composite
+the client approved, is the reference the figures were fitted against; it is no
+longer rendered.
+
+| Token | Value | Use |
+|---|---|---|
+| `--about-shape-inset-x` | `2.5%` | The shape's inset from the left and right of the artwork box. It sits flush with the foot, so narrowing it is what lowers its top edge — this is what buys the cut-out the room to break that edge |
+| `--about-cutout-x` | `2.5%` | The cut-out's offset from the shape's left edge — measured **against the shape**, not the artwork box |
+| `--about-cutout-w` | `37%` | …and its width, against the shape. Width only: the figure's own ratio gives the height, which lands at 109% of the shape's — taller than what it stands in front of, deliberately |
+| `--mask-about-shape` | `url("data:image/svg+xml,…")` | `aboutSael/mask.svg`'s path verbatim, with `fill` changed to opaque white — a mask reads alpha, and the ramp is `--gradient-shape`'s job. Inlined rather than `url(../assets/…)` — a `url()` inside a custom property is an unparsed token stream, and a mask that fails to resolve fails silently |
 
 ### Grid
 
@@ -1133,6 +1161,7 @@ All prototype animations, with their required mobile/reduced-motion behaviour.
 | `sparkFlick` | opacity 0.85↔1, 900ms infinite | Timeline travelling spark — *not built* | **Disable** |
 | Hero parallax | `mousemove`-driven translate: image 10px, mark 24px, headline −14px | Hero, from `lg`. *`--hero-parallax-symbol` and `-text` were deprecated in PR 2528 and are **live again since 2026-08-27** — `HERO-SPEC.md` §4 specifies all three depths* | **Disable**; also inert on touch (no pointer) |
 | Timeline path draw | `stroke-dashoffset` driven by scroll over a 220vh track | Vision section — *not built* | **Jump to complete state** |
+| `saelSettle` | `scale(1.16) translate3d(2.5%, -1.5%, 0) → scale(1.02) translate3d(0,0,0)`, 2.4s `--ease-entrance`, fill `both` | About SAEL photograph, inside its mask. `saelKen` run backwards — a settle, not an ambient drift. **Gated on `[data-reveal='shown']`**, not on mount: the section is second on the page, so an unconditional animation would be over before anyone reached it. Replays each pass, like `Reveal` itself. Added **2026-09-01** | **Disable** — hold at `scale(1.02)`, the animation's own end state, so the framing is the one the section settles into |
 
 ### Added in PR 2528
 
