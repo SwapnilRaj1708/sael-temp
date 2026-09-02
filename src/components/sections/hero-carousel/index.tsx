@@ -33,30 +33,22 @@ export interface HeroCarouselProps {
 }
 
 /**
- * The homepage hero. **`docs/HERO-SPEC.md` is the source of truth for this
- * component**, adopted 2026-08-27; docs/features/04 §1 is the older account.
+ * The homepage hero. docs/features/04 §1, rebuilt to `SAEL Home v2`.
  *
- * What the spec changed from the `SAEL Home v2` build it replaced:
+ * The v2 arrangement, and what changed from the one before it:
  *
- *  - **Four compositions, not one.** Each slide places its mark and its
- *    headline at its own coordinates in the frame — §2's `iconX/iconY` and
- *    `textX/textY` — where v2 had a single shared content column. See
+ *  - **One composition, not four.** The mark, a short red rule and the
+ *    headline sit in a single content column — the right-hand half above `lg`,
+ *    the full width and bottom-anchored below it. The six per-slide
+ *    coordinates that used to place each headline in the frame are gone. See
  *    `<HeroCopy>`.
- *  - **A 2.34:1 frame** (§1), and the four photographs are cut to it. The crop
- *    is in the files, so no slide carries an `object-position`. See
- *    `<HeroBackdrop>`.
- *  - **Progress dots**, not the full-bleed bar v2 pinned to the base (§6). See
- *    `<HeroProgress>`.
- *  - **The mark is loose in the frame again** at 18.5vw, roughly twice the
- *    size it was in the column, and the headline is white throughout — §3e
- *    gives it a flat `#fff`, so v2's per-slide gradient run is gone.
- *
- * **HERO-SPEC.md specifies the 1920 desktop composition and is silent below
- * it**, so everything it gives is applied from `lg` and the `SAEL Home v2`
- * mobile arrangement stands underneath: a portrait art-directed crop, and the
- * mark, rule and headline bottom-anchored in a column on the page gutter.
- * Taken literally at 360px the spec would be a 154px-tall hero with a 112px
- * headline column, which is why. /CLAUDE.md §1 and §9.
+ *  - **A progress bar across the base**, pinned to the bottom edge of a
+ *    section that is exactly one viewport tall — so it is on screen for as
+ *    long as the hero is. It fills once across the whole cycle rather than
+ *    once per slide. See `<HeroProgress>`.
+ *  - **The headline is set at --text-hero**, the site's own display size,
+ *    rather than the larger size the design file draws it at. The client's
+ *    call on 2026-08-20: the layout is v2's, the type scale is ours.
  *
  * The one client component on this page, and the only section that needs to
  * be: it owns timers, pointer tracking and a slide index. Everything it can
@@ -141,7 +133,7 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
       ref={sectionRef}
       fullBleed
       spacing="none"
-      background="hero"
+      background="black"
       data-snap-section
       aria-roledescription="carousel"
       aria-label="SAEL highlights"
@@ -172,55 +164,34 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
       className={cn(
         'relative isolate overflow-hidden',
         /*
-         * HERO-SPEC.md §1's frame, from `lg` — 2.34:1, and explicitly not
-         * 16/9. `lg:min-h-0` is what lets it take effect: `min-h-viewport`
-         * resolves taller than the ratio at every desktop size, and a
-         * min-height beats an aspect-ratio, so leaving it set would silently
-         * keep the v2 box and the spec would appear not to have applied.
+         * One screenful below the fixed header, at every size.
          *
-         * **The hero is no longer a full screenful, and that is the spec's
-         * call.** At 1920 x 1080 the frame is 820px against a ~996px snap
-         * area, so the section under it shows through beneath the fold. The
-         * `min-h-viewport` this replaces was v2's answer to exactly that, and
-         * §1 supersedes it. `snap-start` still holds the hero's top edge.
+         * This replaces the aspect ratios responsive-strategy.md §4 specifies
+         * for the hero (2.34/1 above lg, 4/5 below). Those describe a hero in
+         * normal document flow; the client has since asked for the homepage to
+         * snap section by section, and a snapping section that is not a
+         * viewport tall leaves a gap or a partial neighbour at every rest
+         * position. The photographs are `object-cover`, so they fill whatever
+         * height this resolves to rather than letterboxing.
          *
-         * Below `lg` the spec is silent and `min-h` stands: a viewport-tall
-         * hero over a portrait crop, growing rather than clipping if the
-         * headline wraps past the space at 360px.
+         * `min-h`, not `h`: if the headline ever wraps past the available
+         * space at 360px the section grows instead of clipping it. The content
+         * column reserves --spacing-hero-pad-bottom underneath itself, which
+         * is more than the progress bar is tall, so the two never meet.
          */
         'min-h-viewport snap-start',
-        'lg:aspect-(--hero-aspect) lg:min-h-0',
         // Vertical page scroll is never captured by the swipe handler.
         'touch-pan-y',
       )}
     >
-      {/*
-        One full-bleed layer per slide, cross-fading in place — HERO-SPEC.md
-        §3. The wrapper owns the fade so neither the backdrop nor the copy
-        inside it has to know the slide is changing, and `pointer-events-none`
-        keeps a drag anywhere over the hero reaching the swipe handler.
-      */}
-      {slides.map((slide, slideIndex) => {
-        const isActive = slideIndex === index;
-
-        return (
-          <div
-            key={slide.id}
-            aria-hidden={!isActive}
-            className={cn(
-              'pointer-events-none absolute inset-0',
-              'transition-opacity duration-(--duration-cross-fade) [transition-timing-function:ease]',
-              // An instant swap is the honest reading of "reduce motion" for a
-              // change the user did not ask for. Matches card.tsx.
-              'motion-reduce:transition-none',
-              isActive ? 'opacity-100' : 'opacity-0',
-            )}
-          >
-            <HeroBackdrop slide={slide} isActive={isActive} position={slideIndex + 1} />
-            <HeroCopy slide={slide} isActive={isActive} />
-          </div>
-        );
-      })}
+      {slides.map((slide, slideIndex) => (
+        <HeroBackdrop
+          key={slide.id}
+          slide={slide}
+          isActive={slideIndex === index}
+          position={slideIndex + 1}
+        />
+      ))}
 
       {/*
         The letterbox reveal — two panels wiping off the hero on first paint.
@@ -235,12 +206,14 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
       */}
       <div
         aria-hidden="true"
-        className="anim-letterbox pointer-events-none absolute inset-x-0 top-0 z-6 h-1/2 origin-top bg-surface-darker"
+        className="anim-letterbox pointer-events-none absolute inset-x-0 top-0 z-10 h-1/2 origin-top bg-surface-darker"
       />
       <div
         aria-hidden="true"
-        className="anim-letterbox pointer-events-none absolute inset-x-0 bottom-0 z-6 h-1/2 origin-bottom bg-surface-darker"
+        className="anim-letterbox pointer-events-none absolute inset-x-0 bottom-0 z-10 h-1/2 origin-bottom bg-surface-darker"
       />
+
+      <HeroCopy slides={slides} activeIndex={index} />
 
       <HeroProgress
         labels={slides.map((slide) => slide.headline)}

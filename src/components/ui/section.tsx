@@ -36,11 +36,6 @@ const section = cva('relative', {
        * section whose own content is a full-bleed photograph and would hide
        * it anyway. */
       black: 'bg-surface-black text-body-on-dark',
-      /* The hero's ground, and only the hero's — HERO-SPEC.md §1 gives it its
-       * own `#111418`, lighter than `black`. Seen only in the moment before a
-       * photograph paints, which is exactly why it is not `black`: the cut is
-       * less visible against the images than the near-black would be. */
-      hero: 'bg-hero-bg text-body-on-dark',
       'black-dots': ['ground-dots-dark', 'text-body-on-dark'],
       paper: 'bg-paper text-ink',
       'paper-dots': ['ground-dots-paper', 'text-ink'],

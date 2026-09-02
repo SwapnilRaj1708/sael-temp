@@ -114,9 +114,7 @@ export function IntroSplit({ eyebrow, title, body, cta, media, snap = false }: I
           </Reveal>
 
           <Reveal order={4} className="mt-flow">
-            <p className="max-w-(--ledger-measure) text-body text-pretty text-body-soft">
-              {body}
-            </p>
+            <p className="max-w-(--ledger-measure) text-body text-pretty text-body-soft">{body}</p>
             {cta !== undefined && (
               <Button href={cta.href} className="mt-flow">
                 {cta.label}
@@ -176,7 +174,7 @@ export function IntroSplit({ eyebrow, title, body, cta, media, snap = false }: I
               <div
                 className={cn(
                   'absolute inset-0 isolate',
-                  'mask-(--mask-about-shape) mask-no-repeat mask-size-(--mask-fill)',
+                  'mask-(--mask-about-shape) mask-size-(--mask-fill) mask-no-repeat',
                 )}
               >
                 <MediaFrame

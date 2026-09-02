@@ -53,18 +53,6 @@ with two documented exclusions; **§4's Card spec was rewritten to the v2 primit
 (**C-1**) — the old boxed spec described a surface v2 had removed; §5 and §6 record the
 motion and imagery fixes as closed.
 
-**2026-08-27 — the hero is rebuilt to `docs/HERO-SPEC.md`,** which is now the source of
-truth for that section and supersedes what §5 and §6 recorded of the `SAEL Home v2` hero.
-Four things move: the frame is `2.34/1` from `lg` rather than a viewport-tall box; the mark
-and the headline are placed **per slide** at the spec's own percentages rather than sharing
-one column; the full-bleed progress *bar* becomes the spec's **progress dots**; and the
-headline is flat `#fff`, so the four `--gradient-hero-word-*` ramps have no consumer and are
-marked deprecated below. `--text-hero`'s floor rises 28 → 32 with §3e, and the word reveal
-takes its own `--ease-word` — the spec's curve is a hair flatter than `--ease-entrance` and
-the two are not the same animation. **The spec covers the 1920 desktop composition and is
-silent below it**, so all of it is applied from `lg` and `responsive-strategy.md` §Hero's
-mobile row stands underneath unchanged — which is what that table always specified.
-
 **2026-08-27 — marks are not photographs.** §6 gains a rule separating the two, after the
 hero's slide marks were found centring themselves inside a square `<MediaFrame>`. It had
 already been decided once, locally, in the business ledger; writing it down is what stops it
@@ -344,10 +332,10 @@ on the other.
 | Token | Value | Use |
 |---|---|---|
 | `--gradient-hero-fill` | `linear-gradient(90deg, #F5C000 0%, #E8262A 33%, #B81F6A 55%, #7B2382 78%, #4632A0 100%)` | Progress bar. Walks the pixel-strip ramp end to end so the bar fills **once over the whole cycle**, not four times over four slides — client request, **2026-08-21** |
-| `--gradient-hero-word-1` | `linear-gradient(92deg, #FFD23D 0%, #FF7A3D 55%, #FF5470 100%)` | Slide 1 headline highlight — **deprecated 2026-08-27**: `HERO-SPEC.md` §3e sets the headline flat `#fff`, and its per-word split leaves nowhere for a multi-word run to hold one ramp. No consumer |
-| `--gradient-hero-word-2` | `linear-gradient(92deg, #8CE6A6 0%, #3FD2C4 55%, #4FA9E2 100%)` | Slide 2 — deprecated, as above |
-| `--gradient-hero-word-3` | `linear-gradient(92deg, #FF7AC0 0%, #D07AE8 100%)` | Slide 3 — deprecated, as above |
-| `--gradient-hero-word-4` | `linear-gradient(92deg, #ECF25C 0%, #7AD657 100%)` | Slide 4 — deprecated, as above |
+| `--gradient-hero-word-1` | `linear-gradient(92deg, #FFD23D 0%, #FF7A3D 55%, #FF5470 100%)` | Slide 1 headline highlight |
+| `--gradient-hero-word-2` | `linear-gradient(92deg, #8CE6A6 0%, #3FD2C4 55%, #4FA9E2 100%)` | Slide 2 |
+| `--gradient-hero-word-3` | `linear-gradient(92deg, #FF7AC0 0%, #D07AE8 100%)` | Slide 3 |
+| `--gradient-hero-word-4` | `linear-gradient(92deg, #ECF25C 0%, #7AD657 100%)` | Slide 4 |
 | `--gradient-hero-scrim-side` | `linear-gradient(90deg, rgb(6 7 10 / 0) 0%, … .88 100%)` | Scrim above `lg`. Takes no angle from the slide — v2 has one composition, not four |
 | `--gradient-hero-scrim-stacked` | `linear-gradient(0deg, rgb(6 7 10 / .92) 0%, … .3 100%)` | Scrim below `lg` |
 | `--gradient-hero-foot` | `linear-gradient(0deg, rgb(6 7 10 / .55) 0%, transparent 30%)` | Under the progress bar, so the track never lands on a bright patch of photograph |
@@ -414,7 +402,7 @@ Load with `next/font/local`, converted to **WOFF2** and subset to `latin`. Decla
 
 | Token | Desktop | Weight | Line height | Tracking | Use |
 |---|---|---|---|---|---|
-| `--text-hero` | 32 → 58px | 400 | 1.08 | 0.2px | Hero H1. `clamp(32px, 3vw, 58px)` from `HERO-SPEC.md` §3e — 57.6px at the 1920 design width, and the tracking is an absolute 0.2px, not a ratio. Floor was 28px until 2026-08-27 |
+| `--text-hero` | 58px | 400 | 1.08 | 0.2px | Hero H1 |
 | `--text-h2` | 36px | 700 | 1.15 | — | Section headings |
 | `--text-h3` | 22px | 700 | 1.30 | — | **Sub-section heading** — a heading inside a section, below the `h2`. Reclassified 2026-08-26: this was "news card titles", which now take `--text-card-title`. Generic infrastructure, currently between consumers; About Us is the expected next one |
 | `--text-stat` | 40px | 700 | 1.0 | — | Stats band figures |
@@ -824,8 +812,6 @@ The three §5 standards plus the additions PR 2528 needed:
 | `--duration-parallax` | 500ms | Hero parallax follow |
 | `--reveal-shift` | 28px | Distance a revealing element travels |
 | `--ease-entrance` | `cubic-bezier(.2,.8,.2,1)` | Entrances |
-| `--ease-word` | `cubic-bezier(.2,.7,.2,1)` | The hero's word reveal, `HERO-SPEC.md` §3e. Flatter than `--ease-entrance` through the middle, and deliberately not folded into it |
-| `--duration-dot` | 300ms | A hero progress dot growing to active, `HERO-SPEC.md` §6 |
 | `--ease-letterbox` | `cubic-bezier(.7,0,.2,1)` | Letterbox wipe |
 
 ---
@@ -1153,13 +1139,13 @@ All prototype animations, with their required mobile/reduced-motion behaviour.
 | Name | Spec | Where | `prefers-reduced-motion` |
 |---|---|---|---|
 | `saelKen` | `scale(1.04) → scale(1.12)`, 9s ease forwards | Hero image Ken Burns | **Disable** — hold at `scale(1)` |
-| `fxWord` | `opacity 0→1`, `translateY(32px)→0`, `blur(9px)→0`, 700ms on `--ease-word`, stagger 55ms/word | Hero headline, every word its own box | **Disable** — render at rest |
-| `fxLetter` | `scaleY(1)→0`, 1s `cubic-bezier(.7,0,.2,1)`, fill `both` | Letterbox reveal panels on load | **Disable** — panels absent |
-| `fxFill` | `width 0→100%`, linear over the slide interval | Active carousel dot — **live again since 2026-08-27**, when `HERO-SPEC.md` §6's dots replaced the progress bar | **Disable** — dot shows static active state |
+| `fxWord` | `opacity 0→1`, `translateY(32px)→0`, `blur(9px)→0`, 700ms, stagger 55ms/word | Hero headline | **Disable** — render at rest |
+| `fxLetter` | `scaleY(1)→0`, 1s `cubic-bezier(.7,0,.2,1)` | Letterbox reveal panels on load | **Disable** — panels absent |
+| `fxFill` | `width 0→100%`, linear over the slide interval | Active carousel dot | **Disable** — dot shows static active state |
 | `sdgMarquee` | `translateX(0 → -50%)`, 44s linear infinite | SDG strip — *cancelled 2026-08-05, keyframes still shipped* | **Disable** — becomes a horizontally scrollable list |
 | `dotPulse` | box-shadow pulse, 2.4s infinite | Timeline milestone dots — *not built* | **Disable** |
 | `sparkFlick` | opacity 0.85↔1, 900ms infinite | Timeline travelling spark — *not built* | **Disable** |
-| Hero parallax | `mousemove`-driven translate: image 10px, mark 24px, headline −14px | Hero, from `lg`. *`--hero-parallax-symbol` and `-text` were deprecated in PR 2528 and are **live again since 2026-08-27** — `HERO-SPEC.md` §4 specifies all three depths* | **Disable**; also inert on touch (no pointer) |
+| Hero parallax | `mousemove`-driven translate: image 10px | Hero. *Reduced in PR 2528 to the image only; `--hero-parallax-symbol` and `-text` are deprecated* | **Disable**; also inert on touch (no pointer) |
 | Timeline path draw | `stroke-dashoffset` driven by scroll over a 220vh track | Vision section — *not built* | **Jump to complete state** |
 | `saelKenMedia` / `.anim-ken-burns-media` | `scale(1.16) → scale(1)`, 6s `ease-in-out` **infinite alternate** — a 12s round trip | The masked photograph in **About SAEL and Our Endeavour**. One animation, not one each: the two sections are the same construction, so sharing it is what keeps them from drifting apart. Ambient and endless, unlike the hero's one-shot — neither is tied to a slide that expires. Added **2026-09-01**, shared **2026-09-02** | **Disable** — hold at `scale(1)`. A loop has no end state to rest at, so the still state is the cycle's open framing rather than either extreme |
 | `saelSettle` / `.anim-about-settle` | `scale(1.16) translate3d(2.5%, -1.5%, 0) → scale(1.02)`, `--ease-entrance`, gated on `[data-reveal='shown']` | — **declared, no consumer.** A reveal-triggered settle, superseded by the breathing loop above on 2026-09-02. Kept rather than deleted, like the deprecated gradients | **Disable** — hold at `scale(1.02)` |
@@ -1173,7 +1159,7 @@ Eight behaviours the v2 homepage introduced. Contracts below are **as implemente
 |---|---|---|---|
 | `.anim-reveal` | `opacity 0→1` + `translateY(--reveal-shift)→0`, `--duration-reveal`, staggered `--duration-reveal-step` per `--reveal-order` | **Every section**, via `ui/reveal.tsx` — full spec in §4 | **Disable** — content simply present. Both the transition *and* the hidden state live inside the media query |
 | `.anim-underline` | `scaleX(0→1)` from a left origin, `--duration-underline`, same stagger | The rule under a section eyebrow | **Disable** — rule drawn at full width |
-| `.anim-track-fill` | `clip-path: inset(0 100% 0 0) → inset(0)`, linear over the slide interval | ~~Hero progress bar~~ — **deprecated 2026-08-27**, replaced by `HERO-SPEC.md` §6's dots and `fxFill`. No consumer | **Disable** — bar reads as simply filled |
+| `.anim-track-fill` | `clip-path: inset(0 100% 0 0) → inset(0)`, linear over the slide interval | Hero progress bar | **Disable** — bar reads as simply filled |
 | `.anim-map-ping` | `scale(1)→scale(2.6)`, `opacity .55→0`, 2.6s infinite, offset `--anim-index × 420ms` so pins do not pulse in lockstep | Map pin halo | **Disable** — halo absent; the solid pin underneath is always there |
 | `.anim-drawer-in` | `translateX(100%)→0`, 280ms `--ease-entrance` | Mobile nav drawer | **Disable** — drawer already open when it renders; the slide is decoration on top |
 | `.anim-mega-col` | `opacity 0→1` + `translateY(--reveal-shift)→0`, `--duration-mega`, staggered `--duration-mega-step` per `--mm-index` | Mega-menu columns | **Disable** — columns present as soon as the panel opens |

@@ -4,18 +4,18 @@ import iconModuleManufacturing from '@/assets/images/business/icon-solar-module.
 import iconSolarGeneration from '@/assets/images/business/icon-solar-energy.png';
 import aboutCutout from '@/assets/images/aboutSael/sardar-kid-cropped.png';
 import aboutPhoto from '@/assets/images/aboutSael/burning-crop.png';
-import heroModules from '@/assets/images/hero/hero-modules.jpg';
 import heroImageMobile1 from '@/assets/images/hero/hero-image-mobile-1.jpg';
 import heroImageMobile2 from '@/assets/images/hero/hero-image-mobile-2.jpg';
 import heroImageMobile3 from '@/assets/images/hero/hero-image-mobile-3.jpg';
 import heroImageMobile4 from '@/assets/images/hero/hero-image-mobile-4.jpg';
-import heroGeneration from '@/assets/images/hero/hero-generation.jpg';
-import heroVision from '@/assets/images/hero/hero-vision.jpg';
-import heroAgri from '@/assets/images/hero/hero-agri.jpg';
-import saelIcon1 from '@/assets/images/hero/sael-icon-1.png';
-import saelIcon2 from '@/assets/images/hero/sael-icon-2.png';
-import saelIcon3 from '@/assets/images/hero/sael-icon-3.png';
-import saelIcon4 from '@/assets/images/hero/sael-icon-4.png';
+import heroImage1 from '@/assets/images/hero/hero-1.png';
+import heroImage2 from '@/assets/images/hero/hero-2.png';
+import heroImage3 from '@/assets/images/hero/hero-3.png';
+import heroImage4 from '@/assets/images/hero/hero-4.png';
+import saelIcon1 from '@/assets/images/hero/cropped-sael-icon-1.png';
+import saelIcon2 from '@/assets/images/hero/cropped-sael-icon-2.png';
+import saelIcon3 from '@/assets/images/hero/cropped-sael-icon-3.png';
+import saelIcon4 from '@/assets/images/hero/cropped-sael-icon-4.png';
 import solBhadra from '@/assets/images/solutions/sol-bhadra.jpg';
 import solKishangarh from '@/assets/images/solutions/sol-kishangarh.jpg';
 import solMizoram from '@/assets/images/solutions/sol-mizoram.jpg';
@@ -53,94 +53,74 @@ import { TODO_CONTENT } from '@/lib/config/site';
  */
 
 /**
- * The hero's four slides, built to **`docs/HERO-SPEC.md`** as of 2026-08-27.
+ * The hero's four slides, rebuilt to `SAEL Home v2`.
  *
- * Every number in `placement` is §2's, transcribed and not re-derived: the
- * mark's centre, the headline's left edge and vertical centre, and the width
- * of its column. The photographs are §0's four pre-cropped 2.34:1 JPGs, and
- * the crop is **in the files** — no slide carries an `object-position`, and a
- * photograph that reads off-centre means the wrong file is loaded.
+ * The six placement coordinates each slide used to carry are gone with the
+ * design that needed them: v2 has one composition and the content column sits
+ * in the same place on every slide. What is per-slide now is the photograph,
+ * the mark, the headline, the run of words inside it that takes a gradient,
+ * and the ramp its progress segment fills with.
  *
- * `SAEL Home v2` had collapsed the four compositions into one shared content
- * column and dropped these coordinates; the spec restores them. It also sets
- * the headline flat white, so the per-slide `highlight` and its ramp are gone
- * with the column.
+ * The four highlights are the design's own. Each is an exact substring of the
+ * headline above it — `<HeroHeadline>` matches on words, and a highlight that
+ * does not match renders flat rather than breaking the headline.
  *
- * **Two things here are outside the spec**, which covers the 1920 desktop
- * composition and is silent below `lg`:
+ * The progress bar no longer takes a ramp per slide: it fills once across the
+ * whole cycle from one gradient. See `<HeroProgress>`.
  *
- *  - the art-directed **portrait crops** used below `lg` — a 2.34:1 frame
- *    squeezed into portrait loses its subject. docs/asset-inventory.md §4.
- *  - `alt` text for every photograph, still outstanding (§9), which is why
- *    each is `TODO_CONTENT` rather than closed off with `alt=""`.
+ * Still outstanding, and each renders through `<MediaFrame>`'s pending state
+ * until it lands (docs/asset-inventory.md §9):
+ *
+ *  - the four art-directed **portrait crops** for below `lg`. Until they
+ *    arrive the landscape master stands in — see the note in hero-backdrop.tsx.
+ *  - `alt` text for every photograph
  */
 export const heroSlides: HeroSlide[] = [
   {
     id: 'solar-modules',
     image: {
-      desktop: heroModules,
+      desktop: heroImage1,
       mobile: heroImageMobile1,
       // Describes the scene, not the brand. docs/design-guidelines.md §6.
       alt: TODO_CONTENT,
     },
     symbol: { image: saelIcon1, pending: 'icons/symbol-cell-manufacturing' },
     headline: 'A leading manufacturer for Bifacial TOPCon solar modules',
-    placement: {
-      iconX: 12,
-      iconY: 70,
-      textX: 64,
-      textY: 43,
-      textWidthClassName: 'lg:w-(--hero-text-w)',
-    },
+    highlight: 'Bifacial TOPCon solar modules',
+    highlightClassName: 'bg-(image:--gradient-hero-word-1)',
   },
   {
     id: 'energy-generation',
-    // No `objectClassName` here or anywhere else now. This slide used to pull
-    // its crop right, to move a centred subject out from under the headline;
-    // HERO-SPEC.md §0 supersedes that — the crop is baked into the supplied
-    // file, and §2 is explicit that all four are `object-position: center`.
     image: {
-      desktop: heroGeneration,
+      desktop: heroImage2,
       mobile: heroImageMobile2,
       alt: TODO_CONTENT,
+      // The one slide whose subject stands in the middle of the frame, which
+      // above `lg` is directly under the headline. Aligning the crop's right
+      // edge with the frame moves them clear to the left. The design file
+      // marks this same photograph, and only this one, the same way.
+      objectClassName: 'lg:object-right',
     },
     symbol: { image: saelIcon2, pending: 'icons/symbol-module-manufacturing' },
     headline: 'Generating clean energy by investing in advanced technology and systems',
-    placement: {
-      iconX: 88,
-      iconY: 70,
-      textX: 8,
-      textY: 48,
-      textWidthClassName: 'lg:w-(--hero-text-w)',
-    },
+    highlight: 'clean energy',
+    highlightClassName: 'bg-(image:--gradient-hero-word-2)',
   },
   {
     id: 'clean-energy-vision',
-    image: { desktop: heroVision, mobile: heroImageMobile3, alt: TODO_CONTENT },
+    image: { desktop: heroImage3, mobile: heroImageMobile3, alt: TODO_CONTENT },
     symbol: { image: saelIcon3, pending: 'icons/symbol-solar-generation' },
-    // U+2019 in "India’s", per HERO-SPEC.md §2. Not an ASCII apostrophe.
     headline: 'A vision to building the capacity for India’s clean energy needs',
-    placement: {
-      iconX: 11,
-      iconY: 70,
-      textX: 58,
-      textY: 46,
-      textWidthClassName: 'lg:w-(--hero-text-w)',
-    },
+    highlight: 'clean energy',
+    highlightClassName: 'bg-(image:--gradient-hero-word-3)',
   },
   {
     id: 'agri-waste',
-    image: { desktop: heroAgri, mobile: heroImageMobile4, alt: TODO_CONTENT },
+    image: { desktop: heroImage4, mobile: heroImageMobile4, alt: TODO_CONTENT },
     symbol: { image: saelIcon4, pending: 'icons/symbol-agri-waste' },
     headline: 'Converting ~2 million tonnes of paddy waste into clean energy',
-    // The one slide with its own textW — 30vw against the other three's 31.
-    placement: {
-      iconX: 43,
-      iconY: 60,
-      textX: 58,
-      textY: 49,
-      textWidthClassName: 'lg:w-(--hero-text-w-narrow)',
-    },
+    highlight: 'clean energy',
+    highlightClassName: 'bg-(image:--gradient-hero-word-4)',
   },
 ];
 

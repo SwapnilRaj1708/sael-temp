@@ -1,76 +1,67 @@
 import type { StaticImageData } from 'next/image';
 
-/**
- * Where a slide's mark and headline sit in the frame, from HERO-SPEC.md §2.
- *
- * **Percentages of the hero box, and they mark the element's centre** — every
- * positioned element is `translate(-50%, -50%)`-centred, with one exception
- * the spec is explicit about: the headline is centred *vertically only*, and
- * `textX` is its **left edge**.
- *
- * Numbers rather than strings, for two reasons. The component appends the `%`,
- * so a slide cannot supply a unit the CSS does not expect; and `textX` is read
- * as a number to pick the scrim's direction — §3c flips the gradient to
- * darken whichever side the headline sits on, so storing the angle beside the
- * position would be storing the same fact twice.
- */
-export interface HeroPlacement {
-  /** Centre of the mark. */
-  iconX: number;
-  iconY: number;
-  /** The headline's **left edge**, and its vertical **centre**. */
-  textX: number;
-  textY: number;
-  /**
-   * Tailwind width utility for the headline column at `lg` — §2's `textW`,
-   * which is `31vw` on three slides and `30vw` on the fourth.
-   *
-   * A class naming a token rather than the value itself: a bare `vw` anywhere
-   * under `src/` outside `theme.css` fails `pnpm verify:guardrails`, and the
-   * rule is right — see `--hero-text-w` and `--hero-text-w-narrow`.
-   */
-  textWidthClassName: string;
-}
-
 export interface HeroSlide {
   /** Stable across renders — keys the word animation, so it must not be the
    *  array index. docs/content-model.md §2. */
   id: string;
   image: {
-    /**
-     * The landscape master, used at `lg` and above.
-     *
-     * **Pre-cropped to 2.34:1, and the crop is in the file.** HERO-SPEC.md §0:
-     * the designer build's four JPGs are cut to the frame, so the code shows
-     * them with `object-fit: cover; object-position: center` and nothing else.
-     * If a photograph looks off-centre the wrong file is loaded — do not
-     * reach for `object-position` to correct it.
-     */
+    /** Landscape master, used at `lg` and above. */
     desktop: StaticImageData | null;
     /**
      * Art-directed portrait crop, used below `lg`. **Not** the landscape image
      * re-cropped with `object-position` — scaling a 2.34:1 frame into 4:5
      * crops the subject out. docs/asset-inventory.md §4.
-     *
-     * Outside HERO-SPEC.md, which specifies the 1920 desktop composition and
-     * is silent below it. See the note in hero-carousel/index.tsx.
      */
     mobile: StaticImageData | null;
     /** Describes the scene, not the brand. docs/design-guidelines.md §6. */
     alt: string;
+    /**
+     * Tailwind `object-position` class for the landscape crop, e.g.
+     * `lg:object-right`. Absent means centred, which is what three of the four
+     * want.
+     *
+     * It reads backwards and it is not: aligning the image's *right* edge with
+     * the frame shows the right part of the photograph, which moves a centred
+     * subject to the *left* of the frame. That is the whole reason this
+     * exists — above `lg` the headline occupies the right-hand half, and a
+     * subject sitting under it has to move out from under it.
+     *
+     * A class rather than a raw value so it stays in the token layer, and
+     * scoped to `lg:` by the caller because the portrait crop below that
+     * breakpoint is art-directed and needs no shifting.
+     */
+    objectClassName?: string;
   };
   /**
-   * The slide's mark, set loose in the frame at `placement.iconX/iconY`.
+   * The slide's mark, stacked above the headline.
    *
    * Decorative at every size — the headline carries the meaning — so it is
-   * always `alt=""`.
+   * always `alt=""`. In the earlier design this floated free in the frame as
+   * a watermark, positioned per slide; `SAEL Home v2` sets it in the content
+   * column instead, which is why the six placement coordinates that used to
+   * live on this interface are gone.
    */
   symbol: {
     image: StaticImageData | null;
     /** Name in docs/asset-inventory.md, for the pending-asset placeholder. */
     pending: string;
   };
-  /** Verbatim from HERO-SPEC.md §2, typographic apostrophes included. */
   headline: string;
-  placement: HeroPlacement;
+  /**
+   * The run of words inside `headline` that takes the gradient fill, as an
+   * exact substring of it — "Bifacial TOPCon solar modules", say.
+   *
+   * A substring rather than a pre-split headline because the headline is also
+   * the slide's accessible name and the label on its progress segment, and
+   * those want it whole. If the substring is not found the headline simply
+   * renders flat, which is the right failure: a typo here costs a highlight,
+   * not a headline.
+   */
+  highlight?: string;
+  /**
+   * Tailwind background-image class for the highlight's ramp, e.g.
+   * `bg-(image:--gradient-hero-word-1)`. A class rather than a raw gradient so
+   * it stays in the token layer — /CLAUDE.md §2.
+   */
+  highlightClassName?: string;
 }

@@ -20,18 +20,12 @@
 export const SIZES_FULL_BLEED = '100vw';
 
 /**
- * The hero's mark, set loose in the frame at its own per-slide coordinates.
- * HERO-SPEC.md §2 gives one size for all four slides and §3d applies it as the
- * mark's width, so the `sizes` hint is those same figures — kept in step with
- * `--spacing-hero-icon` and `--spacing-hero-icon-lg`, the second of which is
- * 30% smaller from `lg`, at the client's call (2026-08-27). `64rem` is the `lg`
- * breakpoint; the two must move together.
- *
- * This module is the one place outside `theme.css` allowed a bare `vw`: a
- * `sizes` attribute is a list of media conditions and a viewport unit is the
- * only way to write one. See the note in scripts/verify-guardrails.mjs.
+ * The hero's mark, which in `SAEL Home v2` sits in the content column rather
+ * than floating in the frame as a watermark. `--spacing-hero-icon` sets its
+ * height, 74 → 176px, and the marks are close to square, so the largest it is
+ * ever drawn is 176px. Kept in step with that token.
  */
-export const SIZES_HERO_SYMBOL = '(min-width: 64rem) 12.95vw, 18.5vw';
+export const SIZES_HERO_SYMBOL = '176px';
 
 /**
  * The About SAEL photograph — the layer masked into the chamfered shape. Half

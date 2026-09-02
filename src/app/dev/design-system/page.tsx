@@ -94,7 +94,7 @@ const GRADIENTS = [
 ] as const;
 
 const TYPE_SCALE = [
-  ['text-hero', 'text-hero', '32 → 58'],
+  ['text-hero', 'text-hero', '28 → 58'],
   ['text-h2', 'text-h2', '24 → 36'],
   ['text-h3', 'text-h3', '16 → 22'],
   ['text-stat', 'text-stat', '28 → 40'],

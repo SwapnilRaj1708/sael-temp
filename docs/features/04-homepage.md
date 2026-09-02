@@ -114,11 +114,6 @@ does not name at all.)
 
 ---
 
-> **Superseded for the hero by `docs/HERO-SPEC.md` (2026-08-27).** Where §1 below and the
-> spec disagree on the hero's frame, placement, dots or headline treatment, the spec wins —
-> it is the approved designer build, and its numbers are final. §1 is kept for the copy,
-> the slide order and the asset names, which the spec does not restate.
-
 ## 1. `<HeroCarousel>` — `sections/hero-carousel/`
 
 Client component (interaction + timers). The single most complex piece on the page.
