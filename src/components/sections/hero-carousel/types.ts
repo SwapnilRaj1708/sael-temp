@@ -17,8 +17,12 @@ export interface HeroSlide {
     alt: string;
     /**
      * Tailwind `object-position` class for the landscape crop, e.g.
-     * `lg:object-right`. Absent means centred, which is what three of the four
-     * want.
+     * `lg:object-right`. Absent means centred.
+     *
+     * **No slide sets it as of 2026-09-03.** Slide 2 was the one that did, and
+     * the shifted crop was dropped after review. The prop stays because the
+     * problem it solves is a property of the artwork rather than of that one
+     * photograph — the next hero image with a centred subject needs it again.
      *
      * It reads backwards and it is not: aligning the image's *right* edge with
      * the frame shows the right part of the photograph, which moves a centred

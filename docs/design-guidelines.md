@@ -804,7 +804,7 @@ The three §5 standards plus the additions PR 2528 needed:
 | `--duration-card` | 280ms | Card hovers |
 | `--duration-reveal` | 550ms | Scroll reveals |
 | `--duration-reveal-step` | 90ms | Stagger between reveal steps |
-| `--duration-underline` | 720ms | Eyebrow rule drawing itself in |
+| `--duration-underline` | 720ms | A rule drawing itself in: the section eyebrow's, and the footer accordion head's (**2026-09-03**) |
 | `--duration-header` | 300ms | Masthead firming on scroll |
 | `--duration-mega` | 450ms | Mega-menu panel |
 | `--duration-mega-step` | 60ms | Stagger between mega-menu columns |
@@ -1148,6 +1148,7 @@ All prototype animations, with their required mobile/reduced-motion behaviour.
 | Hero parallax | `mousemove`-driven translate: image 10px | Hero. *Reduced in PR 2528 to the image only; `--hero-parallax-symbol` and `-text` are deprecated* | **Disable**; also inert on touch (no pointer) |
 | Timeline path draw | `stroke-dashoffset` driven by scroll over a 220vh track | Vision section — *not built* | **Jump to complete state** |
 | `saelKenMedia` / `.anim-ken-burns-media` | `scale(1.16) → scale(1)`, 6s `ease-in-out` **infinite alternate** — a 12s round trip | The masked photograph in **About SAEL and Our Endeavour**. One animation, not one each: the two sections are the same construction, so sharing it is what keeps them from drifting apart. Ambient and endless, unlike the hero's one-shot — neither is tied to a slide that expires. Added **2026-09-01**, shared **2026-09-02** | **Disable** — hold at `scale(1)`. A loop has no end state to rest at, so the still state is the cycle's open framing rather than either extreme |
+| Footer accordion head rule | `scaleX(0→1)` from a left origin, `--duration-underline` `--ease-entrance`, driven by `group-aria-expanded:` on the trigger | The footer's four link columns **below `md` only**, where the headings are accordion triggers. Above `md` the same headings take a static `underline underline-offset-8` and this does not apply. Added **2026-09-03** | **Disable transition** — rule tracks the panel, present when open and absent when closed |
 | `saelSettle` / `.anim-about-settle` | `scale(1.16) translate3d(2.5%, -1.5%, 0) → scale(1.02)`, `--ease-entrance`, gated on `[data-reveal='shown']` | — **declared, no consumer.** A reveal-triggered settle, superseded by the breathing loop above on 2026-09-02. Kept rather than deleted, like the deprecated gradients | **Disable** — hold at `scale(1.02)` |
 
 ### Added in PR 2528

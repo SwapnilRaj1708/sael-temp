@@ -726,14 +726,22 @@
   --spacing-rule-accent: 0.125rem; /* 2 */
   --spacing-rule-h: 0.1875rem; /* 3 */
 
-  /* One screenful below the fixed header — the height of a snapping section
-   * on the homepage. `dvh`, never `vh`: mobile browser chrome collapses as you
-   * scroll, and `100vh` overflows by the height of the address bar for the
-   * whole first screen. docs/responsive-strategy.md §3.
+  /* The height of a snapping section on the homepage, in its two forms.
+   * `dvh`, never `vh`: mobile browser chrome collapses as you scroll, and
+   * `100vh` overflows by the height of the address bar for the whole first
+   * screen. docs/responsive-strategy.md §3.
    *
-   * Derived from --spacing-header rather than restating 68px, so the two
-   * cannot drift. Consumed as `min-h-viewport`. */
-  --spacing-viewport: calc(100dvh - var(--spacing-header));
+   * **Which of the two applies is a question about the header, not about the
+   * section.** From `lg` up the bar *offsets* the page — <main> is padded by
+   * its height and a section gets what is left. Below `lg` the bar *overlays*
+   * the page and slides away as you scroll down, so a section gets the whole
+   * screen. globals.css does the swap; see the block comment there.
+   *
+   * The offset form is derived from --spacing-header rather than restating
+   * 68px, so the two cannot drift. Consumed as `min-h-viewport`. */
+  --spacing-viewport-offset: calc(100dvh - var(--spacing-header));
+  --spacing-viewport-full: 100dvh;
+  --spacing-viewport: var(--spacing-viewport-offset);
 
   /* Header height: a flat 68px, the `SAEL Home v2` bar's own height.
    *

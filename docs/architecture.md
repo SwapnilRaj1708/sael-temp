@@ -259,6 +259,12 @@ const nextConfig: NextConfig = {
 };
 ```
 
+`allowedDevOrigins` also sits in the real file. It is **`next dev` only** — it whitelists the
+LAN address a phone on the same network hits to review a build, and Next ignores it in
+`next build`. It is deliberately not in the snippet above: nothing in the deployed artefact
+reads it, so it is not a hardcoded hostname in the sense /CLAUDE.md §7 forbids. Change it to
+your own machine's address rather than assuming the committed one is yours.
+
 ---
 
 ## 7. Backend integration boundary

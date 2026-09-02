@@ -1,6 +1,12 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // `next dev` only — the LAN address a phone on the same network uses to
+  // reach the dev server, which Next otherwise refuses as a cross-origin
+  // request. `next build` ignores it, so nothing in the standalone artefact
+  // reads it and /CLAUDE.md §7's "no hardcoded hostnames" is not in play.
+  // It is one machine's address: change it, do not assume it is yours.
+  allowedDevOrigins: ['192.168.0.156'],
   // Standalone output is the deployment artefact: `.next/standalone/server.js`
   // runs under PM2 behind Nginx. See docs/architecture.md §8 and /CLAUDE.md §7,
   // which requires it. It stays the default, so `pnpm build && pnpm package`

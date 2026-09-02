@@ -75,12 +75,27 @@ export function FooterLinks() {
               value={group.title}
               headingAs="h2"
               title={
-                <span key={group.title} className="text-label underline underline-offset-8">
+                <span key={group.title} className="text-label">
                   {group.title}
+                  {/* The rule draws itself in from the left as the panel opens
+                      and retracts the same way as it closes — the eyebrow's
+                      own gesture, off the trigger's `aria-expanded` rather
+                      than any state of its own. Decorative, so aria-hidden.
+                      `w-full` is the label's width: the span is a flex item,
+                      so it is only as wide as its text. */}
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'mt-2 block h-px w-full origin-left scale-x-0 bg-current',
+                      'transition-transform duration-(--duration-underline) ease-(--ease-entrance)',
+                      'group-aria-expanded:scale-x-100',
+                      'motion-reduce:transition-none',
+                    )}
+                  />
                 </span>
               }
               className="border-hairline-dark"
-              triggerClassName="text-white hover:text-body-on-dark"
+              triggerClassName="group text-white hover:text-body-on-dark"
             >
               <ul className="flex list-none flex-col">
                 {group.links.map((link) => (

@@ -3,6 +3,7 @@
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { createPortal } from 'react-dom';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SOCIAL_ICONS } from '@/components/icons/social';
 import { isNavItemActive, NAV_ITEMS } from '@/components/layout/header/nav-config';
@@ -24,6 +25,16 @@ import { cn } from '@/lib/utils/cn';
  * behind is photography and dense type, and reading a nav through it is
  * unpleasant. It unmounts when closed, so nothing inside can hold focus while
  * invisible.
+ *
+ * **The panel portals to `<body>`.** It used to render in place, inside
+ * `<header>`, which worked only because nothing on the header carried a
+ * transform: a `transform` or `translate` other than `none` makes an element
+ * a containing block for `position: fixed` descendants, and `fixed inset-0`
+ * would then resolve against the 68px bar instead of the viewport — the panel
+ * would be a sliver across the top. The bar now translates below `lg` to slide
+ * itself out of the way on scroll (see header-shell.tsx), so the drawer is
+ * moved out of its subtree rather than left depending on the bar never moving.
+ * It is the same trap header.tsx describes for `backdrop-filter`.
  *
  * Accessibility here is not negotiable — focus trapped while open, `Esc`
  * closes, focus returns to the hamburger, `aria-expanded` on the trigger,
@@ -127,133 +138,139 @@ export function MobileNav() {
         <Menu className="size-6" aria-hidden="true" focusable="false" />
       </button>
 
-      {open && (
-        <div
-          ref={panelRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Main navigation"
-          className={cn(
-            // Sits above the header's z-100. The header applies its
-            // backdrop-filter to an inner layer rather than to itself,
-            // precisely so this `fixed` panel still resolves against the
-            // viewport — see header.tsx.
-            'fixed inset-0 z-(--z-drawer) flex flex-col overflow-y-auto bg-surface',
-            'pb-section-y',
-            // The slide is decoration on an already-open panel, so under
-            // reduced motion it simply appears. See styles/animations.css.
-            'anim-drawer-in',
-          )}
-        >
-          {/* The gutter comes from Container, never from this component —
+      {open &&
+        createPortal(
+          <div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Main navigation"
+            className={cn(
+              // Sits above the header's z-100.
+              'fixed inset-0 z-(--z-drawer) flex flex-col overflow-y-auto bg-surface',
+              // The trigger's `lg:hidden` wrapper is no longer an ancestor, so
+              // the panel carries the breakpoint itself. Without it, opening the
+              // drawer and then widening the window past `lg` would leave it
+              // covering the desktop layout.
+              'lg:hidden',
+              'pb-section-y',
+              // The slide is decoration on an already-open panel, so under
+              // reduced motion it simply appears. See styles/animations.css.
+              'anim-drawer-in',
+            )}
+          >
+            {/* The gutter comes from Container, never from this component —
               the drawer's left edge has to line up with the page behind it. */}
-          <Container className="flex flex-1 flex-col">
-            <div className="flex h-header shrink-0 items-center justify-end">
-              <button
-                type="button"
-                ref={closeRef}
-                onClick={() => {
-                  close();
-                  triggerRef.current?.focus();
-                }}
-                aria-label="Close main navigation"
-                className="-mr-2 inline-flex size-touch cursor-pointer items-center justify-center text-nav-link"
-              >
-                <X className="size-6" aria-hidden="true" focusable="false" />
-              </button>
-            </div>
+            <Container className="flex flex-1 flex-col">
+              <div className="flex h-header shrink-0 items-center justify-end">
+                <button
+                  type="button"
+                  ref={closeRef}
+                  onClick={() => {
+                    close();
+                    triggerRef.current?.focus();
+                  }}
+                  aria-label="Close main navigation"
+                  className="-mr-2 inline-flex size-touch cursor-pointer items-center justify-center text-nav-link"
+                >
+                  <X className="size-6" aria-hidden="true" focusable="false" />
+                </button>
+              </div>
 
-            <nav aria-label="Main" className="flex-1">
-              <Accordion>
-                {NAV_ITEMS.map((item) => {
-                  const active = isNavItemActive(item, pathname);
-                  const children = item.children ?? [];
+              <nav aria-label="Main" className="flex-1">
+                <Accordion>
+                  {NAV_ITEMS.map((item) => {
+                    const active = isNavItemActive(item, pathname);
+                    const children = item.children ?? [];
 
-                  if (children.length === 0 && item.href !== undefined) {
+                    if (children.length === 0 && item.href !== undefined) {
+                      return (
+                        <div key={item.label} className="border-b border-border">
+                          <Link
+                            href={item.href}
+                            aria-current={active ? 'page' : undefined}
+                            className={cn(
+                              'flex min-h-touch items-center py-4 text-h3',
+                              active ? 'text-accent-hover' : 'text-ink',
+                            )}
+                          >
+                            {item.label}
+                          </Link>
+                        </div>
+                      );
+                    }
+
                     return (
-                      <div key={item.label} className="border-b border-border">
-                        <Link
-                          href={item.href}
-                          aria-current={active ? 'page' : undefined}
-                          className={cn(
-                            'flex min-h-touch items-center py-4 text-h3',
-                            active ? 'text-accent-hover' : 'text-ink',
+                      <AccordionItem
+                        key={item.label}
+                        value={item.label}
+                        headingAs="none"
+                        title={
+                          <span className={cn(active && 'text-accent-hover')}>{item.label}</span>
+                        }
+                      >
+                        <ul className="flex list-none flex-col">
+                          {children.map((child) =>
+                            child.href === undefined ? null : (
+                              <li key={child.href}>
+                                <Link
+                                  href={child.href}
+                                  aria-current={
+                                    isNavItemActive(child, pathname) ? 'page' : undefined
+                                  }
+                                  className={cn(
+                                    'flex min-h-touch items-center py-2 pl-4 text-body text-body-base',
+                                    'hover:text-accent-hover',
+                                  )}
+                                >
+                                  {child.label}
+                                </Link>
+                              </li>
+                            ),
                           )}
-                        >
-                          {item.label}
-                        </Link>
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <AccordionItem
-                      key={item.label}
-                      value={item.label}
-                      headingAs="none"
-                      title={
-                        <span className={cn(active && 'text-accent-hover')}>{item.label}</span>
-                      }
-                    >
-                      <ul className="flex list-none flex-col">
-                        {children.map((child) =>
-                          child.href === undefined ? null : (
-                            <li key={child.href}>
-                              <Link
-                                href={child.href}
-                                aria-current={isNavItemActive(child, pathname) ? 'page' : undefined}
-                                className={cn(
-                                  'flex min-h-touch items-center py-2 pl-4 text-body text-body-base',
-                                  'hover:text-accent-hover',
-                                )}
-                              >
-                                {child.label}
-                              </Link>
-                            </li>
-                          ),
-                        )}
-                      </ul>
-                    </AccordionItem>
-                  );
-                })}
-              </Accordion>
-            </nav>
-
-            <div className="mt-flow flex flex-col gap-flow">
-              <Button href="/contact-us/" fullWidth>
-                Contact Us
-              </Button>
-
-              {/* Renders nothing until the client supplies the profile URLs —
-                see lib/content/static/footer.ts. */}
-              {SOCIAL_LINKS.length > 0 && (
-                <ul className="flex list-none items-center justify-center gap-4">
-                  {SOCIAL_LINKS.map((social) => {
-                    const Icon = SOCIAL_ICONS[social.platform];
-                    return (
-                      <li key={social.platform}>
-                        <a
-                          href={social.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={cn(
-                            'rounded-pill bg-surface-alt text-footer-icon',
-                            'inline-flex size-touch items-center justify-center',
-                            'transition-colors duration-(--duration-micro) hover:text-accent-hover',
-                          )}
-                        >
-                          <Icon className="size-5" />
-                          <span className="sr-only">{social.label} — opens in a new tab</span>
-                        </a>
-                      </li>
+                        </ul>
+                      </AccordionItem>
                     );
                   })}
-                </ul>
-              )}
-            </div>
-          </Container>
-        </div>
-      )}
+                </Accordion>
+              </nav>
+
+              <div className="mt-flow flex flex-col gap-flow">
+                <Button href="/contact-us/" fullWidth>
+                  Contact Us
+                </Button>
+
+                {/* Renders nothing until the client supplies the profile URLs —
+                see lib/content/static/footer.ts. */}
+                {SOCIAL_LINKS.length > 0 && (
+                  <ul className="flex list-none items-center justify-center gap-4">
+                    {SOCIAL_LINKS.map((social) => {
+                      const Icon = SOCIAL_ICONS[social.platform];
+                      return (
+                        <li key={social.platform}>
+                          <a
+                            href={social.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={cn(
+                              'rounded-pill bg-surface-alt text-footer-icon',
+                              'inline-flex size-touch items-center justify-center',
+                              'transition-colors duration-(--duration-micro) hover:text-accent-hover',
+                            )}
+                          >
+                            <Icon className="size-5" />
+                            <span className="sr-only">{social.label} — opens in a new tab</span>
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            </Container>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

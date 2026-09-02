@@ -64,11 +64,55 @@ Per `design-guidelines.md` §4:
 
 ### Scroll behaviour
 
-The header is fixed at all times. On scroll past ~80px, increase the background opacity slightly and the shadow — subtle, 200ms. Do **not** hide-on-scroll-down; corporate sites with deep IA benefit from a persistently reachable nav.
+The header is fixed at all times. On scroll past ~80px, increase the background opacity slightly and the shadow — subtle, 200ms.
+
+> **Above `lg` the bar never hides.** Corporate sites with deep IA benefit from a
+> persistently reachable nav, and that has not changed.
+
+**Below `lg` it does hide, at the client's request on 2026-09-03**, reversing the
+blanket "do not hide-on-scroll-down" this section used to carry. A phone has a
+screenful to spare and 68px of it is a lot to give a bar you are not using.
+
+- Scrolling **down** slides the whole bar up and off; it stays off when the scroll
+  stops. Scrolling **up** slides it back. `--duration-header`, `--ease-entrance`,
+  `transition: none` under `prefers-reduced-motion: reduce`.
+- The bar is never hidden while its own height is still on screen, so a short page
+  can never strand the navigation off-screen and there is always a way back.
+- One passive, rAF-throttled scroll listener drives this *and* the glass —
+  `header-shell.tsx`. The breakpoint is CSS's (`lg:translate-none`), not JS's, so
+  `--breakpoint-lg` is not restated in a media-query string.
+- `lg:translate-none` and not `lg:translate-y-0`: a `translate` other than `none`
+  makes the element a containing block for `position: fixed` descendants, and the
+  desktop mega menu is `fixed inset-0` inside the bar. It is the same trap
+  `backdrop-filter` sets. For the same reason the mobile drawer now portals to
+  `<body>` rather than rendering inside `<header>`.
 
 ### Layout offset
 
 The prototype uses `margin-top: 84px` on the hero. Do not do this — it breaks for every non-hero page. Instead: a spacer element or `padding-top` on `<main>` equal to the header height token, plus `scroll-padding-top` on `html` so anchor links (the SDG deep links) do not land under the header.
+
+**On a snapping page below `lg`, that offset is given back** — the bar overlays the
+page instead. It has to be: a bar that hides must leave nothing behind it, or the
+section it uncovers appears not to have reached the top of the screen.
+
+The geometry is static rather than animated in step with the bar. Moving the offset
+during a scroll is a re-layout, and under `scroll-snap-type: mandatory` a re-layout
+moves every snap position while the user's finger is still down. So a section always
+starts at the viewport top and is always a whole screen tall, and the bar slides over
+it — which means scrolling **up** re-reveals the bar across the top of the current
+section. That crop is accepted: you scroll down to read, and up to navigate.
+
+Three declarations, scoped to `html:has([data-snap-sections])` so no other page is
+touched and the SDG deep links keep their `scroll-padding-top`:
+
+| Where | Above `lg` | Below `lg` |
+|---|---|---|
+| `scroll-padding-top` on `html` | `--spacing-header` | `0` |
+| `--spacing-viewport` (`min-h-viewport`) | `--spacing-viewport-offset` | `--spacing-viewport-full` |
+| `<main>`'s `pt-header` | kept | cancelled by `-mt-header` on the page's snap wrapper |
+
+The third is a utility on the page and not a rule in `globals.css` because
+`@layer base` cannot outrank a utility whatever its specificity.
 
 ---
 
@@ -106,6 +150,7 @@ Notes:
 - The year is computed at render, not hardcoded.
 - The email on the live site is Cloudflare-obfuscated. Use a plain `mailto:` — obfuscation is theatre and it breaks accessibility.
 - Below `md` the link groups become accordions and the top row stacks and centres. See `responsive-strategy.md`.
+- **Column headings are underlined, and the two breakpoints underline them differently.** Above `md` the heading is static and takes a plain `underline underline-offset-8`. Below `md` the same heading is an accordion trigger, and a static underline there reads as a link on something that is a disclosure — so it becomes a rule that draws itself in from the left as the panel opens and retracts as it closes, on `--duration-underline`. It is CSS off the trigger's own `aria-expanded` via `group-aria-expanded:`, so `<Accordion>` needs no state of its own. Client's ask, 2026-09-03; contract in `design-guidelines.md` §5.
 - `<nav aria-label="Footer">` around the link grid.
 
 ---

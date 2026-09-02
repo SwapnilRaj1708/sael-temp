@@ -95,11 +95,6 @@ export const heroSlides: HeroSlide[] = [
       desktop: heroImage2,
       mobile: heroImageMobile2,
       alt: TODO_CONTENT,
-      // The one slide whose subject stands in the middle of the frame, which
-      // above `lg` is directly under the headline. Aligning the crop's right
-      // edge with the frame moves them clear to the left. The design file
-      // marks this same photograph, and only this one, the same way.
-      objectClassName: 'lg:object-right',
     },
     symbol: { image: saelIcon2, pending: 'icons/symbol-module-manufacturing' },
     headline: 'Generating clean energy by investing in advanced technology and systems',

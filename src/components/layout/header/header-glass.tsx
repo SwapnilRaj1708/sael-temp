@@ -1,14 +1,11 @@
-'use client';
-
-import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils/cn';
 
 /**
- * The header's background layer, and the only reason any of it is client code.
+ * The header's background layer.
  *
  * As soon as the page leaves the top the bar firms up — a more opaque veil and
  * a heavier hairline — so it stays legible over photography. That is the whole
- * of this component's state.
+ * of this component.
  *
  * **The outer bar is `SAEL Home v2`'s, turned over into the light.** Its `#hdr`
  * rule is copied structurally rather than literally, because the design draws
@@ -24,48 +21,21 @@ import { cn } from '@/lib/utils/cn';
  * separates itself with the hairline and the opacity step alone. `shadow-header`
  * went with it; it had no other consumer.
  *
- * It is deliberately its own file: `<Header>` stays a Server Component, and
- * the client bundle gains one boolean and a scroll listener rather than the
- * whole masthead.
- *
- * The listener is passive and does nothing but request a frame, so it can
- * never delay scrolling, and it re-renders at most once per frame — and in
- * practice only twice per page, since the state is a threshold rather than a
- * position.
+ * **The scroll listener used to live here.** It moved to `<HeaderShell>` when
+ * the bar gained its mobile auto-hide, because that reads the same
+ * `window.scrollY` this did and one listener is enough for both. This is now
+ * presentational: it renders what it is told.
  *
  * `backdrop-filter` lives here rather than on `<header>` on purpose. See the
  * note in header.tsx: on the header it would become the containing block for
- * the mobile drawer's `position: fixed`.
+ * the desktop mega menu's `position: fixed`.
  */
+export interface HeaderGlassProps {
+  /** `true` once the page has left the top — see `<HeaderShell>`. */
+  scrolled: boolean;
+}
 
-/** `SAEL Home v2`'s own `scrollY > 8` — the bar reacts to leaving the top, not
- *  to having scrolled a distance. */
-const THRESHOLD_PX = 8;
-
-export function HeaderGlass() {
-  const [scrolled, setScrolled] = useState(false);
-  const frame = useRef<number | null>(null);
-
-  useEffect(() => {
-    const measure = () => {
-      frame.current = null;
-      setScrolled(window.scrollY > THRESHOLD_PX);
-    };
-
-    const onScroll = () => {
-      frame.current ??= window.requestAnimationFrame(measure);
-    };
-
-    // Deep-linking into a page starts it mid-scroll, so measure once up front.
-    measure();
-    window.addEventListener('scroll', onScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (frame.current !== null) window.cancelAnimationFrame(frame.current);
-    };
-  }, []);
-
+export function HeaderGlass({ scrolled }: HeaderGlassProps) {
   return (
     <div
       aria-hidden="true"

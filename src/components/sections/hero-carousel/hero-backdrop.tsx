@@ -90,8 +90,9 @@ export function HeroBackdrop({ slide, isActive, position }: HeroBackdropProps) {
           priority={position === 1}
           pending={`hero/${slide.id}`}
           className="absolute inset-0 hidden lg:block"
-          // `objectClassName` shifts the crop on the one slide whose subject
-          // would otherwise sit under the headline. See the note on the type.
+          // `objectClassName` shifts the crop on a slide whose subject would
+          // otherwise sit under the headline. No slide sets it at present; see
+          // the note on the type for why it stays.
           imageClassName={cn(isActive && 'anim-ken-burns', image.objectClassName)}
         />
       </div>

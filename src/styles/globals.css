@@ -188,6 +188,56 @@
   html:has([data-snap-sections]) footer[data-snap-section] {
     scroll-snap-align: start;
   }
+
+  /*
+   * Below `lg` the masthead *overlays* the page instead of offsetting it.
+   *
+   * The bar auto-hides on a downward scroll on mobile — see header-shell.tsx —
+   * and a bar that hides has to leave nothing behind it. If a section still
+   * began 68px down, hiding the bar would swap it for 68px of empty page and
+   * the section would read as never having reached the top of the screen.
+   *
+   * The fix is *not* to animate that offset in step with the bar. That is a
+   * re-layout in the middle of a scroll, and under `scroll-snap-type:
+   * mandatory` a re-layout moves every snap position while the user's finger
+   * is still on the glass. The geometry is instead static and header-less: a
+   * section always starts at the viewport top and is always a whole screen
+   * tall, and the bar slides across it. Nothing reflows, ever.
+   *
+   * So scrolling down leaves a full-viewport section, and scrolling up brings
+   * the bar back over the top of it. That crop is the client's 2026-09-03
+   * decision and the trade it names: you scroll *down* to read, and *up* to
+   * navigate.
+   *
+   * Three declarations, one decision:
+   *
+   *   - `scroll-padding-top: 0` — a `snap-start` section aligns its own top
+   *     with the viewport top rather than with the bar's underside.
+   *   - `--spacing-viewport` becomes the whole screen, so `min-h-viewport`
+   *     stops reserving the bar's height. Without it every section would sit
+   *     at the top and leave a 68px sliver of the next one at the bottom.
+   *   - the third is <main>'s `pt-header`, cancelled by `-mt-header` on the
+   *     page's own snap wrapper. It lives in page.tsx and not here because
+   *     `@layer base` cannot outrank a utility whatever its specificity — see
+   *     the warning at the top of this file.
+   *
+   * All of it is scoped to a page that opts into snapping. Everywhere else the
+   * bar still offsets, so an anchor landing on a non-snapping page keeps its
+   * `scroll-padding-top` — which is what stops the SDG deep links putting
+   * their target underneath the bar.
+   */
+  html:has([data-snap-sections]) {
+    scroll-padding-top: 0;
+    --spacing-viewport: var(--spacing-viewport-full);
+  }
+
+  /* From `lg` the bar never hides, so it goes back to offsetting the page. */
+  @media (width >= theme(--breakpoint-lg)) {
+    html:has([data-snap-sections]) {
+      scroll-padding-top: var(--spacing-header);
+      --spacing-viewport: var(--spacing-viewport-offset);
+    }
+  }
 }
 
 /* ---------------------------------------------------------------------------

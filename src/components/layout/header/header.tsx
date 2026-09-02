@@ -1,6 +1,6 @@
 import { DesktopNav } from '@/components/layout/header/desktop-nav';
 import { HeaderCta } from '@/components/layout/header/header-cta';
-import { HeaderGlass } from '@/components/layout/header/header-glass';
+import { HeaderShell } from '@/components/layout/header/header-shell';
 import { Logo } from '@/components/layout/header/logo';
 import { MobileNav } from '@/components/layout/header/mobile-nav';
 import { Container } from '@/components/ui/container';
@@ -11,23 +11,33 @@ import { Container } from '@/components/ui/container';
  * sets `scroll-padding-top`. It stepped up to 84px at `lg` until 2026-08-25;
  * the design draws one height, so there is one value.
  *
- * A Server Component. Only the two nav components are client, and only because
- * they need `usePathname()` and interaction state.
+ * A Server Component. `<HeaderShell>` owns the `<header>` element and the two
+ * scroll-driven states — the glass, and the mobile auto-hide — but everything
+ * below is passed to it as server-rendered children; only the two nav
+ * components are client, and only because they need `usePathname()` and
+ * interaction state.
+ *
+ * **Below `lg` the bar overlays the page rather than offsetting it, and slides
+ * away as you scroll down.** That is one decision in three places: the slide
+ * itself in header-shell.tsx, the geometry it needs — sections starting at the
+ * viewport top rather than under the bar — in globals.css and on the homepage's
+ * snap wrapper. See the block comment in globals.css.
  *
  * **The glass is painted on an inner layer, not on `<header>` itself, and that
  * is load-bearing.** `backdrop-filter` makes an element a containing block for
- * `position: fixed` descendants — so with the filter on the header, the mobile
- * drawer's `fixed inset-0` would resolve against the 64px-tall bar instead of
- * the viewport, and the drawer would render as a sliver across the top. Moving
- * the filter one level down costs a `<div>` and removes the trap entirely.
+ * `position: fixed` descendants — so with the filter on the header, the
+ * desktop mega menu's `fixed inset-0` would resolve against the 68px-tall bar
+ * instead of the viewport, and it would render as a sliver across the top.
+ * Moving the filter one level down costs a `<div>` and removes the trap.
+ *
+ * The auto-hide's `translate` sets the same trap below `lg`, which is why it
+ * is `lg:translate-none` and why the mobile drawer portals to `<body>`.
  *
  * docs/design-guidelines.md §4, docs/features/03-app-shell-header-footer.md §2.
  */
 export function Header() {
   return (
-    <header className="fixed inset-x-0 top-0 z-(--z-header)">
-      <HeaderGlass />
-
+    <HeaderShell>
       <Container>
         {/* Logo, then the nav taking the space between, then the button. The
             nav is `flex-1` so it centres against the bar rather than against
@@ -46,6 +56,6 @@ export function Header() {
           </div>
         </div>
       </Container>
-    </header>
+    </HeaderShell>
   );
 }
