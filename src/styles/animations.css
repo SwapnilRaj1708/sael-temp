@@ -30,6 +30,22 @@
   }
 }
 
+/* A masked photograph, breathing. About SAEL's, and — since 2026-09-02 — Our
+ * Endeavour's: the two sections are the same construction, so they share the
+ * one animation rather than each carrying a copy of it.
+ *
+ * One leg of the cycle: pushed in at `1.16` and easing out to its natural
+ * framing. The rule below runs it `alternate`, so the return leg — the push
+ * back in — is this same travel played backwards rather than a second pair of
+ * keyframes to keep in sync. */
+@keyframes saelKenMedia {
+  from {
+    transform: scale(1.16);
+  }
+  to {
+    transform: scale(1);
+  }
+}
 /* The About SAEL photograph, settling inside its shape as the section arrives.
  * The hero's Ken Burns run the other way round: it starts wide and pushes in
  * over the life of a slide, this one starts pushed in and off to one side and
@@ -176,6 +192,14 @@
     transform: scale(1);
   }
 
+  /* A loop has no end state to rest at, so the still state is the cycle's open
+     framing rather than either extreme — the photograph simply sits at its
+     natural size. Without this the class was silently unstyled under reduced
+     motion; it landed on the same value, but by accident. */
+  .anim-ken-burns-media {
+    transform: scale(1);
+  }
+
   /* The rest state is the animation's *end* state, not `scale(1)`: the 2%
      overscale is what keeps the photograph's edges outside the shape while it
      moves, and a reduced-motion viewer should see the framing the section
@@ -239,6 +263,16 @@
       animation: saelKen 9s ease forwards;
     }
 
+    /* Ambient and endless, unlike the hero's one-shot pan: this photograph is
+       not tied to a slide that expires, so it breathes for as long as the
+       section is on screen. `alternate` is what makes it out-then-back-in off
+       a single pair of keyframes — 6s per leg, so a full round trip is 12s.
+       `ease` at both ends of each leg puts a natural pause at the extremes,
+       which is what stops the turnaround reading as a bounce. */
+    .anim-ken-burns-media {
+      animation: saelKenMedia 6s ease-in-out infinite alternate;
+    }
+
     /* Gated on the `Reveal` ancestor rather than running at mount. About SAEL
        is the second section of the page, so an unconditional animation would
        have finished long before anyone scrolled to it. `data-reveal` is set by
@@ -246,7 +280,7 @@
        viewport, so the settle replays on each pass — which is the behaviour
        the client asked of `Reveal` itself on 2026-08-06. */
     [data-reveal='shown'] .anim-about-settle {
-      animation: saelSettle 2.4s var(--ease-entrance) both;
+      animation: saelSettle 8s var(--ease-entrance) both;
     }
 
     /* `--anim-index` is set per word by the component; `backwards` holds the

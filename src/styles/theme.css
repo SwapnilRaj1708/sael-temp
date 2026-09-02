@@ -836,10 +836,49 @@
    * 16:10 the earlier design drew. */
   --aspect-news-thumb: 5 / 4;
 
-  /* "Our Endeavour". The client supplies this section's artwork as one
-   * pre-composited PNG — chamfered panel, solar-grid gradient and the cut-out
-   * already assembled — so this is simply that file's own ratio. */
+  /* "Our Endeavour" — the artwork box, and the frame the three layers below
+   * are measured in. Still `girl.png`'s ratio: that file was the assembled
+   * composite until 2026-09-02, and stays the reference for the arrangement
+   * now that the layers arrive separately. */
   --aspect-endeavour: 511 / 488;
+
+  /* ---------------------------------------------------------------------
+   * …and its three layers, re-assembled in the browser (2026-09-02).
+   *
+   * The same move About SAEL made a day earlier, and deliberately the same
+   * shape of solution: proportions only, no lengths, no breakpoints. Read
+   * --about-shape-inset-x and --about-cutout-w alongside these; each figure
+   * here answers the one with the matching name there.
+   * ------------------------------------------------------------------ */
+
+  /* The panel's own ratio — `endeavour/mask.svg`'s viewBox, which its path
+   * fills exactly. See --mask-endeavour-panel. */
+  --endeavour-panel-aspect: 498 / 491;
+
+  /* The panel's inset from the left and right of the artwork box. It sits
+   * flush with the foot, so this is also what fixes how far down its top edge
+   * falls — and therefore the room the girl has to stand above it. */
+  --endeavour-panel-inset-x: 4.15%;
+
+  /* The girl, measured **against the panel**. Her foot is the panel's foot, so
+   * `bottom: 0` in the component is the third figure and needs no token. She
+   * is 3% taller than the panel, which is what puts her head over its top
+   * edge, exactly as the boy stands over the About shape's. */
+  --endeavour-figure-x: -0.07%;
+  --endeavour-figure-w: 71%;
+
+  /* Her *content* box — the girl's own ratio, not the file's.
+   *
+   * `endeavour-girl.png` is 1437 x 1150 with the artwork occupying only
+   * x 577–1332, y 48–1149 of it: the export carries ~40% dead transparent
+   * canvas down its left side. The two figures under this one are that
+   * padding, expressed against the content box, and they are the *only*
+   * numbers here that describe the file rather than the design — which is why
+   * they are named for it. Re-export the asset trimmed and these three become
+   * `1437 / 1150`, `0` and `100%`; nothing else moves. */
+  --endeavour-figure-aspect: 756 / 1102;
+  --endeavour-figure-bleed-x: -76.32%;
+  --endeavour-figure-bleed-w: 190.08%;
 
   /* A solutions card's photograph. 4:3 in `SAEL Home v2`, one ratio at every
    * size — the card is now one of four on a rail rather than a single card
@@ -960,6 +999,26 @@
    * always --about-shape-aspect; they would need recomputing if it were not. */
   --gradient-shape: linear-gradient(114.87deg, #3035aa 11.4%, #8a1e42 63.3%, #fb3633 88.6%);
 
+  /* "Our Endeavour"'s panel, and the same transcription job --gradient-shape
+   * describes: `endeavour/mask.svg` declares `gradientUnits="userSpaceOnUse"`
+   * from `(360.159, 0)` to `(130.936, 487.755)` inside a 498 x 491 box — 538.9
+   * units of gradient line where CSS gives itself 656.2 — so the file's
+   * `0.195 / 0.560 / 0.886` land at `24.9% / 55.0% / 81.7%`. Valid only while
+   * the box holds --endeavour-panel-aspect.
+   *
+   * **`ab` on every stop is the file's `fill-opacity="0.67"`**, carried in the
+   * colour rather than as an `opacity` on the element. That 0.67 is the whole
+   * grade: unlike About's, which multiplies, this ramp simply sits over the
+   * photograph and lets a third of the solar grid read through it. Baking it
+   * into the stops is safe because they all carry the same alpha, so the
+   * interpolation is unchanged. */
+  --gradient-endeavour-panel: linear-gradient(
+    205.18deg,
+    #2c1b63ab 24.9%,
+    #8a1e42ab 55%,
+    #f20f18ab 81.7%
+  );
+
   /* `aboutSael/mask.svg`'s silhouette as an alpha mask. The path verbatim; the
    * only change is `fill`, from the file's gradient reference to opaque white,
    * because a mask reads alpha and the ramp is --gradient-shape's job.
@@ -975,12 +1034,30 @@
    * Inline rather than `url(../assets/…)`: a `url()` inside a custom property
    * is an unparsed token stream, so whether the bundler rewrites the path to
    * the emitted asset is not something to bet a silently-empty mask on. */
+  /* Stretch a mask image to its box on both axes.
+   *
+   * `mask-contain` would be equivalent — every box that carries one of these
+   * masks is given the mask's own aspect ratio — but only to within a
+   * rounding error, and `contain` centres what it cannot fill, so the error
+   * shows up as a hairline of unmasked pixels along an edge. Stretching has
+   * nothing to round. A token rather than `mask-size-[100%_100%]`, which is a
+   * magic number by /CLAUDE.md §2.2's third clause and is caught as one. */
+  --mask-fill: 100% 100%;
+
   --mask-about-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 973 620'%3E%3Cpath fill='%23fff' d='M923.89 203.228H651.11C639.251 203.228 627.886 198.426 619.624 189.921L446.957 12.045C439.49 4.33514 429.196 0 418.463 0H49.1099C21.9883 0 0 21.9773 0 49.0853V570.915C0 598.023 21.9883 620 49.1099 620H280.659C291.145 620 301.192 615.857 308.631 608.476L405.122 512.775C412.561 505.395 422.608 501.252 433.094 501.252H923.89C951.012 501.252 973 479.274 973 452.166V252.313C973 225.205 951.012 203.228 923.89 203.228Z'/%3E%3C/svg%3E");
 
-  /* "Our Endeavour" is one supplied image, so the only measurement left is
-   * how wide it sits beside the copy. The panel gradient and the shape mask
-   * that used to be here are gone: the artwork arrived assembled, exactly as
-   * the About composite did once the client sent the graded crop. */
+  /* `endeavour/mask.svg`'s silhouette as an alpha mask — the path verbatim,
+   * `fill` changed to opaque white and `fill-opacity` dropped, both of which
+   * belong to --gradient-endeavour-panel rather than to the mask. Supplied
+   * 2026-09-02. `5.svg`, the same shape from the original handover, is still
+   * in that folder and is no longer the source for this section. */
+  --mask-endeavour-panel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 498 491'%3E%3Cpath fill='%23fff' d='M9.34357 304.203L113.81 405.095C119.812 410.87 123.186 418.818 123.186 427.123V460.343C123.186 477.277 136.909 491 153.845 491H384.093C401.028 491 414.751 477.277 414.751 460.343V217.033C414.751 209.214 417.736 201.688 423.122 195.978L489.63 133.821C495.015 128.111 498 120.585 498 112.766V30.6571C498 13.7227 484.277 0 467.341 0H30.6586C13.7234 0 0 13.7227 0 30.6571V282.143C0 290.48 3.37406 298.428 9.34357 304.203Z'/%3E%3C/svg%3E");
+
+  /* "Our Endeavour" — how wide the artwork sits beside the copy. The panel
+   * gradient and the shape mask that used to live here left when the client
+   * supplied the composite assembled, and are **back as of 2026-09-02** under
+   * --gradient-endeavour-panel and --mask-endeavour-panel, the layers having
+   * arrived separately again. The same round trip the About composite made. */
   --endeavour-max-w: 75rem;
   --endeavour-media-w: 31rem;
 

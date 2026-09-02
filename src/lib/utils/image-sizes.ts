@@ -62,10 +62,24 @@ export const SIZES_ABOUT_CUTOUT = '(min-width: 64rem) 16vw, 32vw';
 export const SIZES_SOLUTION_CARD = '(min-width: 90rem) 440px, (min-width: 52rem) 30vw, 250px';
 
 /**
- * The "Our Endeavour" cut-out. Capped at `--endeavour-media-w` (25rem) beside
- * the copy above `lg`, and close to the full column below it.
+ * The "Our Endeavour" panel photograph — the layer masked into the chamfered
+ * shape. The artwork box is capped at `--endeavour-media-w` (31rem) beside the
+ * copy above `lg` and close to the full column below it; the panel is inset
+ * `--endeavour-panel-inset-x` a side inside that, so 92% of both figures.
  */
-export const SIZES_ENDEAVOUR_FIGURE = '(min-width: 64rem) 26rem, 88vw';
+export const SIZES_ENDEAVOUR_PANEL = '(min-width: 64rem) 29rem, 82vw';
+
+/**
+ * The "Our Endeavour" cut-out — the girl standing in front of the panel.
+ *
+ * **Larger than the artwork box, and that is not a mistake.** She is 70% of the
+ * panel, so 64% of the box — but `endeavour-girl.png` carries ~48% dead
+ * transparent canvas (see `--endeavour-figure-bleed-w`), so the `<img>` that
+ * has to be *rendered* is 190% of that, i.e. 122% of the whole artwork box.
+ * `sizes` describes the element, not the visible girl, so these are the honest
+ * figures. Trim the export and they drop by nearly half.
+ */
+export const SIZES_ENDEAVOUR_FIGURE = '(min-width: 64rem) 38rem, 100vw';
 
 /**
  * An "Our Goals" card's background: a third of the content column at `md` and

@@ -176,7 +176,7 @@ export function IntroSplit({ eyebrow, title, body, cta, media, snap = false }: I
               <div
                 className={cn(
                   'absolute inset-0 isolate',
-                  'mask-(--mask-about-shape) mask-no-repeat mask-size-[100%_100%]',
+                  'mask-(--mask-about-shape) mask-no-repeat mask-size-(--mask-fill)',
                 )}
               >
                 <MediaFrame
@@ -185,7 +185,7 @@ export function IntroSplit({ eyebrow, title, body, cta, media, snap = false }: I
                   sizes={SIZES_ABOUT_MEDIA}
                   pending="aboutSael/burning-crop"
                   className="absolute inset-0"
-                  imageClassName="anim-about-settle brightness-120"
+                  imageClassName="anim-ken-burns-media brightness-120"
                 />
                 <div
                   aria-hidden="true"

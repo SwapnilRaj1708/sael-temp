@@ -23,7 +23,8 @@ import solPatiala from '@/assets/images/solutions/sol-patiala.jpg';
 import goalEthos from '@/assets/images/goals/India-orange.jpg';
 import goalMission from '@/assets/images/goals/green.jpg';
 import goalVision from '@/assets/images/goals/panel-closeup.jpg';
-import endeavourGirl from '@/assets/images/endeavour/girl.png';
+import endeavourGirl from '@/assets/images/endeavour/endeavour-girl.png';
+import endeavourPanel from '@/assets/images/endeavour/solar-panel.png';
 import dottedMap from '@/assets/images/dotted-map.svg';
 // import dottedMap from '@/assets/images/map.svg';
 import markEthos from '@/assets/images/ethos-icon.svg';
@@ -517,11 +518,17 @@ export const ourEndeavour: Omit<EndeavourSplitProps, 'snap'> = {
       'commitment is to improve access to sustainable and clean energy.',
   ],
   media: {
-    image: endeavourGirl,
-    // Describes the artwork, not the section. As with the About composite,
-    // this is written from the image and asserts nothing about the business,
-    // but it is still copy and wants a review.
-    alt: 'A young girl in a white top, against solar panels lit in red and purple',
+    image: endeavourPanel,
+    // Two alts where there was one, the same split the About artwork took on
+    // 2026-09-01: the sentence that described the composite — "A young girl in
+    // a white top, against solar panels lit in red and purple" — divided
+    // between the layers it was describing. The colour is dropped from the
+    // panel's half because it is no longer in the photograph; it is
+    // --gradient-endeavour-panel, applied over it. Still copy, still wants a
+    // review.
+    alt: 'A close view of solar panels',
+    cutout: endeavourGirl,
+    cutoutAlt: 'A young girl in a white top',
   },
 };
 
