@@ -1117,6 +1117,26 @@
    * Both are the client's calls on 2026-08-22. */
   --map-copy-w: 40rem; /* 640 */
 
+  /* The copy column's left inset — breathing space between the map and the
+   * text, on top of the row's own --spacing-flow. The client asked for 5rem
+   * on 2026-09-03, having seen it at the 1920 design width, where both blocks
+   * are capped well inside the row and that slack is there to spend.
+   *
+   * It cannot be a flat 5rem, because the slack is not there at every width.
+   * Between `lg` and `xl` the row is tight enough that both blocks are already
+   * under their caps (38rem of map + 40rem of copy + --spacing-flow does not
+   * fit 1280 minus two gutters), so 5rem there comes straight out of the
+   * copy's measure rather than out of the gap. Hence 0 up to 1280, ramping to
+   * the asked-for 5rem at 1920 and holding flat above it:
+   *
+   *   1280 → 0    1440 → 20px    1600 → 40px    1760 → 60px    1920 → 80px
+   *
+   * The stacked case is not this token's job — it is the `lg:` on the utility
+   * at the call site, so "only when side by side" stays visible as its own
+   * condition rather than being implied by an arithmetic coincidence.
+   * Consumed by sections/presence-map/. */
+  --map-copy-pad: clamp(0rem, 12.5vw - 10rem, 5rem); /* 0 → 80, over 1280 → 1920 */
+
   /* A map callout's cap. It is `w-max` first, so a one-figure state stays as
    * narrow as its content; this only bites on the long legend names — "In-house
    * Module Assembly Capacity" would otherwise set a 300px-wide tooltip on a
@@ -1152,6 +1172,33 @@
   /* The image sits slightly oversized so that parallax translation never
    * exposes an edge. Prototype: `scale(1.06)` on the image wrapper. */
   --hero-image-scale: 1.06;
+
+  /* The anchor point of *both* hero transforms — the Ken Burns pan on the
+   * `<img>` and the `scale(1.06) translate(…)` on the wrapper above it. They
+   * have to share it: if only one moves, the other still expands about the
+   * centre and the clearance below stops holding.
+   *
+   * Not `50% 50%`, which is what it was until 2026-09-03. `object-cover` is
+   * height-bound at every breakpoint (docs/hero-image-spec.md §3), so at
+   * scale 1 the source height exactly fills the box and everything above the
+   * midline is pushed up and out as it scales. The desktop stack opens at
+   * 1.1024 before the animation runs at all, and the highest crown in the set
+   * survived only to a total scale of 1.041 — so no zoom setting could have
+   * saved it and the origin was the only lever.
+   *
+   * 30% is the balance point between the two failure modes. Higher and hair
+   * clips at the top of the frame; lower and `--parallax-y` can drag the
+   * image far enough down to expose a bare strip along the hero's top edge.
+   * At 30% the worst case across every breakpoint, both ends of the zoom and
+   * worst-direction parallax keeps ~16px of hair clearance and ~11px of
+   * top-edge coverage. The safe window is 8.1% → 42.6%, so this survives
+   * small future changes to the scale range without re-deriving it.
+   *
+   * Origin-x stays at 50%. Vertically an origin percentage tracks a source
+   * percentage exactly, because the cover crop is height-bound; horizontally
+   * the image overflows the box, so it does not, and there is nothing to be
+   * gained by moving it. */
+  --hero-origin: 50% 30%;
 
   /* Mouse-parallax travel, per layer. The text moves *against* the pointer,
    * hence the negative. docs/design-guidelines.md §5. */

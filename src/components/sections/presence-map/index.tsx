@@ -292,7 +292,13 @@ export function PresenceMap({
             })}
           </Reveal>
 
-          <div className="w-full max-w-(--map-copy-w)">
+          {/* The client's 5rem inset between the map and this column, at the
+              design width — and 0 wherever the row cannot afford it. The `lg:`
+              is the stacked case: below it the map sits *above* the copy, and
+              an inset there is not a gap between two blocks, it is one column
+              of the page starting further in than everything else on it. The
+              ramp between 1280 and 1920 is in --map-copy-pad. */}
+          <div className="w-full max-w-(--map-copy-w) lg:pl-(--map-copy-pad)">
             <Reveal order={3}>
               <DisplayHeading ground="dark" className="max-w-(--hero-measure)">
                 {heading}

@@ -54,12 +54,19 @@ export function HeroBackdrop({ slide, isActive, position }: HeroBackdropProps) {
         The photograph, oversized so parallax translation never drags an edge
         into frame. The Ken Burns pan lives on the <img> inside; this wrapper
         owns only the parallax, so the two transforms cannot fight.
+
+        They do have to agree on one thing: `--hero-origin`, which both anchor
+        to. The wrapper's `scale(1.06)` is the larger half of the desktop zoom,
+        so moving the origin on the <img> alone would leave the subject's head
+        being pushed out of frame by this element instead. See the note on the
+        token.
       */}
       <div
         className={cn(
           'absolute inset-0 overflow-hidden',
           'lg:transition-transform lg:duration-(--duration-parallax) lg:ease-out',
-          'lg:[transform:scale(var(--hero-image-scale))_translate(calc(var(--parallax-x,0)*var(--hero-parallax-image)),calc(var(--parallax-y,0)*var(--hero-parallax-image)))]',
+          'lg:[transform-origin:var(--hero-origin)]',
+          'lg:[transform:scale(var(--hero-image-scale))]',
         )}
       >
         {/*

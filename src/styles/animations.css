@@ -259,7 +259,13 @@
    * ------------------------------------------------------------------------ */
 
   @media (prefers-reduced-motion: no-preference) {
+    /* `transform-origin` rather than the default centre — see the note on
+       `--hero-origin`. It belongs here and not in the still-state block above
+       because the still state is `scale(1)`, which has no origin to speak of.
+       The wrapper in hero-backdrop.tsx carries the same token; the two are one
+       decision and must not drift. */
     .anim-ken-burns {
+      transform-origin: var(--hero-origin);
       animation: saelKen 9s ease forwards;
     }
 

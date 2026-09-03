@@ -64,5 +64,45 @@
       "Bash(node __TRACKED_VAR__/pdf-text.mjs __TRACKED_VAR__/content.txt 1660 1945)"
     ],
     "additionalDirectories": ["\\tmp"]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "(New-Object Media.SoundPlayer 'C:\\Windows\\Media\\tada.wav').PlaySync()",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "(New-Object Media.SoundPlayer 'C:\\Windows\\Media\\Windows Notify System Generic.wav').PlaySync()",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "(New-Object Media.SoundPlayer 'C:\\Windows\\Media\\chimes.wav').PlaySync()",
+            "async": true
+          }
+        ]
+      }
+    ]
   }
 }
