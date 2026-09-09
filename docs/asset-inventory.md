@@ -37,15 +37,35 @@ Additionally, several assets are enormous unoptimised originals. Shipping them a
 ```
 src/assets/
 ├── fonts/          DIN — client supplied, licensed. WOFF2 only in the repo.
-├── images/
-│   ├── hero/
-│   ├── sections/
-│   ├── news/       placeholder only — production news images come from Azure Blob
-│   └── decorative/
+├── images/         organised by page, then by section. Mirrored to the CDN.
+│   ├── global/     used on every route
+│   │   ├── logo/
+│   │   └── nav/
+│   └── homepage/
+│       ├── about/  business/  endeavour/  goals/  hero/
+│       ├── presence-map/
+│       └── solutions/
 └── icons/          SVGs imported as React components
 public/
 └── images/         only assets referenced by URL string (OG image, favicon set)
+public/
+└── news/           mock news stills, referenced by URL from the fixtures
 ```
+
+**Organised by page, not by section.** The site is ~25 routes; a flat set of
+section folders collides the moment two pages both have a hero. A page's assets
+are added and deleted with the page, and `global/` is reserved for the narrow
+set whose change affects more than one route — today the masthead logo, the
+footer wordmark and the four mega-menu thumbnails.
+
+**`icons/` is not merged into `images/`, and the split is load-bearing.** SVGs
+under `icons/` are compiled to React components by SVGR (the `turbopack.rules`
+entry in `next.config.ts`) so they inherit `currentColor`; SVGs under `images/`
+are files handed to `next/image`. `src/types/svg.d.ts` types the two folders
+differently and resolves the more specific pattern first, so the folder is what
+selects the consumption model. It is also exactly the CDN boundary: an icon is
+inlined into the JavaScript bundle and never becomes a URL, so it has nothing
+to mirror.
 
 Rules:
 
@@ -237,7 +257,47 @@ svgo -f src/assets/icons --multipass
 
 ---
 
-## 8. Azure Blob conventions
+## 8. The asset CDN
+
+`src/assets/images/` is mirrored to Azure Blob Storage and served from there in
+any environment that sets `NEXT_PUBLIC_CDN_BASE_URL`. The mirror is exact, so a
+repository path names a CDN path with no lookup table:
+
+```
+src/assets/images/homepage/hero/hero-1.png
+$NEXT_PUBLIC_CDN_BASE_URL/images/homepage/hero/hero-1.png
+```
+
+`images/` is one category under `web-assets/`; `videos/` and `documents/` are
+reserved and `AssetCategory` in `src/lib/assets/cdn.ts` is where they are added.
+
+Rules:
+
+- An asset is registered in `src/lib/assets/<page>.ts` with `cdnImage()`, never
+  referenced by a URL written at a call site. `src/lib/assets/README.md` is the
+  how-to; `pnpm verify:guardrails` checks that every entry names a file that
+  exists and names it the same way its import does.
+- **Paths are lowercase.** Blob Storage is case-sensitive and the Windows
+  filesystem is not, so a capital letter is a bug that only appears once it is
+  deployed. The guardrail enforces it.
+- The bundled import stays. It is what supplies the intrinsic width, height and
+  `blurDataURL` that `next/image` needs to reserve the right box — `cdnImage()`
+  swaps the URL and keeps the measurements.
+- Rasters still go through `/_next/image`, with the CDN as the optimizer's
+  origin, which is what keeps AVIF/WebP and the responsive `srcset`. SVGs are
+  served straight from the CDN: Next passes any `.svg` src through untouched,
+  so `dangerouslyAllowSVG` is neither set nor needed.
+- Unset `NEXT_PUBLIC_CDN_BASE_URL` and every asset resolves to
+  `/_next/static/media/` exactly as before. That is the local default.
+
+**Fonts are not mirrored.** `next/font/local` self-hosts DIN, emits the
+`@font-face` rules and preloads them; moving it to a CDN puts a cross-origin
+round trip on the critical rendering path and a commercially licensed typeface
+on public storage. `/CLAUDE.md` §8 and §5 of this document both apply.
+
+---
+
+## 8a. Azure Blob conventions (backend-supplied content)
 
 Backend-supplied assets (news images, investor PDFs, team photos) live in Blob Storage and arrive as absolute URLs.
 

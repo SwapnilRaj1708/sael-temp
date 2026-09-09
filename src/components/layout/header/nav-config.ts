@@ -1,8 +1,6 @@
 import type { StaticImageData } from 'next/image';
-import moduleManufacturing from '@/assets/images/nav/module-manufacturing.jpg';
-import solarCellManufacturing from '@/assets/images/nav/solar-cell-manufacturing.jpg';
-import solarEnergy from '@/assets/images/nav/solar-energy.jpg';
-import wasteToEnergy from '@/assets/images/nav/waste-to-energy.jpg';
+
+import { globalImages } from '@/lib/assets/global';
 
 /**
  * The site's information architecture, in one array.
@@ -48,23 +46,32 @@ export const NAV_ITEMS: readonly NavItem[] = [
       {
         label: 'Solar Energy',
         href: '/solar-energy/',
-        image: { src: solarEnergy, alt: 'A SAEL engineer at a solar generation site' },
+        image: {
+          src: globalImages.nav.solarEnergy,
+          alt: 'A SAEL engineer at a solar generation site',
+        },
       },
       {
         label: 'Waste To Energy',
         href: '/waste-to-energy/',
-        image: { src: wasteToEnergy, alt: 'Paddy straw on the conveyor at a SAEL biomass plant' },
+        image: {
+          src: globalImages.nav.wasteToEnergy,
+          alt: 'Paddy straw on the conveyor at a SAEL biomass plant',
+        },
       },
       {
         label: 'Module Manufacturing',
         href: '/module-manufacturing/',
-        image: { src: moduleManufacturing, alt: 'A robotic arm placing a solar module' },
+        image: {
+          src: globalImages.nav.moduleManufacturing,
+          alt: 'A robotic arm placing a solar module',
+        },
       },
       {
         label: 'Solar Cell Manufacturing',
         href: '/solar-cell-manufacturing/',
         image: {
-          src: solarCellManufacturing,
+          src: globalImages.nav.solarCellManufacturing,
           alt: 'The production line at a SAEL solar cell facility',
         },
       },

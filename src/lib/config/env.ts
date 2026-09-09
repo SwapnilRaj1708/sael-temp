@@ -25,6 +25,11 @@ const envSchema = z
     API_TIMEOUT_MS: z.coerce.number().int().positive().default(8000),
     AZURE_BLOB_BASE_URL: optionalUrl,
     NEXT_PUBLIC_SITE_URL: z.url(),
+    // The CDN that mirrors src/assets/images/. Unset means "serve the bundled
+    // files", which is the local default and the behaviour the site shipped
+    // with — see src/lib/assets/cdn.ts. Public because the mega menu is a
+    // client component and has to resolve its thumbnails in the browser.
+    NEXT_PUBLIC_CDN_BASE_URL: optionalUrl,
     CAREER_REDIRECT_URL: optionalUrl,
     MOCK_LATENCY_MS: z.coerce.number().int().nonnegative().default(0),
   })
@@ -47,6 +52,7 @@ const parsed = envSchema.safeParse({
   API_TIMEOUT_MS: process.env.API_TIMEOUT_MS,
   AZURE_BLOB_BASE_URL: process.env.AZURE_BLOB_BASE_URL,
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+  NEXT_PUBLIC_CDN_BASE_URL: process.env.NEXT_PUBLIC_CDN_BASE_URL,
   CAREER_REDIRECT_URL: process.env.CAREER_REDIRECT_URL,
   MOCK_LATENCY_MS: process.env.MOCK_LATENCY_MS,
 });

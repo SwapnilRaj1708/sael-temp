@@ -39,6 +39,17 @@ server {
     }
 
     # Optimised images are cached on disk by Next; let it own the headers.
+    #
+    # When NEXT_PUBLIC_CDN_BASE_URL is set, the source image is fetched from
+    # Blob Storage rather than read off local disk, so **the VM needs outbound
+    # HTTPS to *.blob.core.windows.net**. If the NSG blocks egress, every
+    # raster 500s here while SVGs keep working, because those are served
+    # straight from the CDN and never reach this route.
+    #
+    # The fetch happens once per size per cache period, not per request. Next
+    # keeps the derivative under .next/cache/images and holds it for
+    # max(minimumCacheTTL, upstream max-age) — 4 hours by default, longer if
+    # the blobs are uploaded with a Cache-Control of their own.
     location /_next/image {
         proxy_pass http://sael_web;
     }

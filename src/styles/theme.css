@@ -759,7 +759,7 @@
    * Radius and elevation — docs/design-guidelines.md §3
    * ------------------------------------------------------------------ */
 
-  /* The dotted India map's own viewBox — `src/assets/images/dotted-map.svg`,
+  /* The dotted India map's own viewBox — `src/assets/images/homepage/presence-map/dotted-map.svg`,
    * supplied by the client on 2026-08-21. Kept beside the site coordinates it
    * describes, in sections/presence-map/dots.ts. */
   --aspect-map-india: 311.33 / 337.45;
@@ -794,7 +794,7 @@
    * here answers the one with the matching name there.
    * ------------------------------------------------------------------ */
 
-  /* The panel's own ratio — `endeavour/mask.svg`'s viewBox, which its path
+  /* The panel's own ratio — `homepage/endeavour/mask.svg`'s viewBox, which its path
    * fills exactly. See --mask-endeavour-panel. */
   --endeavour-panel-aspect: 498 / 491;
 
@@ -912,7 +912,7 @@
    * supplies the three layers separately (shape, photograph, cut-out) and the
    * grade is ours to apply again.
    *
-   * **This is `aboutSael/mask.svg`'s own ramp, transcribed** — not a ramp
+   * **This is `homepage/about/mask.svg`'s own ramp, transcribed** — not a ramp
    * chosen here. The client supplied that file on 2026-09-02 to replace the
    * derivation from `14.svg`, and its gradient is the design's answer to what
    * this shape is coloured. `14.svg`'s flatter `#2b1b54 → #8a1e42 → #e01f2b`
@@ -929,7 +929,7 @@
   --gradient-shape: linear-gradient(114.87deg, #3035aa 11.4%, #8a1e42 63.3%, #fb3633 88.6%);
 
   /* "Our Endeavour"'s panel, and the same transcription job --gradient-shape
-   * describes: `endeavour/mask.svg` declares `gradientUnits="userSpaceOnUse"`
+   * describes: `homepage/endeavour/mask.svg` declares `gradientUnits="userSpaceOnUse"`
    * from `(360.159, 0)` to `(130.936, 487.755)` inside a 498 x 491 box — 538.9
    * units of gradient line where CSS gives itself 656.2 — so the file's
    * `0.195 / 0.560 / 0.886` land at `24.9% / 55.0% / 81.7%`. Valid only while
@@ -948,7 +948,7 @@
     #f20f18ab 81.7%
   );
 
-  /* `aboutSael/mask.svg`'s silhouette as an alpha mask. The path verbatim; the
+  /* `homepage/about/mask.svg`'s silhouette as an alpha mask. The path verbatim; the
    * only change is `fill`, from the file's gradient reference to opaque white,
    * because a mask reads alpha and the ramp is --gradient-shape's job.
    *
@@ -975,7 +975,7 @@
 
   --mask-about-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 973 620'%3E%3Cpath fill='%23fff' d='M923.89 203.228H651.11C639.251 203.228 627.886 198.426 619.624 189.921L446.957 12.045C439.49 4.33514 429.196 0 418.463 0H49.1099C21.9883 0 0 21.9773 0 49.0853V570.915C0 598.023 21.9883 620 49.1099 620H280.659C291.145 620 301.192 615.857 308.631 608.476L405.122 512.775C412.561 505.395 422.608 501.252 433.094 501.252H923.89C951.012 501.252 973 479.274 973 452.166V252.313C973 225.205 951.012 203.228 923.89 203.228Z'/%3E%3C/svg%3E");
 
-  /* `endeavour/mask.svg`'s silhouette as an alpha mask — the path verbatim,
+  /* `homepage/endeavour/mask.svg`'s silhouette as an alpha mask — the path verbatim,
    * `fill` changed to opaque white and `fill-opacity` dropped, both of which
    * belong to --gradient-endeavour-panel rather than to the mask. Supplied
    * 2026-09-02. `5.svg`, the same shape from the original handover, is still
@@ -1230,13 +1230,13 @@
    * **proportions, not lengths** — nothing here is a pixel — which is what
    * makes the arrangement identical at 360px and at 1920px.
    *
-   * They are measured off `aboutSael/sardar-kid-cutout.png`, the composite
+   * They are measured off `homepage/about/sardar-kid-cutout.png`, the composite
    * the client approved, at its native 605 x 412. That file is now the
    * *reference* rather than the artwork: if the assembly drifts, it is the
    * thing to diff against.
    * ------------------------------------------------------------------ */
 
-  /* The masked shape's own ratio — `aboutSael/mask.svg`'s viewBox, which its
+  /* The masked shape's own ratio — `homepage/about/mask.svg`'s viewBox, which its
    * path fills exactly. The ratio the derivation from `14.svg` produced,
    * 354.45 : 225.97, was the same picture to four decimal places (1.5686
    * against 1.5694), so this swap moved nothing measurable in the layout.
@@ -1321,7 +1321,7 @@
    *
    * **Sampled from the artwork, then lifted.** The marks are PNGs with the
    * gradient baked in, so there was no CSS ramp to reuse: each one's stops
-   * were taken from `src/assets/images/business/*.png` by projecting its
+   * were taken from `src/assets/images/homepage/business/*.png` by projecting its
    * opaque pixels onto the principal axis of their colour cloud, which is the
    * ramp the artwork actually runs along. The hues below are the artwork's.
    *

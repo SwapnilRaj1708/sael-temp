@@ -47,7 +47,7 @@ instruction wins and the disagreement is recorded beside the token or component.
 | 4 | Our Current Power Portfolio | `sections/presence-map/` | **Rebuilt to v2** on 2026-08-21, and the layout review it was waiting on is closed: map left, display heading with the footprint label and the two figures right, nothing positioned over the artwork any more. A centred flex row rather than v2's 1–6 / 8–12 grid: on a grid both halves are capped and the slack lands between them, which is what kept reading as a hole. The two figures sit a `--spacing-stack` apart and the rule over the footprint label is capped at `--map-rule-w` — all the client's calls, 2026-08-21 and -22. **The 751-subpath generated map is gone**, replaced by the client's supplied `dotted-map.svg`; the six site coordinates are mapped across from the old viewBox and **want a visual check** — see the note in `presence-map/dots.ts`. Carries a **"Portfolio"** section label as of 2026-08-26 — v2's own screen has none, so this is a deliberate departure at the client's request |
 | 5 | Our Endeavour | `sections/endeavour-split/` | Unchanged. Left as-is at the client's request on 2026-08-20. **Moved ahead of Solutions on 2026-08-26** — a two-line reorder in `page.tsx`; the section itself is untouched |
 | 6 | Solutions | `sections/solutions-carousel/` | **Rebuilt to v2** — four 4:3 plates a hairline apart, each captioned underneath; the gradient plaque is gone. It was kept **before** Our Endeavour and set on the light ground, both the client's calls on 2026-08-20; **both were withdrawn on 2026-08-26** and it now follows Our Endeavour on the black ground, which is v2's own arrangement. The flip minted no token — every ramp is the declared dark counterpart of the paper one it replaced |
-| 7 | Our Goals | `sections/goals-grid/` | **Rebuilt to v2** — three cards a hairline apart inside a hairline frame, on black. **The resting state shows the photograph untreated**: the scrim arrives with the pointer, along with the description. The three marks are the client's own artwork as of 2026-08-21, inverted to white at the call site; the `lucide-react` stand-ins are gone. Sized 40 → 56px, then ~4.5x that on 2026-08-22, then halved again to 60 → 126px on 2026-08-24 against the client's revised artwork — the mark is the card's subject, not an icon over a title. **Two sets of marks are in `src/assets/images/`**: `*-goal.svg`, which is what is wired up, and a later `*-icon.svg` set. Confirm which is current before this ships |
+| 7 | Our Goals | `sections/goals-grid/` | **Rebuilt to v2** — three cards a hairline apart inside a hairline frame, on black. **The resting state shows the photograph untreated**: the scrim arrives with the pointer, along with the description. The three marks are the client's own artwork as of 2026-08-21, inverted to white at the call site; the `lucide-react` stand-ins are gone. Sized 40 → 56px, then ~4.5x that on 2026-08-22, then halved again to 60 → 126px on 2026-08-24 against the client's revised artwork — the mark is the card's subject, not an icon over a title. The marks are `*-icon.svg` in `src/assets/images/homepage/goals/`. **Closed 2026-09-07:** a rival `*-goal.svg` set sat beside them, and this row used to claim *that* was the wired-up one. It was not — it was imported nowhere, and its `<image xlink:href="green.jpg">` reference had never resolved. It is deleted |
 | 8 | In the News | `sections/news-carousel/` | **Rebuilt to v2.** The card lost its box — a hairline it hangs from, the date above a 5:4 thumbnail, the accent filling across the rule on hover. Still the one homepage surface fed by the repository |
 | 9 | Pixel strip | `sections/footer-pixel-strip/` | Drawn to a canvas. **Moved into the footer on 2026-08-27** and mirrored to do it — solid along its top, dissolving downward, on the flat footer colour with no dot grid. It closed the page from `sections/pixel-strip/` until then, on the dotted paper ground as of 2026-08-26; that version is **retired** to `sections/_retired/pixel-strip/`, which is lint-blocked from being imported. The two files differ by the ground and by one expression, the row's `y` |
 | — | Timeline (v2 §08) | — | **Not built.** Deferred by the client on 2026-08-20; to be revisited |
@@ -195,6 +195,7 @@ Delivery order. Items FE-02 → FE-04 are the critical path; nothing below FE-04
 
 | ID | Item | Feature doc | Reads |
 |---|---|---|---|
+| FE-26 | Asset restructure + CDN delivery | `asset-inventory.md` §3, §8 | `architecture.md` |
 | FE-25 | Design-system reconciliation — guidelines vs. the as-built homepage | `design-reconciliation.md` | `design-guidelines.md` |
 | FE-05 | Content repository + mock data layer | `features/05-content-repository.md` | `content-model.md`, `api-contracts.md` |
 | FE-06 | About Us | `features/06-about-us.md` | `design-guidelines.md`, `responsive-strategy.md` |
@@ -216,6 +217,50 @@ Delivery order. Items FE-02 → FE-04 are the critical path; nothing below FE-04
 | FE-22 | SEO, redirects, sitemap, robots | `features/22-seo-and-redirects.md` | `accessibility-and-seo.md` |
 | FE-23 | Backend API cutover (mock → Spring Boot) | `features/23-api-integration-cutover.md` | `content-model.md`, `api-contracts.md` |
 | FE-24 | Performance & accessibility hardening pass | `features/24-hardening-pass.md` | `accessibility-and-seo.md`, `responsive-strategy.md` |
+
+### FE-26 — landed and verified against the live CDN
+
+**Raised out of band on 2026-09-07**, at the client's request, and it is not a
+`features/NN-*.md` item — it restructures an existing surface rather than
+specifying a new one, so `asset-inventory.md` §3 and §8 are its spec. It was
+worked while FE-04 was In Progress, which /CLAUDE.md §3 does not contemplate;
+recorded here rather than left undocumented.
+
+`src/assets/images/` is reorganised **by page** rather than by homepage section
+— `global/` and `homepage/<section>/` — and every asset now resolves through
+`src/lib/assets/`, a per-page registry whose `cdnImage()` swaps the URL of a
+bundled import while keeping the width, height and `blurDataURL` the bundler
+measured. `NEXT_PUBLIC_CDN_BASE_URL` unset leaves the site byte-for-byte as it
+was; set, the same assets resolve to the Blob mirror. A new guardrail checks
+each registry entry against its import and against the filesystem.
+
+**Verified against the live CDN on 2026-09-09.** All 47 blobs return 200 with
+the correct MIME type and a byte-identical `content-length`; the SVGs carry
+`image/svg+xml`, which they must, because they bypass the optimizer and are
+fetched by the browser. A production build with `NEXT_PUBLIC_CDN_BASE_URL` set
+was exercised against a running server: rasters resolve through `/_next/image`
+with the CDN as origin and come back AVIF/WebP, and a host outside
+`remotePatterns` is refused with a 400.
+
+**Outstanding:**
+- ~~71.8 MB of unreferenced assets.~~ **Pruned on 2026-09-07.** 28 of the 34
+  went, including the whole superseded hero set and the `*-goal.svg` marks; the
+  six kept are provenance for live `theme.css` tokens (the two `mask.svg`s, the
+  two cut-out composites the `--about-cutout-*` and endeavour figures were
+  measured from, and `14.svg`/`5.svg`). The four live hero masters were renamed
+  `hero-{1..4}.png` and `hero-mobile-{1..4}.jpg` in the same pass — **and that
+  rename corrected a real defect**: slides 2 and 4 had been paired with each
+  other's mobile photograph since the crops landed.
+- The bundled import still emits the file into `.next/static/media`, so the
+  release archive has not shrunk. Dropping those 56 MB means replacing the
+  import with a generated dimension manifest — a second phase, now unblocked.
+- **The blobs carry no `Cache-Control`.** Nothing is broken by that: the
+  optimizer falls back to `minimumCacheTTL`, 4 hours, for the derivatives it
+  caches. But the SVGs go straight to the browser with no caching directive at
+  all, so each is re-fetched far more often than it needs to be. `public,
+  max-age=86400` on upload fixes it. Not `immutable` — these paths mirror the
+  repository rather than being content-hashed, so a corrected image reuses its
+  URL.
 
 ### FE-25 — landed
 
@@ -275,8 +320,8 @@ Items that cannot start until an external dependency lands. Move to Pending once
 
 **Resolved 2026-08-05**, both by the client supplying the artwork, both consumed by FE-04:
 
-- *Business tile icons without baked-in lettering* — supplied as PNGs in `src/assets/images/business/`. The tiles render them beside an HTML heading, so nothing is duplicated or cropped.
-- *Hero overlay symbol icons* — supplied as `src/assets/images/hero/sael-icon-{1..4}.png` and wired per slide.
+- *Business tile icons without baked-in lettering* — supplied as PNGs in `src/assets/images/homepage/business/`. The tiles render them beside an HTML heading, so nothing is duplicated or cropped.
+- *Hero overlay symbol icons* — supplied as `src/assets/images/homepage/hero/sael-icon-{1..4}.png` and wired per slide.
 
 > FE-23 also appears in Pending because the mock-side scaffolding (adapter shape, env switch, Zod schemas) can and should be built ahead of the real endpoints. Only the final swap is blocked.
 
