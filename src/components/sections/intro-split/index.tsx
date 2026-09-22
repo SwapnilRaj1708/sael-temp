@@ -69,9 +69,9 @@ export interface IntroSplitProps {
  * layers separately, so it is assembled again, and the objection is answered
  * rather than dodged: the grade is a `multiply` of --gradient-shape over a
  * desaturated, lifted photograph, and the figures were fitted against
- * `homepage/about/sardar-kid-cutout.png` — the composite that was approved, kept
+ * `aboutSael/sardar-kid-cutout.png` — the composite that was approved, kept
  * as the reference for the arrangement. Not for the colour, since 2026-09-02:
- * the shape now arrives as `homepage/about/mask.svg` carrying its own ramp, which
+ * the shape now arrives as `aboutSael/mask.svg` carrying its own ramp, which
  * is brighter and bluer than the composite's, and that file wins.
  *
  * **Nothing in the assembly is a length.** The shape is a proportion of the
@@ -168,7 +168,7 @@ export function IntroSplit({ eyebrow, title, body, cta, media, snap = false }: I
                 multiplies over it — grade the colour that is there and the
                 result muddies, and the lift is what stops `multiply` reading
                 as a dark wash rather than as a duotone. The figures match
-                `homepage/about/sardar-kid-cutout.png`, the composite the client
+                `aboutSael/sardar-kid-cutout.png`, the composite the client
                 approved.
               */}
               <div
@@ -181,7 +181,7 @@ export function IntroSplit({ eyebrow, title, body, cta, media, snap = false }: I
                   image={media.image}
                   alt={media.alt}
                   sizes={SIZES_ABOUT_MEDIA}
-                  pending="homepage/about/burning-crop"
+                  pending="aboutSael/burning-crop"
                   className="absolute inset-0"
                   imageClassName="anim-ken-burns-media brightness-120"
                 />

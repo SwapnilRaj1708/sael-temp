@@ -1,9 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import logoDark from '@/assets/images/sael-logo-dark.svg';
 import { SOCIAL_ICONS } from '@/components/icons/social';
 import { FooterLinks } from '@/components/layout/footer/footer-links';
 import { FooterPixelStrip } from '@/components/sections/footer-pixel-strip';
-import { globalImages } from '@/lib/assets/global';
 import { Container } from '@/components/ui/container';
 import { siteConfig, TODO_CONTENT } from '@/lib/config/site';
 import { LEGAL_LINKS, SOCIAL_LINKS } from '@/lib/content/static/footer';
@@ -111,11 +111,7 @@ export function Footer() {
                 wrong one. `w-auto` lets the file's own ratio set the width, so
                 nothing is squeezed. */}
             <Link href="/" className="shrink-0" aria-label={`${siteConfig.name} — home`}>
-              <Image
-                src={globalImages.logo.dark}
-                alt={siteConfig.name}
-                className="h-footer-logo w-auto"
-              />
+              <Image src={logoDark} alt={siteConfig.name} className="h-footer-logo w-auto" />
             </Link>
           </div>
 

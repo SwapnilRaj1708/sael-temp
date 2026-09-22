@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { globalImages } from '@/lib/assets/global';
+import logo from '@/assets/images/sael-logo.png';
 import { siteConfig } from '@/lib/config/site';
 import { cn } from '@/lib/utils/cn';
 
@@ -31,7 +31,7 @@ export function Logo({ className, priority = false }: LogoProps) {
       aria-label={`${siteConfig.name} — home`}
     >
       <Image
-        src={globalImages.logo.colour}
+        src={logo}
         alt={siteConfig.name}
         priority={priority}
         sizes="(min-width: 64rem) 170px, 130px"

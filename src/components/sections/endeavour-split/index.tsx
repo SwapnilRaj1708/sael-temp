@@ -41,8 +41,8 @@ export interface EndeavourSplitProps {
  * The note that stood here said the client supplied it pre-rendered and that
  * this was better in every way, not least because it carried solar-grid line
  * work no arrangement of the handover's parts could reproduce. The client has
- * since supplied that line work itself, as `homepage/endeavour/solar-panel.png`, along
- * with `homepage/endeavour/mask.svg` and the cut-out, so the objection is answered
+ * since supplied that line work itself, as `endeavour/solar-panel.png`, along
+ * with `endeavour/mask.svg` and the cut-out, so the objection is answered
  * rather than dodged. `5.svg` is the same panel from the original handover and
  * is no longer the source for this section.
  *

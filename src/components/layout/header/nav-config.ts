@@ -1,6 +1,8 @@
 import type { StaticImageData } from 'next/image';
-
-import { globalImages } from '@/lib/assets/global';
+import moduleManufacturing from '@/assets/images/nav/module-manufacturing.jpg';
+import solarCellManufacturing from '@/assets/images/nav/solar-cell-manufacturing.jpg';
+import solarEnergy from '@/assets/images/nav/solar-energy.jpg';
+import wasteToEnergy from '@/assets/images/nav/waste-to-energy.jpg';
 
 /**
  * The site's information architecture, in one array.
@@ -28,7 +30,11 @@ export interface NavItem {
    * Sustainability and Investors render as plain link lists.
    */
   image?: { src: StaticImageData; alt: string };
-  /** Leaves the site — `/career/` redirects to the client's recruiting system. */
+  /**
+   * Leaves the site, so consumers render a plain anchor with
+   * `rel="noopener noreferrer"` rather than a prefetching `<Link>`. Nothing
+   * sets it today: `/career/` did, until it became a page on 2026-09-22.
+   */
   external?: boolean;
 }
 
@@ -46,32 +52,23 @@ export const NAV_ITEMS: readonly NavItem[] = [
       {
         label: 'Solar Energy',
         href: '/solar-energy/',
-        image: {
-          src: globalImages.nav.solarEnergy,
-          alt: 'A SAEL engineer at a solar generation site',
-        },
+        image: { src: solarEnergy, alt: 'A SAEL engineer at a solar generation site' },
       },
       {
         label: 'Waste To Energy',
         href: '/waste-to-energy/',
-        image: {
-          src: globalImages.nav.wasteToEnergy,
-          alt: 'Paddy straw on the conveyor at a SAEL biomass plant',
-        },
+        image: { src: wasteToEnergy, alt: 'Paddy straw on the conveyor at a SAEL biomass plant' },
       },
       {
         label: 'Module Manufacturing',
         href: '/module-manufacturing/',
-        image: {
-          src: globalImages.nav.moduleManufacturing,
-          alt: 'A robotic arm placing a solar module',
-        },
+        image: { src: moduleManufacturing, alt: 'A robotic arm placing a solar module' },
       },
       {
         label: 'Solar Cell Manufacturing',
         href: '/solar-cell-manufacturing/',
         image: {
-          src: globalImages.nav.solarCellManufacturing,
+          src: solarCellManufacturing,
           alt: 'The production line at a SAEL solar cell facility',
         },
       },
@@ -96,7 +93,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     ],
   },
   { label: 'Newsroom', href: '/newsroom/' },
-  { label: 'Career', href: '/career/', external: true },
+  { label: 'Career', href: '/career/' },
   { label: 'Contact Us', href: '/contact-us/' },
 ];
 

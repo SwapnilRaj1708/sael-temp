@@ -1,7 +1,7 @@
 /**
  * The coordinate space the project sites are placed in.
  *
- * It is the viewBox of `src/assets/images/homepage/presence-map/dotted-map.svg`, the dotted India
+ * It is the viewBox of `src/assets/images/dotted-map.svg`, the dotted India
  * artwork the client supplied on 2026-08-21, and it is only here so the
  * numbers in `src/app/_content/homepage.ts` have somewhere to say what they
  * are measured against. Change one and change the other.

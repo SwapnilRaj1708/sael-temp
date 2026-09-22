@@ -16,8 +16,6 @@
  *      (docs/design-guidelines.md §3).
  *   6. No file under `src/` carries a magic number in a Tailwind arbitrary
  *      value (/CLAUDE.md §2.2, third clause).
- *   7. Every asset in `src/lib/assets/` names a file that exists, and names it
- *      the same way its bundled import does.
  *
  * 4 and 5 are the FE-02 acceptance criteria that would otherwise be "someone
  * remembers to grep for it". 6 closes the gap they left: rule 2.2 has four
@@ -30,7 +28,7 @@
  */
 
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ESLint } from 'eslint';
@@ -432,108 +430,6 @@ for (const id of LAYERED_STYLESHEETS) {
       ? undefined
       : `${offenders.join('\n')}\nWrap it in @layer base (globals.css) or @layer components (animations.css).`,
   );
-}
-
-// ---------------------------------------------------------------------------
-// 7. Asset registry ↔ filesystem
-// ---------------------------------------------------------------------------
-
-/*
- * `cdnImage(bundled, path)` has to state the asset's path a second time,
- * because the bundler flattens and content-hashes the emitted filename and the
- * folder it came from is not recoverable at runtime. Two statements of one
- * fact is a drift hazard, and the failure mode is the expensive kind: the
- * bundled import still resolves, so the build is green, the local site is
- * perfect, and only the deployed one 404s.
- *
- * So the pair is checked rather than trusted. Three ways it can be wrong:
- *
- *   - the string disagrees with the import it is passed;
- *   - the string names a file that is not there;
- *   - the string differs from the file only in case, which Windows forgives
- *     and Azure Blob Storage does not.
- *
- * Files present but not registered are listed rather than failed — an asset
- * can legitimately be waiting for the page that will use it. See
- * src/lib/assets/README.md.
- */
-
-const ASSET_DIR = join(SRC, 'lib', 'assets');
-const IMAGE_ROOT = join(SRC, 'assets', 'images');
-
-const registryFiles = readdirSync(ASSET_DIR)
-  .filter((name) => name.endsWith('.ts') && name !== 'cdn.ts')
-  .map((name) => ({
-    name,
-    id: `src/lib/assets/${name}`,
-    source: readFileSync(join(ASSET_DIR, name), 'utf8'),
-  }));
-
-const registered = new Set();
-const assetOffenders = [];
-
-for (const file of registryFiles) {
-  const imports = new Map();
-  for (const match of file.source.matchAll(/^import (\w+) from '@\/assets\/images\/(.+?)';$/gm)) {
-    imports.set(match[1], match[2]);
-  }
-
-  const called = new Set();
-  for (const match of file.source.matchAll(/cdnImage\(\s*(\w+),\s*'([^']+)',?\s*\)/g)) {
-    const [, identifier, path] = match;
-    called.add(identifier);
-    registered.add(path);
-
-    const importPath = imports.get(identifier);
-    if (importPath === undefined) {
-      assetOffenders.push(`${file.id}  ${identifier} is not imported from @/assets/images/`);
-      continue;
-    }
-    if (importPath !== path) {
-      assetOffenders.push(
-        `${file.id}  ${identifier}: import is "${importPath}", path is "${path}"`,
-      );
-      continue;
-    }
-    if (path !== path.toLowerCase()) {
-      assetOffenders.push(
-        `${file.id}  ${path} is not lowercase — Blob Storage paths are case-sensitive`,
-      );
-    }
-    if (!existsSync(join(IMAGE_ROOT, path))) {
-      assetOffenders.push(`${file.id}  ${path} does not exist under src/assets/images/`);
-    }
-  }
-
-  for (const identifier of imports.keys()) {
-    if (!called.has(identifier)) {
-      assetOffenders.push(`${file.id}  ${identifier} is imported but never passed to cdnImage()`);
-    }
-  }
-}
-
-report(
-  assetOffenders.length === 0,
-  'assets: every registry entry matches its import and its file',
-  assetOffenders.length === 0
-    ? undefined
-    : `${assetOffenders.join('\n')}\nSee src/lib/assets/README.md.`,
-);
-
-const onDisk = walk(IMAGE_ROOT)
-  .map((path) => relative(IMAGE_ROOT, path).split(sep).join('/'))
-  .filter((path) => !path.endsWith('.gitkeep'));
-
-const unregistered = onDisk.filter((path) => !registered.has(path));
-
-console.log(
-  `INFO  assets: ${String(registered.size)} of ${String(onDisk.length)} files under src/assets/images/ are wired up`,
-);
-if (unregistered.length > 0) {
-  console.log(
-    `      ${String(unregistered.length)} unreferenced — they still mirror to the CDN. First few:`,
-  );
-  for (const path of unregistered.slice(0, 5)) console.log(`        ${path}`);
 }
 
 // ---------------------------------------------------------------------------

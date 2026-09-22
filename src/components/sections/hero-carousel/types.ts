@@ -46,6 +46,7 @@ export interface HeroSlide {
    * live on this interface are gone.
    */
   symbol: {
+    /** The symbol image. */
     image: StaticImageData | null;
     /** Name in docs/asset-inventory.md, for the pending-asset placeholder. */
     pending: string;

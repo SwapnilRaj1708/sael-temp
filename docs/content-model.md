@@ -76,14 +76,48 @@ export interface InvestorDocument {
 
 /* ---------- Company ---------- */
 
+export type TeamGroup = 'leadership' | 'management';
+
 export interface TeamMember {
   id: string;
   name: string;
   designation: string;
-  photo: ImageAsset | null;
+  group: TeamGroup;         // which tab on /our-team/ this person appears under
+  photoUrl: string | null;
   bio: string | null;       // may contain sanitised HTML
+  linkedinUrl: string | null;
+  portraitZoom: number | null;  // dialog zoom into the passport crop; null = 1.5
   order: number;
 }
+
+`portraitZoom` was added on 2026-09-17. The biography dialog shows the card's
+photograph zoomed to a head-and-shoulders crop, and the client wants to set
+that zoom by eye per person — `1` is the card's own framing, `2` a tight head
+shot. `null` takes the default, `--scale-team-passport` in theme.css. It is
+data, not presentation, because which value is right depends on how each
+photograph happens to be framed.
+
+**Two fields changed in FE-07**, which built `/our-team/` and is the only
+consumer of this type.
+
+`group` is new. `Our Team.dc.html` splits the roster into Leadership and
+Management tabs, and a tab is a partition of the data, so the grouping has to
+travel with the person rather than live as a hardcoded list of names in a
+component. `GET /api/v1/team` gains a matching `group` string — see
+`api-contracts.md` §4.
+
+`photoUrl: string | null` replaces `photo: ImageAsset | null`. These portraits
+are CMS assets the frontend cannot know at build time, so what a component
+needs is a URL that `next/image` can optimise — which is exactly the shape
+`NewsItem.imageUrl` already took in FE-04, for the same reason. There is no
+`photoAlt`: the contract offers one and it is `null` in every row, and the
+right alternative text for a portrait is the name of the person in it, which
+`name` already carries.
+
+`linkedinUrl` was added on 2026-09-10, from the live site's own popups: seven of
+the seventeen publish a profile and ten do not. It is genuinely sparse rather
+than merely unfilled — whether someone publishes a profile is their decision —
+so a consumer omits the link entirely rather than rendering a disabled one.
 
 export interface CapacityStat {
   id: string;
@@ -241,7 +275,7 @@ The route handler:
 
 While `CONTENT_SOURCE=mock`, the handler logs the payload and returns `{ ok: true }` after a short delay, so the full success/error UI is buildable today.
 
-Forms in scope: **Contact Us** and **Investor Contact**. Both post to `/api/forms/[form]`. Careers is an external redirect and has no form.
+Forms in scope: **Contact Us** and **Investor Contact**. Both post to `/api/forms/[form]`. Careers has no form: it became a page on 2026-09-22, and its two "Explore" CTAs link out to the Oracle recruiting portal, which is where an application is made.
 
 ---
 

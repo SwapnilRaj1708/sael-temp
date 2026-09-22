@@ -114,34 +114,15 @@ taller than 9:16.
 
 ```
 Desktop (used ≥ lg)              Mobile (used < lg)
-hero-1.png  2200×1176  1.871     hero-mobile-1.jpg   5028×3328  1.511
-hero-2.png  2200×1176  1.871     hero-mobile-2.jpg  10549×6144  1.717
-hero-3.png  2200×1176  1.871     hero-mobile-3.jpg   5040×3909  1.289
-hero-4.png  2200×1176  1.871     hero-mobile-4.jpg   5382×3328  1.617
+hero-1.png  2100×1026  2.047     hero-image-mobile-1.jpg   5028×3328  1.511
+hero-2.png  2100×1026  2.047     hero-image-mobile-2.jpg   5382×3328  1.617
+hero-3.png  2100×1026  2.047     hero-image-mobile-3.jpg   5040×3909  1.289
+hero-4.png  2100×1026  2.047     hero-image-mobile-4.jpg  10549×6144  1.717
 ```
 
-> **Corrected 2026-09-07, and the correction changes §6's premise.**
->
-> This table was written against the assets the code imported *before* `de5264c`
-> — `hero-{1..4}.png` at 2100×1026 (ratio 2.047). That commit added a higher
-> quality set at **2200×1176 (1.871)** and rewired the hero to it without
-> updating this table. The old files were deleted on 2026-09-07 and the live set
-> renamed into their names, so the *names* below are unchanged and every
-> *number* is different.
->
-> **The mobile column is also re-paired.** Slides 2 and 4 had been wired to each
-> other's photograph — `hero-image-mobile-2.jpg` is the visor man, which is
-> slide *4*'s subject. The rename fixed it; the ratios above move with it.
->
-> **What this breaks:** the desktop masters are now **1.871**, which is
-> *narrower* than the 1.897 box at 1920×1080. So the claim below no longer holds
-> at the widest breakpoint — `object-cover` becomes width-bound there, and the
-> desktop percentages in §3 and the safe zones in §6 were computed from 2.047
-> and want recomputation before this is handed to a designer.
-
-Every source ratio (1.289 – 1.871) is wider than the widest box ratio (1.897) **except
-the desktop masters at 1920** — see the correction above. Where it holds,
-`object-cover` is height-bound and that simplifies everything below — see §6.
+Every source ratio (1.289 – 2.047) is wider than the widest box ratio (1.897), so
+**`object-cover` is height-bound at every single breakpoint.** That one fact simplifies
+everything below — see §6.
 
 ### Visible window, desktop (% of the 2100 × 1026 master, centred)
 

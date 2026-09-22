@@ -1,4 +1,35 @@
-import { homepageImages } from '@/lib/assets/homepage';
+import iconAgriWaste from '@/assets/images/business/icon-agri-waste.png';
+import iconCellManufacturing from '@/assets/images/business/icon-solar-cell.png';
+import iconModuleManufacturing from '@/assets/images/business/icon-solar-module.png';
+import iconSolarGeneration from '@/assets/images/business/icon-solar-energy.png';
+import aboutCutout from '@/assets/images/aboutSael/sardar-kid-cropped.png';
+import aboutPhoto from '@/assets/images/aboutSael/burning-crop.png';
+import heroImageMobile1 from '@/assets/images/hero/hero-image-mobile-1.jpg';
+import heroImageMobile2 from '@/assets/images/hero/hero-image-mobile-2.jpg';
+import heroImageMobile3 from '@/assets/images/hero/hero-image-mobile-3.jpg';
+import heroImageMobile4 from '@/assets/images/hero/hero-image-mobile-4.jpg';
+import heroImage1 from '@/assets/images/hero/hero-copy-2-1.png';
+import heroImage2 from '@/assets/images/hero/hero-copy-2-2.png';
+import heroImage3 from '@/assets/images/hero/hero-copy-2-3.png';
+import heroImage4 from '@/assets/images/hero/hero-copy-2-4.png';
+import saelIcon1 from '@/assets/images/hero/cropped-sael-icon-1.png';
+import saelIcon2 from '@/assets/images/hero/cropped-sael-icon-2.png';
+import saelIcon3 from '@/assets/images/hero/cropped-sael-icon-3.png';
+import saelIcon4 from '@/assets/images/hero/cropped-sael-icon-4.png';
+import solBhadra from '@/assets/images/solutions/sol-bhadra.jpg';
+import solKishangarh from '@/assets/images/solutions/sol-kishangarh.jpg';
+import solMizoram from '@/assets/images/solutions/sol-mizoram.jpg';
+import solPatiala from '@/assets/images/solutions/sol-patiala.jpg';
+import goalEthos from '@/assets/images/goals/India-orange.jpg';
+import goalMission from '@/assets/images/goals/green.jpg';
+import goalVision from '@/assets/images/goals/panel-closeup.jpg';
+import endeavourGirl from '@/assets/images/endeavour/endeavour-girl.png';
+import endeavourPanel from '@/assets/images/endeavour/solar-panel.png';
+import dottedMap from '@/assets/images/dotted-map.svg';
+// import dottedMap from '@/assets/images/map.svg';
+import markEthos from '@/assets/images/ethos-icon.svg';
+import markMission from '@/assets/images/mission-icon.svg';
+import markVision from '@/assets/images/vision-icon.svg';
 import type { EndeavourSplitProps } from '@/components/sections/endeavour-split';
 import type { GoalsGridProps } from '@/components/sections/goals-grid';
 import type { HeroSlide } from '@/components/sections/hero-carousel';
@@ -48,15 +79,12 @@ export const heroSlides: HeroSlide[] = [
   {
     id: 'solar-modules',
     image: {
-      desktop: homepageImages.hero.slide1.desktop,
-      mobile: homepageImages.hero.slide1.mobile,
+      desktop: heroImage1,
+      mobile: heroImageMobile1,
       // Describes the scene, not the brand. docs/design-guidelines.md §6.
       alt: TODO_CONTENT,
     },
-    symbol: {
-      image: homepageImages.hero.slide1.symbol,
-      pending: 'icons/symbol-cell-manufacturing',
-    },
+    symbol: { image: saelIcon1, pending: 'icons/symbol-cell-manufacturing' },
     headline: 'A leading manufacturer for Bifacial TOPCon solar modules',
     highlight: 'Bifacial TOPCon solar modules',
     highlightClassName: 'bg-(image:--gradient-hero-word-1)',
@@ -64,38 +92,27 @@ export const heroSlides: HeroSlide[] = [
   {
     id: 'energy-generation',
     image: {
-      desktop: homepageImages.hero.slide2.desktop,
-      mobile: homepageImages.hero.slide2.mobile,
+      desktop: heroImage2,
+      mobile: heroImageMobile2,
       alt: TODO_CONTENT,
     },
-    symbol: {
-      image: homepageImages.hero.slide2.symbol,
-      pending: 'icons/symbol-module-manufacturing',
-    },
+    symbol: { image: saelIcon2, pending: 'icons/symbol-module-manufacturing' },
     headline: 'Generating clean energy by investing in advanced technology and systems',
     highlight: 'clean energy',
     highlightClassName: 'bg-(image:--gradient-hero-word-2)',
   },
   {
     id: 'clean-energy-vision',
-    image: {
-      desktop: homepageImages.hero.slide3.desktop,
-      mobile: homepageImages.hero.slide3.mobile,
-      alt: TODO_CONTENT,
-    },
-    symbol: { image: homepageImages.hero.slide3.symbol, pending: 'icons/symbol-solar-generation' },
+    image: { desktop: heroImage3, mobile: heroImageMobile3, alt: TODO_CONTENT },
+    symbol: { image: saelIcon3, pending: 'icons/symbol-solar-generation' },
     headline: 'A vision to building the capacity for India’s clean energy needs',
     highlight: 'clean energy',
     highlightClassName: 'bg-(image:--gradient-hero-word-3)',
   },
   {
     id: 'agri-waste',
-    image: {
-      desktop: homepageImages.hero.slide4.desktop,
-      mobile: homepageImages.hero.slide4.mobile,
-      alt: TODO_CONTENT,
-    },
-    symbol: { image: homepageImages.hero.slide4.symbol, pending: 'icons/symbol-agri-waste' },
+    image: { desktop: heroImage4, mobile: heroImageMobile4, alt: TODO_CONTENT },
+    symbol: { image: saelIcon4, pending: 'icons/symbol-agri-waste' },
     headline: 'Converting ~2 million tonnes of paddy waste into clean energy',
     highlight: 'clean energy',
     highlightClassName: 'bg-(image:--gradient-hero-word-4)',
@@ -123,7 +140,7 @@ export const aboutSael: Omit<IntroSplitProps, 'snap'> = {
     'India’s leading renewable energy companies, we are dedicated to enhancing ' +
     'the energy landscape nationwide.',
   media: {
-    image: homepageImages.about.photo,
+    image: aboutPhoto,
     // Two alts where there was one, because there are two images where there
     // was one: the sentence that described the composite — "A young boy in a
     // turban, against a field of burning crop stubble" — split at its comma,
@@ -131,7 +148,7 @@ export const aboutSael: Omit<IntroSplitProps, 'snap'> = {
     // asserted. Both describe the artwork rather than the section, and both
     // are still copy that wants a review.
     alt: 'A field of burning crop stubble',
-    cutout: homepageImages.about.cutout,
+    cutout: aboutCutout,
     cutoutAlt: 'A young boy in a turban',
   },
 };
@@ -159,7 +176,7 @@ export const aboutSael: Omit<IntroSplitProps, 'snap'> = {
 export const businessTiles = [
   {
     id: 'solar-generation',
-    icon: homepageImages.business.solarGeneration,
+    icon: iconSolarGeneration,
     title: 'Solar Energy Generation',
     description:
       'SAEL develops and operates large-scale solar power plants, generating clean, ' +
@@ -172,7 +189,7 @@ export const businessTiles = [
   },
   {
     id: 'cell-manufacturing',
-    icon: homepageImages.business.cellManufacturing,
+    icon: iconCellManufacturing,
     title: 'Solar Cell Manufacturing',
     // The design marks this business as upcoming, and the footnote on the
     // capacity figure explains what the asterisk means.
@@ -191,7 +208,7 @@ export const businessTiles = [
   },
   {
     id: 'module-manufacturing',
-    icon: homepageImages.business.moduleManufacturing,
+    icon: iconModuleManufacturing,
     title: 'Solar Module Manufacturing',
     description:
       'We produce bifacial solar modules engineered for performance, durability and ' +
@@ -204,7 +221,7 @@ export const businessTiles = [
   },
   {
     id: 'agri-waste',
-    icon: homepageImages.business.agriWaste,
+    icon: iconAgriWaste,
     title: 'Agri Waste to Energy',
     description:
       'We convert agricultural residue into clean energy, reducing stubble burning and ' +
@@ -263,7 +280,7 @@ export const businessTiles = [
  * ---------------------------------------------------------------------------
  *
  * Coordinates are points in the artwork's own 311.33 × 337.45 viewBox —
- * `src/assets/images/homepage/presence-map/dotted-map.svg`, supplied by the client on 2026-08-21.
+ * `src/assets/images/dotted-map.svg`, supplied by the client on 2026-08-21.
  *
  * **They are fitted, not measured.** The six site pins that preceded these
  * were themselves carried across from a previous 620 × 660 geometry rather
@@ -390,7 +407,7 @@ export const presenceSummary = {
   // PDF's.
   eyebrow: 'Portfolio',
   heading: 'Our Current Power Portfolio',
-  map: { image: homepageImages.presenceMap.dotted },
+  map: { image: dottedMap },
   title: ['SAEL Pan India', 'Green Footprint'] as [string, string],
   primaryStat: '11 States',
   secondaryStat: '60 Projects Sites',
@@ -422,28 +439,28 @@ export const solutions: Omit<SolutionsCarouselProps, 'snap'> = {
   slides: [
     {
       id: 'patiala',
-      image: homepageImages.solutions.patiala,
+      image: solPatiala,
       alt: 'Aerial view of long rows of solar panels raised over a canal, lined with trees',
       place: 'Patiala',
       descriptor: 'Solar Plant',
     },
     {
       id: 'mizoram',
-      image: homepageImages.solutions.mizoram,
+      image: solMizoram,
       alt: 'Aerial view of solar panels stepped across forested hills at sunrise',
       place: 'Mizoram',
       descriptor: '21 MW Solar Plant',
     },
     {
       id: 'kishangarh',
-      image: homepageImages.solutions.kishangarh,
+      image: solKishangarh,
       alt: 'Aerial view of a manufacturing plant at dusk beside a highway, hills on the horizon',
       place: 'Kishangarh',
       descriptor: 'Solar Module Manufacturing Plant',
     },
     {
       id: 'bhadra',
-      image: homepageImages.solutions.bhadra,
+      image: solBhadra,
       alt: 'Aerial view of a lit power plant at night, its chimney stack rising over scrubland',
       place: 'Bhadra',
       descriptor: 'Biomass Plant',
@@ -476,7 +493,7 @@ export const ourEndeavour: Omit<EndeavourSplitProps, 'snap'> = {
       'commitment is to improve access to sustainable and clean energy.',
   ],
   media: {
-    image: homepageImages.endeavour.panel,
+    image: endeavourPanel,
     // Two alts where there was one, the same split the About artwork took on
     // 2026-09-01: the sentence that described the composite — "A young girl in
     // a white top, against solar panels lit in red and purple" — divided
@@ -485,7 +502,7 @@ export const ourEndeavour: Omit<EndeavourSplitProps, 'snap'> = {
     // --gradient-endeavour-panel, applied over it. Still copy, still wants a
     // review.
     alt: 'A close view of solar panels',
-    cutout: homepageImages.endeavour.figure,
+    cutout: endeavourGirl,
     cutoutAlt: 'A young girl in a white top',
   },
 };
@@ -517,8 +534,8 @@ export const ourGoals: Omit<GoalsGridProps, 'snap'> = {
         'sustainable solutions. We harness cutting-edge technologies and industry best ' +
         'practices to provide dependable and eco-friendly energy solutions, fostering the ' +
         'widespread adoption of renewable energy across diverse markets.',
-      image: homepageImages.goals.mission,
-      icon: homepageImages.goals.markMission,
+      image: goalMission,
+      icon: markMission,
     },
     {
       id: 'vision',
@@ -527,8 +544,8 @@ export const ourGoals: Omit<GoalsGridProps, 'snap'> = {
         'At SAEL, our vision is to spearhead the shift towards a sustainable energy future, ' +
         'where renewable sources drive economies and enhance lives. We envision a future ' +
         'where sustainable energy solutions seamlessly integrate into global infrastructure.',
-      image: homepageImages.goals.vision,
-      icon: homepageImages.goals.markVision,
+      image: goalVision,
+      icon: markVision,
     },
     {
       id: 'ethos',
@@ -538,8 +555,8 @@ export const ourGoals: Omit<GoalsGridProps, 'snap'> = {
         'by innovation, integrity, and holistic community empowerment. Our principles embody ' +
         'a culture of excellence, inclusivity, and accountability, fostering resonance with ' +
         'our global communities and partners.',
-      image: homepageImages.goals.ethos,
-      icon: homepageImages.goals.markEthos,
+      image: goalEthos,
+      icon: markEthos,
     },
   ],
 };

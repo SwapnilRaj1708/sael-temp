@@ -250,7 +250,7 @@ export function BusinessTiles({ eyebrow, tiles, snap = false }: BusinessTilesPro
                       longer run under it — but 68ch still lets a line run far
                       wider than the design sets it. 46ch is the design's own
                       cap. */}
-                    <p className="mt-4 max-w-(--ledger-measure) text-body-sm [text-wrap:pretty] text-on-dark-soft">
+                    <p className="mt-4 max-w-(--ledger-measure) text-body-sm text-pretty text-on-dark-soft">
                       {tile.description}
                     </p>
 

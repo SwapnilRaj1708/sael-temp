@@ -1,5 +1,5 @@
 import { NotImplementedError, type ContentRepository } from '../repository';
-import type { CapacityStat, NewsItem } from '../types';
+import type { CapacityStat, NewsItem, TeamMember } from '../types';
 
 export interface ApiContentRepositoryOptions {
   baseUrl: string;
@@ -33,5 +33,16 @@ export class ApiContentRepository implements ContentRepository {
   getNewsItems(options?: { limit?: number }): Promise<NewsItem[]> {
     void options;
     return Promise.reject(new NotImplementedError('ApiContentRepository.getNewsItems'));
+  }
+
+  /**
+   * `GET /api/v1/team`, mapped by `displayOrder` → `order`, `photoUrl` kept,
+   * `photoAlt` dropped (a portrait's alternative text is the name beside it),
+   * `group` read straight through, and `portraitZoom` read through with a
+   * missing or non-positive value mapped to `null` (the dialog then takes the
+   * default). FE-23 wires the body.
+   */
+  getTeamMembers(): Promise<TeamMember[]> {
+    return Promise.reject(new NotImplementedError('ApiContentRepository.getTeamMembers'));
   }
 }

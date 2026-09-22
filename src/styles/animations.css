@@ -149,7 +149,8 @@
   }
 }
 
-/* The halo expanding out of a map pin. */
+/* The halo expanding out of a map pin. How far it grows is --map-ping-scale
+   in theme.css, which is where to tune it. */
 @keyframes saelPing {
   0% {
     transform: scale(1);
@@ -157,7 +158,7 @@
   }
   70%,
   100% {
-    transform: scale(2.6);
+    transform: scale(var(--map-ping-scale));
     opacity: 0;
   }
 }
@@ -170,6 +171,38 @@
   }
   50% {
     opacity: 1;
+  }
+}
+
+/* The three "Our Strategic Pillars" marks, from `About Us.dc.html` §05. Each
+ * animates one idea and nothing else: the bars grow, the gear turns, the leaf
+ * sways. All three are ambient loops on a `<g>` inside the SVG, so they
+ * composite on the GPU and never touch layout.
+ *
+ * `transform-origin` is in the SVG's own user space — the marks are drawn on a
+ * 56x56 viewBox — which is why the origins below are unitless pairs and not
+ * percentages. */
+@keyframes saelPillarGrow {
+  from {
+    transform: scaleY(0.45);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes saelPillarSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes saelPillarSway {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(5deg);
   }
 }
 
@@ -254,11 +287,50 @@
     transform: none;
   }
 
+  /* The pillar marks at rest. Each is the artwork as drawn — the bars at full
+   * height, the gear and the leaf unrotated — so a reduced-motion viewer sees
+   * the mark the designer drew rather than one frozen mid-cycle. */
+  .anim-pillar-bar,
+  .anim-pillar-gear,
+  .anim-pillar-leaf {
+    transform: none;
+  }
+
   /* ---------------------------------------------------------------------------
    * Motion — only when the user has not asked for less
    * ------------------------------------------------------------------------ */
 
   @media (prefers-reduced-motion: no-preference) {
+    /* The pillar marks. `alternate` on two of the three, so they breathe
+     * rather than snapping back to the start of the cycle; the gear is the
+     * exception because a gear that reversed would read as broken.
+     *
+     * The three bars share one class and are staggered by a second class each,
+     * which is cheaper than three near-identical animations and keeps the
+     * timing in one place. */
+    .anim-pillar-bar {
+      transform-origin: 50% 44px;
+      animation: saelPillarGrow 2.2s ease-in-out infinite alternate;
+    }
+
+    .anim-pillar-bar-2 {
+      animation-delay: 0.3s;
+    }
+
+    .anim-pillar-bar-3 {
+      animation-delay: 0.6s;
+    }
+
+    .anim-pillar-gear {
+      transform-origin: 28px 28px;
+      animation: saelPillarSpin 14s linear infinite;
+    }
+
+    .anim-pillar-leaf {
+      transform-origin: 28px 44px;
+      animation: saelPillarSway 3.4s ease-in-out infinite alternate;
+    }
+
     /* `transform-origin` rather than the default centre — see the note on
        `--hero-origin`. It belongs here and not in the still-state block above
        because the still state is `scale(1)`, which has no origin to speak of.
@@ -454,6 +526,153 @@
     [data-mega='open'] .anim-mega-col {
       opacity: 1;
       transform: none;
+    }
+  }
+}
+
+/*
+ * The glow frame - components/ui/glow-frame.tsx.
+ *
+ * A mesh-gradient ring and a halo that sweep once round a panel, driven by
+ * two registered custom properties: the sweep angle and how far the light has
+ * risen. Both are animated with keyframes, so no JavaScript touches a style,
+ * and both are gated on the data-reveal attribute that <Reveal> already sets,
+ * so the sweep runs every time the section reveals and re-arms with it -
+ * scroll past, scroll back, and it plays again, exactly as the reveal does.
+ * That is the same mechanism .anim-about-settle rides on.
+ *
+ * The still state is the frame with no light on it: --glow-edge at zero
+ * leaves both layers at opacity zero. Under reduced motion that is all a
+ * visitor ever sees, per this file's contract.
+ *
+ * Registering the properties is what makes them interpolate: an unregistered
+ * custom property flips at the keyframe rather than tweening between them.
+ * The ring is drawn by the padding-box / border-box mask trick, so it is
+ * exactly the one pixel of the frame's own border and sits on the frame's own
+ * radius - which is why the pasted effect, drawn in its own box at its own
+ * radius, did not line up with the card inside it.
+ */
+@property --glow-angle {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 110deg;
+}
+
+@property --glow-edge {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+/* The light travels once round, easing in for the first third of the turn
+ * and out for the rest, as the pasted effect timed it. */
+@keyframes glowSweepAngle {
+  from {
+    --glow-angle: 110deg;
+    animation-timing-function: ease-in;
+  }
+  37.5% {
+    --glow-angle: 287.5deg;
+    animation-timing-function: ease-out;
+  }
+  to {
+    --glow-angle: 465deg;
+  }
+}
+
+/* The light rises quickly, holds while the sweep passes, and fades. */
+@keyframes glowSweepEdge {
+  0% {
+    --glow-edge: 0;
+  }
+  12.5% {
+    --glow-edge: 1;
+  }
+  62.5% {
+    --glow-edge: 1;
+  }
+  100% {
+    --glow-edge: 0;
+  }
+}
+
+@layer components {
+  .anim-glow-sweep {
+    --glow-angle: 110deg;
+    --glow-edge: 0;
+  }
+
+  /* The ring: the mesh, clipped to the border pixel by masking the content
+   * box out of the border box, then to a cone of the sweep by the angle. */
+  .anim-glow-border {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: var(--glow-edge);
+    mask-image: conic-gradient(
+      from var(--glow-angle) at center,
+      black 25%,
+      transparent 40%,
+      transparent 60%,
+      black 75%
+    );
+  }
+
+  .anim-glow-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--gradient-glow-mesh);
+    /* The shorthand, not mask-image: content-box is a mask-clip value and is
+       only valid here. Composite after the shorthand, which resets it. */
+    mask:
+      linear-gradient(black 0 0) content-box,
+      linear-gradient(black 0 0);
+    mask-composite: exclude;
+  }
+
+  /* The halo: the layered shadow on a box the size of the frame, inside a
+   * layer that extends --glow-halo-radius beyond it so the outer shadow is not
+   * clipped, masked to a narrower cone at the head of the sweep. */
+  .anim-glow-halo {
+    position: absolute;
+    inset: calc(var(--glow-halo-radius) * -1);
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: var(--glow-edge);
+    mix-blend-mode: plus-lighter;
+    mask-image: conic-gradient(
+      from var(--glow-angle) at center,
+      black 2.5%,
+      transparent 10%,
+      transparent 90%,
+      black 97.5%
+    );
+  }
+
+  .anim-glow-halo::before {
+    content: '';
+    position: absolute;
+    inset: var(--glow-halo-radius);
+    border-radius: inherit;
+    box-shadow: var(--shadow-glow-halo);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* Under the pointer the light eases in and out rather than snapping,
+       on the card-hover duration: this is a hover on a card. */
+    .anim-glow-border,
+    .anim-glow-halo {
+      transition: opacity var(--duration-card);
+    }
+
+    [data-reveal='shown'] .anim-glow-sweep {
+      animation:
+        glowSweepAngle 4s backwards,
+        glowSweepEdge 4s backwards;
     }
   }
 }

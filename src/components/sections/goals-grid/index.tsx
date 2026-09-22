@@ -152,7 +152,7 @@ export function GoalsGrid({ title, goals, snap = false }: GoalsGridProps) {
                   <div
                     className={cn(
                       'flex flex-col items-center gap-stack',
-                      '[text-shadow:var(--shadow-goal-title)]',
+                      'text-shadow-(--shadow-goal-title)',
                     )}
                   >
                     {/*
@@ -238,7 +238,7 @@ export function GoalsGrid({ title, goals, snap = false }: GoalsGridProps) {
                           aria-hidden="true"
                           className="mx-auto my-stack block h-px w-rule-w bg-hairline-on-media"
                         />
-                        <p className="text-body-sm [text-wrap:pretty]">{goal.body}</p>
+                        <p className="text-body-sm text-pretty">{goal.body}</p>
                       </div>
                     </div>
                   </div>

@@ -162,7 +162,19 @@
    * design element at two opacities, not two elements. */
   --color-hairline-dark: rgb(255 255 255 / 0.16);
   --color-hairline-grid: rgb(255 255 255 / 0.14);
+
+  /* The modal scrim behind a biography dialog. --color-surface-black at 0.72,
+   * which is the design file's own `dialog::backdrop`. Its own token rather
+   * than an opacity utility on the black, because `::backdrop` is not a child
+   * of anything and cannot inherit one. */
+  --color-scrim-dialog: rgb(8 9 12 / 0.72);
   --color-hairline-paper: rgb(20 24 32 / 0.18);
+  /* The outlined card's frame (ui/card.tsx `shape="outlined"`). A full box
+   * drawn at hairline weight vanishes on the dot ground — the client's
+   * reference of 2026-09-17 draws it plainly visible — so it takes roughly
+   * twice the hairline's alpha on each ground. */
+  --color-outline-dark: rgb(255 255 255 / 0.36);
+  --color-outline-paper: rgb(20 24 32 / 0.32);
   --color-hairline-paper-soft: rgb(20 24 32 / 0.2);
 
   /* A rule drawn over a photograph rather than over a flat ground — the
@@ -245,7 +257,7 @@
    * which in v2 is left to headings that sit inside a card or a rail. Regular
    * weight and tight: DIN at this size does not need the extra. */
   --text-display: clamp(1.875rem, 1.4423rem + 1.9231vw, 4rem);
-  --text-display--line-height: 1.02;
+  --text-display--line-height: 1.2;
   --text-display--letter-spacing: -0.028em;
   --text-display--font-weight: 400;
 
@@ -289,6 +301,23 @@
   --text-body--font-weight: 400;
 
   /* 15 → 17 */
+  /* 18 → 36. The copy on the "Our Ambition" panel, which is a display
+   * statement rather than running text: the client set it at 36 on the
+   * desktop design (2026-09-17) and asked for it to come down to 18 on the
+   * way to the tablet floor. Linear between 768 and 1920 wide. */
+  --text-cutout-copy: clamp(1.125rem, 0.375rem + 1.5625vw, 2.25rem);
+  --text-cutout-copy--line-height: 1.35;
+  --text-cutout-copy--font-weight: 400;
+
+  /* 16 → 24. The same copy on the mobile panel, below `md`. The client set
+   * it in three steps on 2026-09-17 — 16 to 400 wide, 20 to 460, 24 above —
+   * and this is that curve made continuous: 16 at 360, 24 from 460 up. The
+   * slope is steep on purpose; the panel gains width fast across that range
+   * and the copy has to keep pace with it. */
+  --text-cutout-copy-m: clamp(1rem, 8vw - 0.8rem, 1.5rem);
+  --text-cutout-copy-m--line-height: 1.4;
+  --text-cutout-copy-m--font-weight: 400;
+
   --text-body-sm: clamp(0.9375rem, 0.9087rem + 0.1282vw, 1.0625rem);
   --text-body-sm--line-height: 1.5;
   --text-body-sm--font-weight: 400;
@@ -492,6 +521,13 @@
 
   --spacing-section-y: clamp(3rem, 2.3077rem + 3.0769vw, 6rem); /* 48 → 96 */
   --spacing-section-y-tight: clamp(2.5rem, 2.1394rem + 1.6026vw, 4.0625rem); /* 40 → 65 */
+  /* The foot of a page's last section, where it meets the footer's pixel
+   * strip. The standard rhythm reads as too little there: the strip is
+   * solid along its top edge, so the section's content sits closer to a hard
+   * line than it does to any other section's. Roughly a step and two thirds
+   * over --spacing-section-y, on the client's ask of 2026-09-22. Consumed by
+   * <Section spacing="closing">. */
+  --spacing-section-y-closing: clamp(5rem, 3.8462rem + 5.1282vw, 10rem); /* 80 → 160 */
   /* Heading → content gap. docs/design-guidelines.md §3 calls this
    * `--space-block`; it is `--spacing-flow` here, and the name is load-bearing.
    *
@@ -759,7 +795,7 @@
    * Radius and elevation — docs/design-guidelines.md §3
    * ------------------------------------------------------------------ */
 
-  /* The dotted India map's own viewBox — `src/assets/images/homepage/presence-map/dotted-map.svg`,
+  /* The dotted India map's own viewBox — `src/assets/images/dotted-map.svg`,
    * supplied by the client on 2026-08-21. Kept beside the site coordinates it
    * describes, in sections/presence-map/dots.ts. */
   --aspect-map-india: 311.33 / 337.45;
@@ -794,7 +830,7 @@
    * here answers the one with the matching name there.
    * ------------------------------------------------------------------ */
 
-  /* The panel's own ratio — `homepage/endeavour/mask.svg`'s viewBox, which its path
+  /* The panel's own ratio — `endeavour/mask.svg`'s viewBox, which its path
    * fills exactly. See --mask-endeavour-panel. */
   --endeavour-panel-aspect: 498 / 491;
 
@@ -835,6 +871,7 @@
   --radius-quote: 1.125rem; /* 18 */
 
   --radius-card: 0.875rem; /* 14 — news cards */
+  --radius-card-outlined: 2.5rem; /* 40 — the outlined value card, client reference of 2026-09-17 */
   --radius-sdg: 1rem; /* 16 — SDG cards */
   --radius-pill: 62.4375rem; /* 999 — dots, social buttons */
   --radius-none: 0; /* goals cards, CTA buttons — square by design */
@@ -912,7 +949,7 @@
    * supplies the three layers separately (shape, photograph, cut-out) and the
    * grade is ours to apply again.
    *
-   * **This is `homepage/about/mask.svg`'s own ramp, transcribed** — not a ramp
+   * **This is `aboutSael/mask.svg`'s own ramp, transcribed** — not a ramp
    * chosen here. The client supplied that file on 2026-09-02 to replace the
    * derivation from `14.svg`, and its gradient is the design's answer to what
    * this shape is coloured. `14.svg`'s flatter `#2b1b54 → #8a1e42 → #e01f2b`
@@ -929,7 +966,7 @@
   --gradient-shape: linear-gradient(114.87deg, #3035aa 11.4%, #8a1e42 63.3%, #fb3633 88.6%);
 
   /* "Our Endeavour"'s panel, and the same transcription job --gradient-shape
-   * describes: `homepage/endeavour/mask.svg` declares `gradientUnits="userSpaceOnUse"`
+   * describes: `endeavour/mask.svg` declares `gradientUnits="userSpaceOnUse"`
    * from `(360.159, 0)` to `(130.936, 487.755)` inside a 498 x 491 box — 538.9
    * units of gradient line where CSS gives itself 656.2 — so the file's
    * `0.195 / 0.560 / 0.886` land at `24.9% / 55.0% / 81.7%`. Valid only while
@@ -948,7 +985,7 @@
     #f20f18ab 81.7%
   );
 
-  /* `homepage/about/mask.svg`'s silhouette as an alpha mask. The path verbatim; the
+  /* `aboutSael/mask.svg`'s silhouette as an alpha mask. The path verbatim; the
    * only change is `fill`, from the file's gradient reference to opaque white,
    * because a mask reads alpha and the ramp is --gradient-shape's job.
    *
@@ -975,12 +1012,23 @@
 
   --mask-about-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 973 620'%3E%3Cpath fill='%23fff' d='M923.89 203.228H651.11C639.251 203.228 627.886 198.426 619.624 189.921L446.957 12.045C439.49 4.33514 429.196 0 418.463 0H49.1099C21.9883 0 0 21.9773 0 49.0853V570.915C0 598.023 21.9883 620 49.1099 620H280.659C291.145 620 301.192 615.857 308.631 608.476L405.122 512.775C412.561 505.395 422.608 501.252 433.094 501.252H923.89C951.012 501.252 973 479.274 973 452.166V252.313C973 225.205 951.012 203.228 923.89 203.228Z'/%3E%3C/svg%3E");
 
-  /* `homepage/endeavour/mask.svg`'s silhouette as an alpha mask — the path verbatim,
+  /* `endeavour/mask.svg`'s silhouette as an alpha mask — the path verbatim,
    * `fill` changed to opaque white and `fill-opacity` dropped, both of which
    * belong to --gradient-endeavour-panel rather than to the mask. Supplied
    * 2026-09-02. `5.svg`, the same shape from the original handover, is still
    * in that folder and is no longer the source for this section. */
   --mask-endeavour-panel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 498 491'%3E%3Cpath fill='%23fff' d='M9.34357 304.203L113.81 405.095C119.812 410.87 123.186 418.818 123.186 427.123V460.343C123.186 477.277 136.909 491 153.845 491H384.093C401.028 491 414.751 477.277 414.751 460.343V217.033C414.751 209.214 417.736 201.688 423.122 195.978L489.63 133.821C495.015 128.111 498 120.585 498 112.766V30.6571C498 13.7227 484.277 0 467.341 0H30.6586C13.7234 0 0 13.7227 0 30.6571V282.143C0 290.48 3.37406 298.428 9.34357 304.203Z'/%3E%3C/svg%3E");
+
+  /* The Solar Energy page's two photograph shapes — `solarEnergy/mask1.svg`
+   * and `mask2.svg`, supplied 2026-09-18, as alpha masks. The paths verbatim,
+   * filled white where the files draw a black stroke: a mask reads alpha and
+   * the outline was the designer's guide, not the shape. mask1 is two
+   * interlocking rounded tabs, one path each; mask2 is one notched panel.
+   * Boxes carrying them take --aspect-solar-overview / --aspect-solar-execution,
+   * their viewBoxes, so --mask-fill stretches nothing. Consumed by
+   * sections/prose-split (via `media.mask`) and sections/capability-split. */
+  --mask-solar-overview: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 385 323'%3E%3Cpath fill='%23fff' d='M284.038 0.5H367.333C376.889 0.5 384.5 7.12456 384.5 15.1396V176.086C384.5 184.101 376.888 190.725 367.333 190.725H234.465C230.715 190.725 227.134 189.426 224.547 187.136L224.546 187.135L162.433 132.273L162.141 132.022C159.098 129.469 155.015 128.044 150.774 128.044H52.6465C43.0911 128.044 35.4805 121.419 35.4805 113.404V51.7646C35.4805 43.7497 43.0911 37.1252 52.6465 37.125H229.202C233.084 37.1249 236.816 35.8112 239.589 33.4521L274.299 3.93555C276.878 1.74187 280.375 0.5 284.038 0.5Z'/%3E%3Cpath fill='%23fff' d='M100.962 322.5H17.6667C8.11119 322.5 0.499756 315.875 0.499756 307.86V146.914C0.499912 138.899 8.11129 132.275 17.6667 132.275H150.535C154.284 132.275 157.866 133.574 160.453 135.864L160.454 135.865L222.567 190.726L222.859 190.977C225.902 193.53 229.985 194.956 234.225 194.956H332.353C341.909 194.956 349.519 201.58 349.519 209.595V271.235C349.519 279.25 341.909 285.874 332.353 285.875H155.798C151.916 285.875 148.184 287.188 145.411 289.547L110.701 319.064C108.122 321.258 104.624 322.5 100.962 322.5Z'/%3E%3C/svg%3E");
+  --mask-solar-execution: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 366 436'%3E%3Cpath fill='%23fff' d='M22.5322 0.5H343.468C355.554 0.500031 365.5 12.3689 365.5 27.2227V100.135C365.5 106.971 363.339 113.538 359.461 118.512L310.595 173.694L310.584 173.706L310.575 173.718C306.543 178.883 304.317 185.677 304.317 192.722V408.777C304.317 423.631 294.371 435.5 282.285 435.5H113.066C100.981 435.5 91.0343 423.631 91.0342 408.777V379.278C91.0342 371.796 88.5191 364.619 84.0225 359.392L7.24707 269.802C2.94484 264.773 0.500029 257.834 0.5 250.538V27.2227C0.500166 12.3689 10.4464 0.500009 22.5322 0.5Z'/%3E%3C/svg%3E");
 
   /* "Our Endeavour" — how wide the artwork sits beside the copy. The panel
    * gradient and the shape mask that used to live here left when the client
@@ -994,6 +1042,171 @@
    * four cards stretch to the full gutter width and read as slabs rather than
    * as cards. `SAEL Homepage v3.dc.html`. */
   --business-max-w: 72.5rem; /* 1160 */
+
+  /* ---------------------------------------------------------------------
+   * The inner-page templates — <ProseSplit> and <ValueGrid>, introduced by
+   * About Us (FE-06) and inherited by FE-07 → FE-15.
+   *
+   * Every figure here is read off `About Us.dc.html`. They are column
+   * *floors* rather than breakpoints: each grid is one
+   * `repeat(auto-fit, minmax(min(100%, <floor>), 1fr))` track and reflows on
+   * its own content width, so a section that gains a card later needs no new
+   * media query. `min(100%, …)` is what stops the floor from overflowing a
+   * 360px viewport — without it a 380px column is wider than the screen.
+   * --------------------------------------------------------------------- */
+
+  /* The inner-page hero's height: a full screen, with a floor under it.
+   *
+   * `--spacing-viewport` is the screen minus whatever the masthead is taking —
+   * the whole screen below `lg` where the bar overlays, the screen less 68px
+   * from `lg` where it offsets. globals.css does that swap off
+   * `[data-viewport-hero]`, which <PageHero> sets itself.
+   *
+   * **The floor is a `max()` and not a media query, because the problem is the
+   * viewport's height and a breakpoint can only ask about its width.** A phone
+   * held landscape is around 390px tall: a full-viewport hero there is shorter
+   * than the copy standing in it, and no width breakpoint distinguishes that
+   * phone from the same phone held upright. `max()` asks the only question that
+   * matters — is a screen's worth actually enough room — and answers it at every
+   * width and orientation at once.
+   *
+   * 576px is what the content stack needs before it starts to feel cramped:
+   * ~100px of top padding clearing the bar, the breadcrumb, the `--text-hero`
+   * headline, a two-line standfirst, and --spacing-hero-pad-bottom under it. */
+  --page-hero-min-h: 36rem; /* 576 */
+  --page-hero-h: max(var(--page-hero-min-h), var(--spacing-viewport));
+
+  /* A prose split — heading and running copy beside one photograph. */
+  --prose-split-col-min: 23.75rem; /* 380 */
+  --prose-media-landscape-w: 35rem; /* 560 — "Our Endeavours" */
+  --prose-media-portrait-w: 26.25rem; /* 420 — "Our Ambition" */
+  --aspect-prose-landscape: 4/3;
+  --aspect-prose-portrait: 4/5;
+  /* The Solar Energy photograph masks' own viewBoxes. See --mask-solar-*. */
+  --aspect-solar-overview: 385 / 323;
+  --aspect-solar-execution: 366 / 436;
+  /* How wide each business page's photograph may run beside its copy. Wider than the
+   * prose split's own caps (560 / 420): the shapes carve notches out of their
+   * boxes, so a box sized like a plain photograph reads smaller than one, and
+   * at the design width it sat centred in its column with slack either side.
+   * Client's ask of 2026-09-18. Below the caps the auto-fit grid governs.
+   *
+   * Named for the family rather than for Solar Energy: all four business
+   * pages draw the same composition and share these two caps. The `--mask-*`
+   * and `--aspect-solar-*` tokens above keep their names, because those name
+   * the two shape files the client supplied as `solarEnergy/mask1.svg` and
+   * `mask2.svg` — the name is the provenance. */
+  --business-overview-media-w: 44rem; /* 704 */
+  --business-execution-media-w: 34rem; /* 544 */
+
+  /* A cutout split — "Our Ambition" from `md` up: a shaped paper panel
+   * (`bg-for-cutout.svg`, drawn at 700 × 405) with the copy on the shelf under
+   * the notch cut from its top-left corner, and a cut-out portrait standing
+   * against its right edge. Everything inside the panel is positioned as a
+   * fraction of the panel, so it scales with the panel and nothing drifts off
+   * the artwork. The fractions are read off the SVG path: the notch floor is
+   * at 77.57 of 405, the shelf floor at 272.25 of 405.
+   *
+   * The panel is the container's width less an inset on the right, which is
+   * what lets the portrait (34% of the panel) stand proud of the panel's edge
+   * rather than inside it; the inset and the portrait's offset are the
+   * client's own values of 2026-09-17, the inset eased down for a narrow
+   * container so the panel keeps its room. */
+  --cutout-panel-inset-r: clamp(2rem, 5vw, 6rem); /* 32 → 96 */
+  --cutout-portrait-r: 1rem; /* 16 */
+  --cutout-notch-h: 19.15%;
+  --cutout-shelf-b: 32.8%; /* the shelf's floor, measured from the bottom */
+  --cutout-copy-x: 7%; /* clear of the panel's 5% corner radius */
+  --cutout-copy-w: 50%;
+  --cutout-portrait-w: 34%;
+
+  /* The same section below `md`, to the client's mobile reference of
+   * 2026-09-17: a tall paper panel (`bg-for-cutout-mobile.svg`, drawn at
+   * 179 × 322) with the notch at its top-right, the copy running down the
+   * body, and the portrait standing on the panel's bottom-right foot and
+   * overhanging its right edge. The block is capped so a tablet does not get
+   * a panel a screen and a half tall, and the fractions are read off the
+   * path: the notch floor at 26.16 of 322, the foot's top at 276.15 of 322.
+   * The inset and the portrait are fractions of the *block*, the copy of
+   * the panel. */
+  --cutout-m-w: 28rem; /* 448 — the block's cap */
+  --cutout-m-panel-inset-r: 18%; /* the room the portrait overhangs into */
+  --cutout-m-portrait-w: 42%;
+  --cutout-m-notch-h: 8.15%;
+  --cutout-m-foot-b: 14.25%; /* the foot's top, measured from the bottom */
+  --cutout-m-copy-x: 7%;
+  --cutout-m-copy-w: 62%;
+
+  /* A grid of value cards. Two floors, because the two surfaces on About Us
+   * carry different amounts of copy: three short pillars tile happily at 260,
+   * where the eight guiding principles need 340 to keep a card from becoming
+   * a column of single words. */
+  --value-grid-col-min: 16.25rem; /* 260 — "Our Strategic Pillars" */
+  --value-grid-col-min-wide: 21.25rem; /* 340 — "Our Guiding Principles" */
+  --value-mark-size: 3.5rem; /* 56 — the mark at the head of a value card */
+
+  /* How wide a value card may grow when the grid is `balance`d — the Careers
+   * page's five culture cards, which no column count divides at every width.
+   * A balanced grid is a wrapping flex row rather than a CSS grid, so a short
+   * last row centres instead of hanging left, and the cards in it grow to
+   * fill their row. Without a cap a lone fifth card would grow to the full
+   * content width; with this one it stops at roughly two columns' worth,
+   * which is wide enough to read as deliberate and narrow enough to still
+   * read as a card. Consumed by sections/value-grid. */
+  --value-grid-card-max: 30rem; /* 480 */
+
+  /* A photograph in a gallery grid — sections/gallery-grid. The four "Life at
+   * SAEL" photographs are supplied at 1200 × 800 and 1024 × 683, which is 3:2
+   * to within a pixel, so the box takes the assets' own ratio and
+   * `object-cover` crops nothing anyone would notice. */
+  --aspect-gallery: 3 / 2;
+
+  /* A centred panel of copy — the "Looking for your dream job?" card. It
+   * would otherwise run the full content width, which at 1920 is 1608px, and
+   * a three-line card that wide reads as a banner rather than an object.
+   * Narrower than --measure, which is for running copy, and wide enough that
+   * the heading holds one line at the design width. */
+  --panel-max-w: 52rem; /* 832 */
+
+  /* The team directory — a tabbed grid of portrait cards, each opening a
+   * biography in a modal dialog. `Our Team.dc.html`, docs/features/07.
+   *
+   * 250 is a lower floor than either value-grid column, and deliberately: a
+   * team card carries a name and one line of designation under a portrait, so
+   * it tiles four-up on a desktop where a card carrying a paragraph tiles
+   * three. The grid is `auto-fill` rather than `auto-fit` — Management has
+   * seven cards to Leadership's ten, and `auto-fit` would collapse the empty
+   * tracks and draw the same person wider on one tab than on the other. */
+  --team-grid-col-min: 15.625rem; /* 250 */
+
+  /* 3:4 against portraits that are supplied at 4:5. `object-cover` takes the
+   * difference off the top and bottom, which on a head-and-shoulders portrait
+   * is the crop that costs nothing. The design's ratio wins over the assets'
+   * because the card grid, not the photographer, sets the rhythm here. */
+  --aspect-team-photo: 3 / 4;
+
+  /* The biography dialog. Width and height are expressed against the viewport
+   * — a modal dialog's containing block is the viewport itself, which is what
+   * lets `100%` stand in for the `100vw` that is banned everywhere under
+   * `src/` (/CLAUDE.md §2.2). The inset comes off --spacing-flow rather than a
+   * fixed 32/64, so the dialog breathes on a large screen and hugs a phone. */
+  --team-dialog-w: min(45rem, calc(100% - var(--spacing-flow))); /* 720 cap */
+  --team-dialog-max-h: calc(100dvh - var(--spacing-flow) * 2);
+  --team-dialog-portrait-w: 6rem; /* 96 */
+  /* The dialog's portrait is the card's photograph zoomed to a passport crop —
+   * head and shoulders, the client's ask of 2026-09-17 — rather than a second
+   * asset. All seventeen portraits share one studio framing, head in the upper
+   * third and shoulders mid-frame, so one zoom fits every face: 1.5× anchored
+   * a little below the top edge keeps each head whole with air above it and
+   * runs the shoulders off the bottom. Checked against every photograph, not
+   * assumed; 1.6× clipped three heads. The card's own crop is unchanged.
+   *
+   * This is the **default**. `TeamMember.portraitZoom` overrides it per person
+   * — the dialog sets this same property inline from the data — so the client
+   * can tune a photograph that sits differently in its frame without touching
+   * the rest. */
+  --scale-team-passport: 1.5;
+  --team-passport-origin: 50% 14%;
 
   /* The pixel strip's six ramp stops, left to right. Separate values rather
    * than one gradient because the scattered squares are painted to a canvas,
@@ -1100,7 +1313,7 @@
   /* Body-copy measure cap. The layout is fluid to the viewport with no max
    * width, so without this, running text reaches 1600px on an ultrawide.
    * docs/responsive-strategy.md §2. */
-  --measure: 68ch;
+  --measure: 90ch;
 
   /* The hero headline's own measure. Far tighter than --measure: this is
    * display type at 28 → 58px, and a line of it is spent long before running
@@ -1230,13 +1443,13 @@
    * **proportions, not lengths** — nothing here is a pixel — which is what
    * makes the arrangement identical at 360px and at 1920px.
    *
-   * They are measured off `homepage/about/sardar-kid-cutout.png`, the composite
+   * They are measured off `aboutSael/sardar-kid-cutout.png`, the composite
    * the client approved, at its native 605 x 412. That file is now the
    * *reference* rather than the artwork: if the assembly drifts, it is the
    * thing to diff against.
    * ------------------------------------------------------------------ */
 
-  /* The masked shape's own ratio — `homepage/about/mask.svg`'s viewBox, which its
+  /* The masked shape's own ratio — `aboutSael/mask.svg`'s viewBox, which its
    * path fills exactly. The ratio the derivation from `14.svg` produced,
    * 354.45 : 225.97, was the same picture to four decimal places (1.5686
    * against 1.5694), so this swap moved nothing measurable in the layout.
@@ -1321,7 +1534,7 @@
    *
    * **Sampled from the artwork, then lifted.** The marks are PNGs with the
    * gradient baked in, so there was no CSS ramp to reuse: each one's stops
-   * were taken from `src/assets/images/homepage/business/*.png` by projecting its
+   * were taken from `src/assets/images/business/*.png` by projecting its
    * opaque pixels onto the principal axis of their colour cloud, which is the
    * ramp the artwork actually runs along. The hues below are the artwork's.
    *
@@ -1389,9 +1602,82 @@
     rgb(6 7 10 / 0.6) 42%,
     rgb(6 7 10 / 0.3) 100%
   );
+  /* The inner-page hero's scrim. **Not --gradient-hero-scrim-stacked**, which
+   * this used until 2026-09-10 and which belongs to the homepage carousel.
+   *
+   * That one never lets the photograph go: it is 0.92 at the foot, still 0.6
+   * at 42%, and 0.3 even at the very top, so the whole image sits under a grey
+   * film. It is tuned for the homepage's stacked composition, where a large
+   * headline and a four-segment progress bar cross the full frame and every
+   * part of the picture is behind something.
+   *
+   * An inner page's hero carries far less: a breadcrumb, one heading and a line
+   * of standfirst, all bottom-anchored. So the protection is concentrated where
+   * that block actually sits and released everywhere else — still 0.88 at the
+   * foot, but fully clear by 82%, which lets the top two-thirds of the
+   * photograph read at its own brightness.
+   *
+   * The stops are close together through the bottom fifth on purpose. A scrim
+   * that reaches full strength gradually shows a visible band where it crosses
+   * a flat area of photograph; one that arrives quickly under the text does
+   * not, because the eye reads the edge as the text's own ground. */
+  --gradient-page-hero-scrim: linear-gradient(
+    0deg,
+    rgb(6 7 10 / 0.88) 0%,
+    rgb(6 7 10 / 0.72) 16%,
+    rgb(6 7 10 / 0.4) 38%,
+    rgb(6 7 10 / 0.14) 62%,
+    rgb(6 7 10 / 0) 82%
+  );
+
   /* Sat under the progress bar on every slide, so the track never lands on a
    * bright patch of photograph. */
   --gradient-hero-foot: linear-gradient(0deg, rgb(6 7 10 / 0.55) 0%, transparent 30%);
+
+  /* The glow behind the Careers page's "Looking for your dream job?" panel —
+   * sections/cta-panel. The brand purple and red of --gradient-cta, at a
+   * fraction of their strength, rising from the panel's top edge and gone by
+   * three quarters of the way down, so the black ground and its dot grid
+   * show through the lower half. Alphas kept low on purpose: the panel is
+   * lit, not painted, and the button on it is the one thing that carries the
+   * gradient at full strength. Added 2026-09-22. */
+  --gradient-panel-glow: radial-gradient(
+    120% 90% at 50% 0%,
+    rgb(69 37 141 / 0.42) 0%,
+    rgb(228 15 20 / 0.14) 48%,
+    transparent 76%
+  );
+
+  /* The ring and halo that sweep round that same panel as it reveals —
+   * ui/glow-frame.tsx, with the motion in animations.css.
+   *
+   * The client pasted in a mesh-gradient border effect on 2026-09-22 (React
+   * state driving inline styles, its own hex palette, a hover follow). This is
+   * that effect re-drawn in the token layer: the mesh is the heading's own
+   * --gradient-heading-bright ramp scattered as seven radial pools, so the
+   * ring reads as the heading's light caught on the frame rather than a
+   * third palette; the halo is the ramp's rose at falling alphas, inset and
+   * outset, so it glows on both sides of the 1px border. The pool positions
+   * are the pasted effect's own. */
+  --gradient-glow-mesh:
+    radial-gradient(at 80% 55%, #7d6fd4 0, transparent 50%),
+    radial-gradient(at 69% 34%, #cf3f7f 0, transparent 50%),
+    radial-gradient(at 8% 6%, #ff4a4f 0, transparent 50%),
+    radial-gradient(at 41% 38%, #7d6fd4 0, transparent 50%),
+    radial-gradient(at 86% 85%, #cf3f7f 0, transparent 50%),
+    radial-gradient(at 82% 18%, #ff4a4f 0, transparent 50%),
+    radial-gradient(at 51% 4%, #cf3f7f 0, transparent 50%), linear-gradient(#7d6fd4 0 100%);
+  --shadow-glow-halo:
+    inset 0 0 0 1px hsl(345 75% 68% / 100%), inset 0 0 1px 0 hsl(345 75% 68% / 60%),
+    inset 0 0 3px 0 hsl(345 75% 68% / 50%), inset 0 0 6px 0 hsl(345 75% 68% / 40%),
+    inset 0 0 15px 0 hsl(345 75% 68% / 30%), inset 0 0 25px 2px hsl(345 75% 68% / 20%),
+    inset 0 0 50px 2px hsl(345 75% 68% / 10%), 0 0 1px 0 hsl(345 75% 68% / 60%),
+    0 0 3px 0 hsl(345 75% 68% / 50%), 0 0 6px 0 hsl(345 75% 68% / 40%),
+    0 0 15px 0 hsl(345 75% 68% / 30%), 0 0 25px 2px hsl(345 75% 68% / 20%),
+    0 0 50px 2px hsl(345 75% 68% / 10%);
+  /* How far outside the panel the halo layer extends, so the outer shadow
+   * has room to bloom and is not clipped at the panel's edge. */
+  --glow-halo-radius: 2.5rem; /* 40 */
 
   /* "Our Goals". The scrim is no longer always on — at rest the photograph is
    * shown as it is, and this arrives with the pointer. See the note in
@@ -1436,6 +1722,12 @@
   --reveal-shift: 1.75rem; /* 28 */
   --duration-cross-fade: 1100ms; /* hero slide cross-fade */
   --duration-parallax: 500ms; /* hero parallax follow, ease-out */
+  /* A background video fading in over its poster once it is actually
+   * playing — ui/video-frame.tsx. Slower than a card hover and quicker than
+   * the hero's cross-fade: the poster and the first frame are near enough
+   * the same picture that a fast cut would read as a flicker, and a slow one
+   * would make the still look like it had stalled. */
+  --duration-media-fade: 600ms;
 
   /* ---------------------------------------------------------------------
    * Stacking order — docs/design-guidelines.md §4
@@ -1464,6 +1756,13 @@
   /* Paired with --blur-header / --blur-mega; the design saturates both panes
    * by the same amount, so one token serves both. */
   --saturate-glass: 1.4;
+
+  /* How far a map pin's halo grows before it fades — the pulse's radius, as a
+   * multiple of the pin (--spacing-map-pin). Read by `saelPing` in
+   * animations.css. Was 2.6 until 2026-09-21; doubled on the client's note
+   * that the pulse was hard to see. **This is the number to tune** — change
+   * it here, nowhere else, and every map on the site follows. */
+  --map-ping-scale: 4.2;
 
   /* The primary CTA's hover. A filter rather than a second gradient, so the
    * button lifts without the stops having to be restated. */

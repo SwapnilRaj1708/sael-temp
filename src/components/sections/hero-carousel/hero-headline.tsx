@@ -84,7 +84,7 @@ export function HeroHeadline({ slide, isActive }: HeroHeadlineProps) {
         // its longest member and nothing below it moves as slides change.
         '[grid-area:1/1]',
         'max-w-(--hero-measure) text-hero text-white',
-        '[text-shadow:var(--shadow-hero-text)]',
+        'text-shadow-(--shadow-hero-text)',
         'transition-opacity duration-(--duration-cross-fade) motion-reduce:transition-none',
         isActive ? 'opacity-100' : 'opacity-0',
       )}

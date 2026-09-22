@@ -101,3 +101,55 @@ export const SIZES_MAP = '(min-width: 64rem) 38rem, 92vw';
  * A business mark on a ledger row — `--spacing-ledger-icon` wide, 69 → 132px.
  */
 export const SIZES_BUSINESS_ICON = '132px';
+
+/**
+ * A `<ProseSplit>` photograph. The split's columns have a 380px floor, so the
+ * grid collapses to one column somewhere under 50rem of viewport and the
+ * artwork is then the full content width inside the gutter. Above that it is
+ * one column of two, capped by `--prose-media-landscape-w` (560px) or
+ * `--prose-media-portrait-w` (420px). The caps and these hints move together.
+ */
+export const SIZES_PROSE_MEDIA_LANDSCAPE = '(min-width: 50rem) 560px, 88vw';
+export const SIZES_PROSE_MEDIA_PORTRAIT = '(min-width: 50rem) 420px, 88vw';
+
+/**
+ * A business page's two shaped photographs, which run wider than the prose
+ * split's own caps — `--business-overview-media-w` (704px) and
+ * `--business-execution-media-w` (544px). Same hinge as the prose split,
+ * since they sit in the same grid. The caps and these hints move together.
+ */
+export const SIZES_BUSINESS_OVERVIEW_MEDIA = '(min-width: 50rem) 704px, 88vw';
+export const SIZES_BUSINESS_EXECUTION_MEDIA = '(min-width: 50rem) 544px, 88vw';
+
+/**
+ * A portrait on a team card. The grid's floor is `--team-grid-col-min` (250px)
+ * and it is `auto-fill`, so a column never grows much past that on a wide
+ * screen — 340px is the widest it is drawn before another track fits. Below
+ * the first wrap it is two columns inside the gutter, and below the second it
+ * is one.
+ */
+export const SIZES_TEAM_CARD = '(min-width: 64rem) 340px, (min-width: 35rem) 46vw, 92vw';
+
+/** The small portrait in a biography dialog — `--team-dialog-portrait-w`, 96px. */
+/** A 96px box, but the portrait is drawn at 1.5× inside it (the passport crop), so 144px of pixels. */
+export const SIZES_TEAM_DIALOG_PORTRAIT = '144px';
+
+/**
+ * The cut-out portrait of the "Our Ambition" panel. From `md` it is 34% of a
+ * panel that is as wide as the container unless the screen's height caps it
+ * first; below `md` it is the prose split's portrait and takes that constant
+ * instead. The 34vw is the uncapped case and over-fetches a little when the
+ * height binds, which is the safe direction.
+ */
+export const SIZES_CUTOUT_PORTRAIT = '(min-width: 48rem) 34vw, 190px';
+
+/* The two panels behind it had `sizes` constants here until 2026-09-17. They
+ * are SVG served from the blob container, so `<CutoutSplit>` renders them
+ * `unoptimized` — no srcset is generated and `sizes` would describe nothing. */
+
+/**
+ * A photograph in a gallery grid — sections/gallery-grid. One column inside
+ * the gutter below `sm`, two from `sm` up; at 1920 a column is ~790px, which
+ * is 41vw, so the first condition is rounded outward from that.
+ */
+export const SIZES_GALLERY = '(min-width: 30rem) 48vw, 92vw';

@@ -28,12 +28,34 @@ import { cn } from '@/lib/utils/cn';
  *
  * The accent is `scaleX` from a left origin, so nothing is laid out again per
  * frame, and it is `aria-hidden` — it repeats the hover state a focus ring
- * already carries. `group-focus-within` mirrors `group-hover` throughout, so a
- * card reached by keyboard behaves as it does under a pointer.
+ * already carries. `group-has-focus-visible` mirrors `group-hover`
+ * throughout, so a card reached by keyboard behaves as it does under a pointer.
  * docs/responsive-strategy.md §5.
+ *
+ * **It was `group-focus-within` until FE-07, and that was a bug.** A card whose
+ * content opens a modal — the team card's biography dialog — gets focus back on
+ * its trigger when the dialog closes, because that is what a native `<dialog>`
+ * correctly does. `:focus-within` cannot tell that restored focus from a
+ * deliberate keyboard visit, so the accent stayed filled after a mouse user
+ * closed the dialog, and stayed filled while they moved the pointer over other
+ * cards. `:has(:focus-visible)` defers to the browser's own modality
+ * heuristic instead: after a pointer interaction the ring is not drawn and
+ * neither is the accent, and after a keyboard one both are — which is right,
+ * because a keyboard user does need to see where focus landed.
+ *
+ * **`shape="outlined"` is the second card idiom**, added 2026-09-17 to the
+ * client's reference for the strategic pillars: a rounded box outlined on all
+ * four sides, with its content set inside `--spacing-flow` of padding. It
+ * keeps the same `group` and ground so the accent and the hover contract are
+ * unchanged; only the frame differs. The hairline idiom stays the default.
  */
-const card = cva('group relative flex w-full border-t', {
+const card = cva('group relative flex w-full', {
   variants: {
+    /** `hairline` hangs from a top rule; `outlined` is a rounded, bordered box. */
+    shape: {
+      hairline: 'border-t',
+      outlined: 'rounded-(--radius-card-outlined) border p-flow',
+    },
     /** Which hairline the card hangs from — follow the section's ground. */
     ground: {
       paper: 'border-hairline-paper',
@@ -46,9 +68,16 @@ const card = cva('group relative flex w-full border-t', {
     inset: {
       top: 'pt-inset',
       block: 'py-inset',
+      /** For `outlined`, whose padding is its own. */
+      none: '',
     },
   },
-  defaultVariants: { ground: 'paper', inset: 'top' },
+  compoundVariants: [
+    // The box needs a stronger line than a lone hairline — see --color-outline-*.
+    { shape: 'outlined', ground: 'dark', className: 'border-outline-dark' },
+    { shape: 'outlined', ground: 'paper', className: 'border-outline-paper' },
+  ],
+  defaultVariants: { ground: 'paper', inset: 'top', shape: 'hairline' },
 });
 
 export interface CardProps extends ComponentPropsWithRef<'div'>, VariantProps<typeof card> {
@@ -70,20 +99,21 @@ export function Card({
   as: Element = 'div',
   ground,
   inset,
+  shape,
   accentClassName,
   className,
   children,
   ...props
 }: CardProps) {
   return (
-    <Element className={cn(card({ ground, inset }), className)} {...props}>
+    <Element className={cn(card({ ground, inset, shape }), className)} {...props}>
       {accentClassName !== undefined && (
         <span
           aria-hidden="true"
           className={cn(
             'absolute inset-x-0 -top-px h-rule-accent origin-left',
             'scale-x-0 transition-transform duration-(--duration-card)',
-            'group-focus-within:scale-x-100 group-hover:scale-x-100',
+            'group-hover:scale-x-100 group-has-focus-visible:scale-x-100',
             'motion-reduce:transition-none',
             accentClassName,
           )}

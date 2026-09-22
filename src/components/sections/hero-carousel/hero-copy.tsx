@@ -6,7 +6,9 @@ import { HeroHeadline } from './hero-headline';
 import type { HeroSlide } from './types';
 
 export interface HeroCopyProps {
+  /** The slides to render. */
   slides: HeroSlide[];
+  /** The index of the active slide. */
   activeIndex: number;
 }
 

@@ -57,3 +57,34 @@ export function webSiteJsonLd(): JsonLd {
     // sitelinks search box that 404s.
   };
 }
+
+/** One step of a breadcrumb trail. `href` is absent for a rung that is not a page. */
+export interface BreadcrumbTrailItem {
+  name: string;
+  /** Root-relative, e.g. `/about-us/`. Omitted for a grouping label. */
+  href?: string;
+}
+
+/**
+ * `BreadcrumbList` for an inner page. Rendered by `ui/breadcrumb.tsx` beside
+ * the trail it describes, rather than from the root layout, because the trail
+ * is per-page and the markup must not be able to disagree with the visible
+ * links. docs/accessibility-and-seo.md §3.
+ *
+ * A rung without an `href` — "Company", which groups pages but is not one —
+ * emits `name` and `position` and no `item`. That is schema.org's own answer
+ * for an intermediate node, and it is why `item` is spread in rather than set
+ * to a placeholder: a URL that 404s is a worse claim than no URL.
+ */
+export function breadcrumbJsonLd(items: readonly BreadcrumbTrailItem[]): JsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      ...(item.href === undefined ? {} : { item: `${siteConfig.url}${item.href}` }),
+    })),
+  };
+}

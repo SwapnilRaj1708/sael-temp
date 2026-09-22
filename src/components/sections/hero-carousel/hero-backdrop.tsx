@@ -43,7 +43,7 @@ export function HeroBackdrop({ slide, isActive, position }: HeroBackdropProps) {
       aria-hidden={!isActive}
       className={cn(
         'pointer-events-none absolute inset-0',
-        'transition-opacity duration-(--duration-cross-fade) [transition-timing-function:ease]',
+        'transition-opacity duration-(--duration-cross-fade) ease-[ease]',
         // An instant swap is the honest reading of "reduce motion" for a
         // change the user did not ask for. Matches card.tsx.
         'motion-reduce:transition-none',
@@ -65,8 +65,8 @@ export function HeroBackdrop({ slide, isActive, position }: HeroBackdropProps) {
         className={cn(
           'absolute inset-0 overflow-hidden',
           'lg:transition-transform lg:duration-(--duration-parallax) lg:ease-out',
-          'lg:[transform-origin:var(--hero-origin)]',
-          'lg:[transform:scale(var(--hero-image-scale))]',
+          'lg:origin-(--hero-origin)',
+          'lg:transform-[scale(var(--hero-image-scale))]',
         )}
       >
         {/*

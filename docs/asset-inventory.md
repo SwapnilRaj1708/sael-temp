@@ -37,35 +37,15 @@ Additionally, several assets are enormous unoptimised originals. Shipping them a
 ```
 src/assets/
 ├── fonts/          DIN — client supplied, licensed. WOFF2 only in the repo.
-├── images/         organised by page, then by section. Mirrored to the CDN.
-│   ├── global/     used on every route
-│   │   ├── logo/
-│   │   └── nav/
-│   └── homepage/
-│       ├── about/  business/  endeavour/  goals/  hero/
-│       ├── presence-map/
-│       └── solutions/
+├── images/
+│   ├── hero/
+│   ├── sections/
+│   ├── news/       placeholder only — production news images come from Azure Blob
+│   └── decorative/
 └── icons/          SVGs imported as React components
 public/
 └── images/         only assets referenced by URL string (OG image, favicon set)
-public/
-└── news/           mock news stills, referenced by URL from the fixtures
 ```
-
-**Organised by page, not by section.** The site is ~25 routes; a flat set of
-section folders collides the moment two pages both have a hero. A page's assets
-are added and deleted with the page, and `global/` is reserved for the narrow
-set whose change affects more than one route — today the masthead logo, the
-footer wordmark and the four mega-menu thumbnails.
-
-**`icons/` is not merged into `images/`, and the split is load-bearing.** SVGs
-under `icons/` are compiled to React components by SVGR (the `turbopack.rules`
-entry in `next.config.ts`) so they inherit `currentColor`; SVGs under `images/`
-are files handed to `next/image`. `src/types/svg.d.ts` types the two folders
-differently and resolves the more specific pattern first, so the folder is what
-selects the consumption model. It is also exactly the CDN boundary: an icon is
-inlined into the JavaScript bundle and never becomes a URL, so it has nothing
-to mirror.
 
 Rules:
 
@@ -257,54 +237,25 @@ svgo -f src/assets/icons --multipass
 
 ---
 
-## 8. The asset CDN
-
-`src/assets/images/` is mirrored to Azure Blob Storage and served from there in
-any environment that sets `NEXT_PUBLIC_CDN_BASE_URL`. The mirror is exact, so a
-repository path names a CDN path with no lookup table:
-
-```
-src/assets/images/homepage/hero/hero-1.png
-$NEXT_PUBLIC_CDN_BASE_URL/images/homepage/hero/hero-1.png
-```
-
-`images/` is one category under `web-assets/`; `videos/` and `documents/` are
-reserved and `AssetCategory` in `src/lib/assets/cdn.ts` is where they are added.
-
-Rules:
-
-- An asset is registered in `src/lib/assets/<page>.ts` with `cdnImage()`, never
-  referenced by a URL written at a call site. `src/lib/assets/README.md` is the
-  how-to; `pnpm verify:guardrails` checks that every entry names a file that
-  exists and names it the same way its import does.
-- **Paths are lowercase.** Blob Storage is case-sensitive and the Windows
-  filesystem is not, so a capital letter is a bug that only appears once it is
-  deployed. The guardrail enforces it.
-- The bundled import stays. It is what supplies the intrinsic width, height and
-  `blurDataURL` that `next/image` needs to reserve the right box — `cdnImage()`
-  swaps the URL and keeps the measurements.
-- Rasters still go through `/_next/image`, with the CDN as the optimizer's
-  origin, which is what keeps AVIF/WebP and the responsive `srcset`. SVGs are
-  served straight from the CDN: Next passes any `.svg` src through untouched,
-  so `dangerouslyAllowSVG` is neither set nor needed.
-- Unset `NEXT_PUBLIC_CDN_BASE_URL` and every asset resolves to
-  `/_next/static/media/` exactly as before. That is the local default.
-
-**Fonts are not mirrored.** `next/font/local` self-hosts DIN, emits the
-`@font-face` rules and preloads them; moving it to a CDN puts a cross-origin
-round trip on the critical rendering path and a commercially licensed typeface
-on public storage. `/CLAUDE.md` §8 and §5 of this document both apply.
-
----
-
-## 8a. Azure Blob conventions (backend-supplied content)
+## 8. Azure Blob conventions
 
 Backend-supplied assets (news images, investor PDFs, team photos) live in Blob Storage and arrive as absolute URLs.
 
 - Compose with `blobUrl(path)` from `@/lib/utils/blob-url` — never string-concatenate at a call site.
+- **Store the path, not the URL.** A fixture or a DTO carries `web-assets/media/our-team/jasbir-singh.jpg`; the host comes from `AZURE_BLOB_BASE_URL` at render time. That is what keeps hostnames out of the repository (/CLAUDE.md §7) and lets one fixture work against any environment's container. `blobUrl()` passes an already-absolute value through, so a backend that returns full URLs needs no special case.
 - Add the account host to `next.config.ts` `images.remotePatterns`.
 - **PDFs are linked, not proxied.** `<a href={doc.file.url} target="_blank" rel="noopener noreferrer">` with the file type and size in the accessible label: *"Annual Return FY 2024-25, PDF, 2.4 MB, opens in a new tab"*.
 - Never commit a PDF to the repository.
+- **Page furniture can come from the container too, and `cdnImage()` is how.** §8 was
+  written for backend-supplied assets that arrive as data. The About Us artwork is not
+  data — it is fourteen fixed files a section renders unconditionally — and it moved to
+  the container on 2026-09-17 all the same. `cdnImage(path, width, height)` from
+  `@/lib/assets/cdn` describes one: it composes the URL with `blobUrl()` and carries the
+  intrinsic dimensions a bundled import would otherwise have supplied, returning
+  something shaped like `StaticImageData` so no consuming component changes. The
+  dimensions must be read from the blob itself. Vectors must be rendered `unoptimized`.
+- **The Careers page's six assets** live at `web-assets/media/career/`, uploaded by the client on 2026-09-22, and are described in `src/app/_content/career.ts` with dimensions read from the blobs' own headers: `career-image-1.webp` 700 × 524 (the intro photograph), `career-image-2.webp`, `-3.webp` and `-4.webp` 1200 × 800 and `career-image-5.jpg` 1024 × 683 (the "Life at SAEL" gallery, in that order; image 2 doubles as the hero's poster), and `career-video.mp4` 1920 × 1080, 12.3 s, H.264 with a silent AAC track (the hero). All five images are byte-identical to the live sael.co files, so the slot mapping is the live page's own. The video has no `cdnImage()` — it is a `<VideoFrame>` fed by `tryBlobUrl()`.
+- Never commit a backend-supplied image either. The seventeen `/our-team/` portraits were briefly mirrored into `public/team/` while the client's URLs were outstanding; **the client supplied them on 2026-09-10** and the copies were deleted. They live at `web-assets/media/our-team/<slug>.<ext>` — fifteen `.jpg`, two `.webp`, one `.png`, matching the slugs in `mock/data/team-members.json`.
 
 ---
 
@@ -328,6 +279,25 @@ Items the client must supply before the relevant tracker item can complete:
 - [ ] Art-directed **portrait crops** of the four hero photographs — *blocks FE-04*
 - [ ] Confirmation that hero photography is final (three unused hero images in the prototype) — *blocks FE-04*
 - [ ] India map as vector, if Option B or C is chosen — *blocks Open Decision #6*
+- [x] ~~**About Us: the page assets**~~ — supplied 2026-09-10 (eleven) and completed
+      2026-09-17 (the three cut-out panels), under
+      `<container>/web-assets/media/about-us/`: the boardroom banner, the solar-field
+      photograph, the Our Ambition portrait, both cut-out panels, the cut-out sitter, and
+      `principle-icon-1` … `-8`. They were committed at `src/assets/images/about-us/` and
+      imported until the container was populated; **the local copies were deleted on
+      2026-09-17** and all fourteen are now described by `cdnImage()` — see
+      `src/lib/assets/cdn.ts` and the folder note in `src/app/_content/about-us.ts`
+- [ ] **Rename `about-us-hero.JPG` on the CDN to `about-us-hero.jpg`.** Azure Blob names
+      are case-sensitive and this is the only file in the folder that is not lowercase,
+      so the call site has to spell the extension in upper case. It blocked the CDN swap
+      while Turbopack was being asked to bundle the file — it refuses an uppercase
+      extension outright (*Unknown module type*) — but nothing bundles it now.
+      *tidiness only; blocks nothing*
+- [ ] **The Our Ambition sitter's name and role.** The asset is
+      `our-ambition-person-image.webp` and the design labelled it only "Portrait
+      photograph", so the `alt` describes what is visible — "A person in a business
+      suit standing in an office" — and asserts no identity. It should name them
+
 - [ ] Favicon / app icon source
 - [ ] OG share image, 1200×630
 
