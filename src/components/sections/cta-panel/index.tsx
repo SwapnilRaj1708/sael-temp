@@ -45,13 +45,23 @@ export interface CtaPanelProps {
  */
 export function CtaPanel({ title, body, action }: CtaPanelProps) {
   return (
-    <Section background="black-dots">
+    <Section
+      background="black-dots"
+      // <GlowFrame>'s halo reaches --glow-halo-radius past the panel so its
+      // outer shadow is not cut off, and on a phone that is past the
+      // viewport's edge — a horizontal scroll, lit or not. `clip`, not
+      // `hidden`, so the halo above and below is left alone.
+      className="overflow-x-clip"
+    >
       <Reveal className="mx-auto w-full max-w-(--panel-max-w)">
         <GlowFrame>
           <Card
             shape="outlined"
             ground="dark"
             inset="none"
+            // It has a light of its own in <GlowFrame>, and clips its
+            // overflow, so the outlined card's hover gradient is left off.
+            hoverEffect={false}
             className="flex-col items-center gap-flow overflow-hidden bg-(image:--gradient-panel-glow) py-section-y-tight text-center"
           >
             <DisplayHeading ground="dark">{title}</DisplayHeading>
