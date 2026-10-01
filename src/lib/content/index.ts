@@ -4,8 +4,26 @@ import { MockContentRepository } from './mock';
 import type { ContentRepository } from './repository';
 
 export { ContentUnavailableError, NotImplementedError } from './repository';
-export type { ContentRepository } from './repository';
-export type { CapacityStat, NewsItem, TeamGroup, TeamMember } from './types';
+export type { ContentRepository, NewsItemsQuery } from './repository';
+export { NEWSROOM_PATH, newsArticlePath, newsListingPath } from './news-links';
+export type {
+  BlobFile,
+  BoardCommittee,
+  BoardMember,
+  CommitteeMember,
+  CapacityStat,
+  CaptionTrack,
+  InvestorDocument,
+  InvestorDocumentCategory,
+  InvestorListing,
+  InvestorVideo,
+  NewsArticle,
+  NewsArticleCategory,
+  NewsCategory,
+  NewsItem,
+  TeamGroup,
+  TeamMember,
+} from './types';
 
 let instance: ContentRepository | null = null;
 

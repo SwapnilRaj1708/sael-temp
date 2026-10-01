@@ -201,6 +201,10 @@
   /* The unfilled part of a hero progress segment. */
   --color-hero-track: rgb(255 255 255 / 0.16);
 
+  /* The hero's slide dots: the resting dot, and the one for the slide on screen. */
+  --color-hero-dot: rgb(255 255 255 / 0.45);
+  --color-hero-dot-active: rgb(255 255 255 / 1);
+
   /* The "upcoming" business card.
    *
    * Solar Cell Manufacturing is the one block in the ledger that is not yet
@@ -411,6 +415,13 @@
   --text-tile-note--font-weight: 400;
 
   /* The asterisk marking an upcoming facility. */
+  /* The business name under the hero's mark: DIN bold capitals, matching
+   * the lettering in the client's original artwork. 10 → 20. */
+  --text-hero-mark-label: clamp(0.625rem, 0.4808rem + 0.641vw, 1.25rem);
+  --text-hero-mark-label--line-height: 1.1;
+  --text-hero-mark-label--letter-spacing: 0.02em;
+  --text-hero-mark-label--font-weight: 700;
+
   --text-tile-marker: clamp(0.75rem, 0.7212rem + 0.1282vw, 0.875rem);
   --text-tile-marker--font-weight: 700;
 
@@ -461,12 +472,8 @@
   --text-ledger-figure--letter-spacing: -0.04em;
   --text-ledger-figure--font-weight: 700;
 
-  /* 28 → 58 for the same slot, where the figure runs long enough that the
-   * size above would break the row. "3625 MW + 5 GW" is the case. */
-  --text-ledger-figure-long: clamp(1.75rem, 1.3462rem + 1.7949vw, 3.625rem);
-  --text-ledger-figure-long--line-height: 0.9;
-  --text-ledger-figure-long--letter-spacing: -0.04em;
-  --text-ledger-figure-long--font-weight: 700;
+  /* A trailing asterisk on a ledger figure, at half the figure's size. */
+  --text-ledger-figure-marker: 0.5em;
 
   /* 22 → 34. The name on an "Our Goals" card. Regular weight and tight, where
    * --text-goal-title was bold and tracked — the design resets it. */
@@ -665,13 +672,20 @@
    * wide screen, as the design has them. */
   --spacing-news-card: clamp(14.875rem, 13.5481rem + 5.8974vw, 20.625rem); /* 238 → 330 */
 
+  /* The play mark centred on a Multimedia card's thumbnail. 44 at 360 so it
+   * still reads on the compact row card's 112px thumbnail, 64 at 1920. */
+  --spacing-play-mark: clamp(2.75rem, 2.4615rem + 1.2821vw, 4rem); /* 44 → 64 */
+
   /* ------------------------------------------------------------------
    * `SAEL Home v2` measurements.
    * ---------------------------------------------------------------- */
 
-  /* The hero's per-slide mark, stacked above the headline rather than set
-   * loose in the frame as a watermark. */
-  --spacing-hero-icon: clamp(4.625rem, 3.1538rem + 6.5385vw, 11rem); /* 74 → 176 */
+  /* The hero's per-slide mark, stacked above the headline. Since 2026-10-01 it is the business ledger's unlettered icon with
+   * the name typed beneath it, in proportion to the client's lettered
+   * artwork (74 → 176 overall): the mark ~70% of it, and a gap of ~8%
+   * of the mark above two lines of caption. */
+  --spacing-hero-mark: clamp(3.25rem, 2.2115rem + 4.6154vw, 7.75rem); /* 52 → 124 */
+  --spacing-hero-mark-gap: clamp(0.25rem, 0.1923rem + 0.2564vw, 0.5rem); /* 4 → 8 */
 
   /* The hero's block padding. The top clears the fixed masthead with room to
    * spare; the bottom keeps the content column clear of the progress bar
@@ -689,6 +703,12 @@
    * clearance plus its own padding and the two never meet. */
   --spacing-hero-progress: 2.75rem; /* 44 */
   --spacing-hero-track: 0.1875rem; /* 3 */
+
+  /* The hero's slide dots, centred in the progress row: the dot, the pill the
+   * active one stretches to, and the gap between hit areas. */
+  --spacing-hero-dot: 0.5rem; /* 8 */
+  --spacing-hero-dot-active: 1.5rem; /* 24 */
+  --spacing-hero-dot-gap: 0.25rem; /* 4 */
 
   /* A business ledger row: the mark set at the row's right edge, the padding
    * that keeps the copy clear of it, and the gutter between the two columns. */
@@ -1208,6 +1228,59 @@
   --scale-team-passport: 1.5;
   --team-passport-origin: 50% 14%;
 
+  /* The investor page template — `sections/sub-page/`, built with Offer
+   * Documents. From `lg` the area's own page list takes a column to the left
+   * of the content; 288 holds the longest Offer Documents label ("Information with
+   * respect to Group Companies") on two lines at --text-body-sm without
+   * starving the content column at 1024, where it is left with ~500px — the
+   * width a 16:9 video and a paragraph of notice both still read at. */
+  --sub-page-nav-w: 18rem; /* 288 */
+
+  /* The consent dialog — `ui/consent-dialog.tsx`, the DRHP's disclaimer.
+   * From `md` only; below that it is the whole screen. Wider than the team
+   * dialog because it carries twenty-two paragraphs rather than one: 832 sets
+   * the notice at roughly the line length of --measure at --text-body-sm,
+   * where 720 would add a third again to an already long scroll. The legacy
+   * dialog's own cap was 900. Same viewport arithmetic as the team dialog —
+   * `100%` is the viewport, a modal's containing block. */
+  /* The document filter's field — ui/document-filter.tsx — clears the search
+   * glyph inside it: the glyph's own inset, its 20px (lucide's `size-5`),
+   * and a tight gap before the typed text. */
+  --spacing-filter-inset: calc(var(--spacing-stack) + 1.25rem + var(--spacing-tight));
+
+  /* A balanced tile row — `<LinkGrid balance>` — two across from `sm`,
+   * three from `xl`, each a share of the row less the gaps between. */
+  --link-grid-basis-2: calc((100% - var(--spacing-gap-grid)) / 2);
+  --link-grid-basis-3: calc((100% - var(--spacing-gap-grid) * 2) / 3);
+
+  --consent-dialog-w: min(52rem, calc(100% - var(--spacing-flow) * 2)); /* 832 cap */
+  --consent-dialog-max-h: calc(100dvh - var(--spacing-flow) * 2);
+
+  /* The Newsroom — ui/news-card.tsx, sections/news-grid/, the article page.
+   *
+   * A news card in a single-column grid is a row, not a tower: the thumbnail
+   * at this width on the left, the date, title and action beside it. 112 at
+   * 360 leaves the headline ~190px; 160 by 720, past which the grid has two
+   * columns and the card stands up again. It is what keeps the 42-item In
+   * The News listing a list on a phone rather than 42 screens of photograph. */
+  --news-row-thumb-w: clamp(7rem, 4rem + 13.3333vw, 10rem); /* 112 → 160, 360 → 720 */
+  --news-row-cols: var(--news-row-thumb-w) minmax(0, 1fr);
+
+  /* An article's reading measure. --measure (90ch) is a cap for copy that
+   * shares a row with something; an article is nothing but running text,
+   * and 68ch at --text-body is the classic 60–75 character line. */
+  --measure-article: 68ch;
+
+  /* The video dialog. As wide as the consent dialog's arithmetic allows,
+   * capped at 1152 — and capped again by the screen's *height*, so a 16:9
+   * player plus the close bar always fits a landscape phone without
+   * scrolling: the height left after the margins and the bar, times 16/9. */
+  --video-dialog-w: min(
+    72rem,
+    calc(100% - var(--spacing-flow) * 2),
+    calc((100dvh - var(--spacing-flow) * 2 - var(--spacing-touch) - var(--spacing-tight)) * 16 / 9)
+  ); /* 1152 cap */
+
   /* The pixel strip's six ramp stops, left to right. Separate values rather
    * than one gradient because the scattered squares are painted to a canvas,
    * which takes a colour and not a CSS gradient.
@@ -1675,9 +1748,82 @@
     0 0 3px 0 hsl(345 75% 68% / 50%), 0 0 6px 0 hsl(345 75% 68% / 40%),
     0 0 15px 0 hsl(345 75% 68% / 30%), 0 0 25px 2px hsl(345 75% 68% / 20%),
     0 0 50px 2px hsl(345 75% 68% / 10%);
+  /* The same halo, about a quarter brighter at every layer, and how much
+   * sooner the light reaches full strength — `<GlowFrame strength="strong">`,
+   * the Offer Documents tiles' tuning of 2026-09-29. */
+  --shadow-glow-halo-strong:
+    inset 0 0 0 1px hsl(345 75% 68% / 100%), inset 0 0 1px 0 hsl(345 75% 68% / 75%),
+    inset 0 0 3px 0 hsl(345 75% 68% / 62%), inset 0 0 6px 0 hsl(345 75% 68% / 50%),
+    inset 0 0 15px 0 hsl(345 75% 68% / 38%), inset 0 0 25px 2px hsl(345 75% 68% / 25%),
+    inset 0 0 50px 2px hsl(345 75% 68% / 13%), 0 0 1px 0 hsl(345 75% 68% / 75%),
+    0 0 3px 0 hsl(345 75% 68% / 62%), 0 0 6px 0 hsl(345 75% 68% / 50%),
+    0 0 15px 0 hsl(345 75% 68% / 38%), 0 0 25px 2px hsl(345 75% 68% / 25%),
+    0 0 50px 2px hsl(345 75% 68% / 13%);
+  --glow-gain-strong: 1.25;
+  /* Hovered, a tile grows by this much — the client's 5%, 2026-09-29. */
+  --scale-tile-hover: 1.05;
+
   /* How far outside the panel the halo layer extends, so the outer shadow
    * has room to bloom and is not clipped at the panel's edge. */
   --glow-halo-radius: 2.5rem; /* 40 */
+
+  /* The ripple band — Aceternity UI's background ripple effect, at the head
+   * of the Offer Documents index at the client's request of 2026-09-29.
+   * ui/background-ripple.tsx, sections/ripple-hero, motion in animations.css.
+   *
+   * The grid is drawn in neutral light, as Aceternity draws it, and then
+   * coloured by one layer over the whole band: --gradient-heading-bright in
+   * `mix-blend-mode: color`, which keeps each cell's brightness and gives it
+   * the ramp's hue at that point across the screen — violet on the left
+   * through magenta to red on the right, the same travel as the legacy
+   * site's banner. It is done over true black and added to the page with
+   * `screen`, so the page's own ground is untouched (animations.css,
+   * `.ripple-band`). So the colour is one token and the grid needs no colour
+   * of its own.
+   *
+   * The neutrals are brighter than Aceternity's dark-mode greys (neutral-700
+   * line, neutral-900 fill, neutral-800 glow) because a hue on a near-black
+   * grey reads as black; the rest and lit opacities are theirs. */
+  --ripple-cell: clamp(2.75rem, 2.5769rem + 0.7692vw, 3.5rem); /* 44 → 56 — theirs is 56 */
+  --ripple-line-w: 0.5px; /* theirs */
+  --color-ripple-line: rgb(255 255 255 / 0.34);
+  --color-ripple-fill: rgb(255 255 255 / 0.03);
+  --shadow-ripple-cell: inset 0 0 40px 1px rgb(255 255 255 / 0.2); /* their blur and spread */
+  --ripple-rest: 0.4;
+  --ripple-lit: 0.8;
+  /* A click sends a wave out from the cell: each cell lights after
+   * `distance × step` and holds for `base + distance × spread` — Aceternity's
+   * 55ms, 200ms and 80ms per cell of distance. */
+  --duration-ripple-step: 55ms;
+  --duration-ripple-base: 200ms;
+  --duration-ripple-spread: 80ms;
+  /* The grid fades from the top centre, so it lights the title and is gone
+   * by the band's foot and its lower corners. Theirs is Tailwind's
+   * `mask-radial-from-20% mask-radial-at-top` on a fixed 1512px grid; this
+   * is sized to the band instead, so the fade lands on the screen at every
+   * width, and reaches transparent exactly at the bottom edge. */
+  --mask-ripple: radial-gradient(ellipse 75% 100% at top, black 25%, transparent 100%);
+  /* The band's height. First the top half of the screen, less the masthead
+   * — the client's brief of 2026-09-29 — then, on 2026-09-30, cut down
+   * because it pushed the page's content too far below the fold: by a
+   * quarter on phones and tablets and by 30% from `lg`, where the screen is
+   * shorter relative to its width and the band read as tallest. Each is
+   * still a share of the screen's own height, so it scales with the device.
+   * `svh`, so a phone's toolbar showing and hiding does not resize it
+   * mid-scroll. The floor, 208px, holds the longest title at 360px (three
+   * lines) with its padding, and keeps a landscape phone's band from
+   * collapsing; it is a minimum, so a longer title still grows the band.
+   *
+   * At 360×740 that is 226px (from 302), at 1440×900 267px (from 382), at
+   * 1920×1080 330px (from 472). */
+  --ripple-hero-h: max(13rem, calc((50svh - var(--spacing-header)) * 0.75));
+  --ripple-hero-h-lg: max(13rem, calc((50svh - var(--spacing-header)) * 0.7));
+  /* How far the band's title sits below the band's centre: a quarter of
+   * the top padding of the section under the band (`pt-section-y`,
+   * 48 → 96), the client's call of 2026-09-30 — so the title leans toward the
+   * content it introduces. 12px on a phone, 24px at the design width. Tied to
+   * that token, so the two cannot drift apart. */
+  --ripple-title-shift: calc(var(--spacing-section-y) / 4);
 
   /* Two Aceternity UI effects, trialled on About Us at the client's request of
    * 2026-09-25 — ui/background-gradient.tsx and ui/dotted-glow-background.tsx.

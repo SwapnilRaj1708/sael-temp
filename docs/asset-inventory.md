@@ -255,9 +255,252 @@ Backend-supplied assets (news images, investor PDFs, team photos) live in Blob S
   something shaped like `StaticImageData` so no consuming component changes. The
   dimensions must be read from the blob itself. Vectors must be rendered `unoptimized`.
 - **The Careers page's six assets** live at `web-assets/media/career/`, uploaded by the client on 2026-09-22, and are described in `src/app/_content/career.ts` with dimensions read from the blobs' own headers: `career-image-1.webp` 700 × 524 (the intro photograph), `career-image-2.webp`, `-3.webp` and `-4.webp` 1200 × 800 and `career-image-5.jpg` 1024 × 683 (the "Life at SAEL" gallery, in that order; image 2 doubles as the hero's poster), and `career-video.mp4` 1920 × 1080, 12.3 s, H.264 with a silent AAC track (the hero). All five images are byte-identical to the live sael.co files, so the slot mapping is the live page's own. The video has no `cdnImage()` — it is a `<VideoFrame>` fed by `tryBlobUrl()`.
+- **The Offer Documents files (17) are not uploaded yet** — inventoried 2026-09-29 from the legacy pages, each legacy URL checked (all 200) and its size recorded. They are served from the container, never from the legacy site, which goes away at cutover. The rule is mechanical so the upload can be one pass: **a PDF's blob path is its legacy path with `web-assets` in front**, file name unchanged (including the legacy `corrigendum-to-drh.pdf`); the two videos and their posters go under `web-assets/media/offer-documents/`, file names unchanged. Until the upload, every Offer Documents link 404s. The same paths are in `src/lib/content/mock/data/investor-documents.json` and `investor-videos.json`, each row with its `legacyPath`.
+
+  | Title (as the link reads) | Legacy path on www.sael.co | Blob path | Bytes |
+  |---|---|---|---|
+  | Draft Red Herring Prospectus — **gated** | `/documents/investors/offer-documents/drhp/SAEL_DRHP.pdf` | `web-assets/documents/investors/offer-documents/drhp/SAEL_DRHP.pdf` | 13,489,413 |
+  | Corrigendum to DRHP | `/documents/investors/offer-documents/corrigendum-to-drhp/corrigendum-to-drh.pdf` | `web-assets/documents/investors/offer-documents/corrigendum-to-drhp/corrigendum-to-drh.pdf` | 550,149 |
+  | Addendum to DRHP | `/documents/investors/offer-documents/addendum-to-drhp/Addendum-to-DRHP.pdf` | `web-assets/documents/investors/offer-documents/addendum-to-drhp/Addendum-to-DRHP.pdf` | 627,753 |
+  | Final Report India RE Market Assessment SAEL 03112025 | `/documents/investors/offer-documents/industry-reports/Final-Report-India-RE-Market-Assessment-SAEL-03112025.pdf` | `web-assets/documents/investors/offer-documents/industry-reports/Final-Report-India-RE-Market-Assessment-SAEL-03112025.pdf` | 2,839,816 |
+  | Dr. HS Awla Foundation (FY 2025) | `/documents/investors/offer-documents/information-with-respect-to-group-companies/FY-2025/Dr-HS-Awla-Foundation.pdf` | `web-assets` + legacy path | 8,026,910 |
+  | Sapphire Agri Warehousing Private Limited (FY 2025) | `…/information-with-respect-to-group-companies/FY-2025/Sapphire-Agri-Warehousing-Private-Limited.pdf` | `web-assets` + legacy path | 2,995,880 |
+  | Sun Layer Energy Private Limited (FY 2025) | `…/information-with-respect-to-group-companies/FY-2025/Sun-Layer-Energy-Private-Limited.pdf` | `web-assets` + legacy path | 12,194,000 |
+  | Dr. HS Awla Foundation (FY 2024) | `…/FY-2024/Dr-HS-Awla-Foundation.pdf` | `web-assets` + legacy path | 6,933,934 |
+  | Sapphire Agri Warehousing Private Limited (FY 2024) | `…/FY-2024/Sapphire-Agri-Warehousing-Private-Limited.pdf` | `web-assets` + legacy path | 1,513,884 |
+  | Sun Layer Energy Private Limited (FY 2024) | `…/FY-2024/Sun-Layer-Energy-Private-Limited.pdf` | `web-assets` + legacy path | 7,208,449 |
+  | Dr. HS Awla Foundation (FY 2023) | `…/FY-2023/Dr-HS-Awla-Foundation.pdf` | `web-assets` + legacy path | 2,231,861 |
+  | Sapphire Agri Warehousing Private Limited (FY 2023) | `…/FY-2023/Sapphire-Agri-Warehousing-Private-Limited.pdf` | `web-assets` + legacy path | 11,268,615 |
+  | Sun Layer Energy Private Limited (FY 2023) | `…/FY-2023/Sun-Layer-Energy-Private-Limited.pdf` | `web-assets` + legacy path | 1,641,679 |
+  | DRHP - Audio Visual (English) — **gated** | `/video/SAEL-DRHP-English.mp4` | `web-assets/media/offer-documents/SAEL-DRHP-English.mp4` | 111,001,343 |
+  | …its poster (1600 × 900) | `/img/site/drhp-english.png` | `web-assets/media/offer-documents/drhp-english.png` | 134,733 |
+  | DRHP - Audio Visual (Hindi) — **gated** | `/video/SAEL-DRHP-Hindi.mp4` | `web-assets/media/offer-documents/SAEL-DRHP-Hindi.mp4` | 106,541,645 |
+  | …its poster (1600 × 900) | `/img/site/drhp-hindi.png` | `web-assets/media/offer-documents/drhp-hindi.png` | 173,529 |
+
+  The index page's eight tile icons (`/img/site/4603456.png` and siblings) are **not** migrated: they are stock Flaticon artwork of unknown licence, and the tiles draw lucide icons instead.
+- **The rest of the investor area's files (146) are not uploaded yet either** — inventoried 2026-09-30 from the twelve legacy Corporate Governance, Financials & Reports and Notifications pages that list files. Same mechanical rule as Offer Documents: **the blob path is the legacy path with `web-assets` in front**, file name unchanged (including `Terms-&-condition-of-Independent-Directors.pdf`, whose `&` is part of the name). Until the upload, and while `LEGACY_ASSET_BASE_URL` is set, the mock serves each from the legacy site; the same rows, with their `legacyPath`, are in `src/lib/content/mock/data/investor-documents.json`. 145 of the 146 legacy URLs returned 200 on 2026-09-30; **one is broken on the legacy site itself** — `MGT 7 Mar'26` (Annual Return, FY 2026), marked below.
+
+  | Title (as the link reads) | Legacy path under `/documents/investors/` | Category / section | Group | Bytes |
+  |---|---|---|---|---|
+  | MGT 7 Mar'26 | `financials-and-reports/annual-return/FY-2026/MGT-7-Mar-26.pdf` | annual-return | FY 2026 | **404 on legacy** |
+  | MGT 7 Mar'25 | `financials-and-reports/annual-return/FY-2025/MGT-7-Mar-25.pdf` | annual-return | FY 2025 | 2,446,335 |
+  | MGT 7 Mar'24 | `financials-and-reports/annual-return/FY-2024/MGT-7-March-24.pdf` | annual-return | FY 2024 | 4,812,984 |
+  | MGT 7 Mar'23 | `financials-and-reports/annual-return/FY-2023/MGT-7-March-23.pdf` | annual-return | FY 2023 | 2,485,821 |
+  | SAEL Industries Limited Consolidated Financial Statements | `financials-and-reports/consolidated-financials-of-the-company/FY-2025/SAEL-Industries-Limited-Consolidated-Financial-Statements.pdf` | consolidated-financials | FY 2025 | 7,846,659 |
+  | SAEL Industries Limited Consolidated Financial Statements | `financials-and-reports/consolidated-financials-of-the-company/FY-2024/SAEL-Industries-Limited-Consolidated-Financial-Statements.pdf` | consolidated-financials | FY 2024 | 7,785,375 |
+  | SAEL Industries Limited Consolidated Financial Statements | `financials-and-reports/consolidated-financials-of-the-company/FY-2023/SAEL-Industries-Limited-Consolidated-Financial-Statements.pdf` | consolidated-financials | FY 2023 | 5,576,415 |
+  | SAEL Industries Limited | `financials-and-reports/standalone-financials-of-the-company/FY-2025/SAEL-Industries-Limited.pdf` | standalone-financials | FY 2025 | 4,998,361 |
+  | SAEL Industries Ltd. | `financials-and-reports/standalone-financials-of-the-company/FY-2024/SAEL-Industries-Ltd.pdf` | standalone-financials | FY 2024 | 4,040,351 |
+  | SAEL Industries Ltd. | `financials-and-reports/standalone-financials-of-the-company/FY-2023/SAEL-Industries-Ltd.pdf` | standalone-financials | FY 2023 | 3,522,628 |
+  | Canal Solar Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/Canal-Solar-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 3,273,616 |
+  | Chattargarh Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/Chattargarh-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 3,231,587 |
+  | Jasrasar Green Power Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/Jasrasar-Green-Power-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 3,424,431 |
+  | Kaithal Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/Kaithal-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 3,434,660 |
+  | SAEL Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/SAEL-Limited.pdf` | subsidiary-financials | FY 2025 | 6,191,737 |
+  | SAEL RE Power Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/SAEL-RE-Power-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 2,702,024 |
+  | SAEL Solar MGF Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/SAEL-Solar-MGF-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 4,550,156 |
+  | SAEL Solar MHP1 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/SAEL-Solar-MHP1-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 2,743,107 |
+  | SAEL Solar MHP2 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/SAEL-Solar-MHP2-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 2,850,984 |
+  | SAEL Solar P10 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/SAEL-Solar-P10-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 2,641,327 |
+  | SAEL Solar P4 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/SAEL-Solar-P4-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 2,847,530 |
+  | SAEL Solar P5 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/SAEL-Solar-P5-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 2,883,894 |
+  | SAEL Solar P6 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/SAEL-Solar-P6-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 29,301,710 |
+  | SAEL Solar P9 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/SAEL-Solar-P9-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 2,625,002 |
+  | SAEL Solar Solutions Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/SAEL-Solar-Solutions-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 30,757,560 |
+  | Sardarshahar Agri Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/Sardarshahar-Agri-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 2,984,423 |
+  | KTA Powers Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/KTA-Powers-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 2,905,213 |
+  | Sunfree Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/Sunfree-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 2,041,387 |
+  | Sunfree Energy RJP1 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/Sunfree-Energy-RJP1-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 8,770,431 |
+  | Sunfree North East Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/Sunfree-North-East-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 3,118,125 |
+  | Sunfree Paschim Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/Sunfree-Paschim-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 3,627,557 |
+  | TNA Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/TNA-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 2,806,516 |
+  | Universal Biomass Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/Universal-Biomass-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 3,938,627 |
+  | VCA Power Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2025/VCA-Power-Private-Limited.pdf` | subsidiary-financials | FY 2025 | 2,803,965 |
+  | TNA Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/TNA-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 2,530,227 |
+  | Sardarshahar Agri Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/Sardarshahar-Agri-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 1,869,183 |
+  | Jasrasar Green Power Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/Jasrasar-Green-Power-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 2,055,578 |
+  | SAEL Solar MHP2 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/SAEL-Solar-MHP2-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 1,576,106 |
+  | KTA Powers Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/KTA-Powers-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 2,196,794 |
+  | VCA Power Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/VCA-Power-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 2,209,670 |
+  | SAEL Solar MHP1 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/SAEL-Solar-MHP1-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 1,852,541 |
+  | Chattargarh Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/Chattargarh-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 2,289,516 |
+  | SAEL RE Power Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/SAEL-RE-Power-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 8,365,751 |
+  | Sunfree Energy RJP1 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/Sunfree-Energy-RJP1-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 1,920,348 |
+  | SAEL Solar MGF Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/SAEL-Solar-MGF-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 4,053,485 |
+  | SAEL Solar Solution Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/SAEL-Solar-Solution-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 2,385,883 |
+  | SAEL Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/SAEL-Limited.pdf` | subsidiary-financials | FY 2024 | 30,239,905 |
+  | Sunfree Paschim Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/Sunfree-Paschim-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 17,061,850 |
+  | Canal Solar Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/Canal-Solar-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 16,950,419 |
+  | SAEL Kaithal Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/SAEL-Kaithal-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 21,214,269 |
+  | SAEL Solar P6 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/SAEL-Solar-P6-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 3,292,093 |
+  | SAEL Solar P4 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/SAEL-Solar-P4-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 47,858,260 |
+  | SAEL Solar P5 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/SAEL-Solar-P5-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 17,835,228 |
+  | SAEL Solar P9 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/SAEL-Solar-P9-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 3,299,814 |
+  | SAEL Solar P10 Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/SAEL-Solar-P10-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 3,320,371 |
+  | Sunfree Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/Sunfree-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 10,173,524 |
+  | Sunfree North East Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/Sunfree-North-East-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 3,405,202 |
+  | Universal Biomass Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2024/Universal-Biomass-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2024 | 18,862,143 |
+  | Canal Solar Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/Canal-Solar-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 3,054,365 |
+  | Chattargarh Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/Chattargarh-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 2,328,779 |
+  | Jasrasar Green Power Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/Jasrasar-Green-Power-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 15,361,158 |
+  | SAEL Kaithal Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/SAEL-Kaithal-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 17,336,576 |
+  | KTA Powers Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/KTA-Powers-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 2,301,472 |
+  | SAEL Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/SAEL-Limited.pdf` | subsidiary-financials | FY 2023 | 69,843,282 |
+  | SAEL RE Power Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/SAEL-RE-Power-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 1,721,706 |
+  | SAEL Solar MFG Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/SAEL-Solar-MFG-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 2,633,696 |
+  | SAEL Solar Solutions Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/SAEL-Solar-Solutions-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 6,820,762 |
+  | Sardarshahar Agri Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/Sardarshahar-Agri-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 1,657,664 |
+  | TNA Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/TNA-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 2,513,704 |
+  | VCA Power Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/VCA-Power-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 2,198,751 |
+  | Sunfree North East Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/Sunfree-North-East-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 2,956,413 |
+  | Sunfree Paschim Renewable Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/Sunfree-Paschim-Renewable-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 3,136,601 |
+  | Universal Biomass Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/Universal-Biomass-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 3,402,970 |
+  | Sunfree Energy Private Limited | `financials-and-reports/standalone-financials-of-material-subsidiary-companies/FY-2023/Sunfree-Energy-Private-Limited.pdf` | subsidiary-financials | FY 2023 | 12,402,209 |
+  | SAEL RG Financials 3M FY 2027 | `financials-and-reports/investor-downloads/FY-2027/SAEL-RG-Financials-3M-FY-2027.pdf` | investor-downloads | FY 2027 | 918,857 |
+  | SAEL Restricted Group Financials March 2026 | `financials-and-reports/investor-downloads/FY-2026/SAEL-Restricted-Group-Financials-March-2026.pdf` | investor-downloads | FY 2026 | 5,423,060 |
+  | SAEL Restricted Group Auditor's Report March 2026 | `financials-and-reports/investor-downloads/FY-2026/SAEL-Restricted-Group-Auditors-Report-March-2026.pdf` | investor-downloads | FY 2026 | 840,675 |
+  | SAEL RG Financials 9M FY 2026 | `financials-and-reports/investor-downloads/FY-2026/SAEL-RG-Financials-9M-FY-2026.pdf` | investor-downloads | FY 2026 | 1,295,470 |
+  | SAEL RG Financials 6M FY 2026 | `financials-and-reports/investor-downloads/FY-2025/SAEL-RG-Financials-6M-FY-2026.pdf` | investor-downloads | FY 2026 | 10,704,971 |
+  | Unaudited RG June 2025 | `financials-and-reports/investor-downloads/FY-2025/Unaudited-RG-June-2025.pdf` | investor-downloads | FY 2025 | 1,839,575 |
+  | SAEL Restricted Group_Financials and Report_March | `financials-and-reports/investor-downloads/FY-2025/SAEL-Restricted-Group-Financials-and-Report-March-2025.pdf` | investor-downloads | FY 2025 | 4,129,897 |
+  | Compliance Certificate 2025 | `financials-and-reports/investor-downloads/FY-2025/Compliance-Certificate-2025.pdf` | investor-downloads | FY 2025 | 494,196 |
+  | H1 FY25 Earnings Presentation | `financials-and-reports/investor-downloads/FY-2025/H1-FY2025-presentation-updated.pdf` | investor-downloads | FY 2025 | 1,960,821 |
+  | Financial Report 2024 | `financials-and-reports/investor-downloads/FY-2024/Financial-Results-Dec-24.pdf` | investor-downloads | FY 2024 | 603,774 |
+  | Financial Performance 2024 | `financials-and-reports/investor-downloads/FY-2024/Financial-Performance-December-2024.pdf` | investor-downloads | FY 2024 | 1,812,679 |
+  | RG Financials September 2024 | `financials-and-reports/investor-downloads/FY-2024/RG-Financials-September-24_V1-updated-21nov24.pdf` | investor-downloads | FY 2024 | 604,751 |
+  | Resignation letter of Ms. Kainaat Awla dt. 12.09.2025 | `notifications/FY-2026/Resignation-letter-of-Ms-Kainaat-Awla-dated-12-09-2025.pdf` | notifications | FY 2026 | 50,770 |
+  | Resignation Letter of Mr. Inge Karsten Stoelen dt. 08.08.2024 | `notifications/FY-2025/Resignation-Letter-of-Mr-Inge-Karsten-Stoelen-dt-08-08-2024.pdf` | notifications | FY 2025 | 56,969 |
+  | Whistleblower Policy | `corporate-governance/codes-and-policies/whistleblower-policy-feb-2026.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 348,516 |
+  | Risk Management Policy | `corporate-governance/codes-and-policies/risk-management-policy-new.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 383,260 |
+  | Code of practices and procedures for fair disclosure of unpublished price sensitive information | `corporate-governance/codes-and-policies/code-of-practices-and-procedures-for-fair-disclosure-of-unpublished-price-sensitive-information.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 650,298 |
+  | Policy and procedure for enquiry in case of leak suspected leak of unpublished price sensitive information | `corporate-governance/codes-and-policies/policy-and-procedure-for-enquiry-in-case-of-leak-suspected-leak-of-unpublished-price-sensitive-information.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 325,395 |
+  | Code of conduct to regulate, monitor, and report trading by designated persons | `corporate-governance/codes-and-policies/code-of-conduct-to-regulate-monitor-and-report-trading-by-designated-persons.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 696,100 |
+  | Code of conduct for Board of members key managerial personnel & the senior management | `corporate-governance/codes-and-policies/code-of-conduct-for-board-of-members-key-managerial-personnel-and-the-senior-management.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 251,160 |
+  | Policy on diversity of Board of Directors | `corporate-governance/codes-and-policies/policy-on-diversity-of-board-of-directors.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 506,417 |
+  | Policy on materiality of related party transactions and on dealing with related party transactions | `corporate-governance/codes-and-policies/policy-on-materiality-of-related-party-transactions-and-on-dealing-with-related-party-transactions.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 304,516 |
+  | Policy on determining material subsidiaries | `corporate-governance/codes-and-policies/policy-on-determining-material-subsidiaries.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 484,802 |
+  | Corporate social responsibility policy | `corporate-governance/codes-and-policies/corporate-social-responsibility-policy.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 358,567 |
+  | Nomination and Remuneration Policy | `corporate-governance/codes-and-policies/nomination-and-remuneration-policy.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 527,291 |
+  | Policy on succession planning for the Board senior management | `corporate-governance/codes-and-policies/policy-on-succession-planning-for-the-board-senior-management.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 613,260 |
+  | Policy on Familiarization programmes for independent directors | `corporate-governance/codes-and-policies/policy-on-familiarization-programmes-for-independent-directors.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 465,743 |
+  | Archival Policy | `corporate-governance/codes-and-policies/archival-policy.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 514,663 |
+  | Policy on Determination of Material Events and Information for Disclosures | `corporate-governance/codes-and-policies/policy-on-determination-of-material-events-and-information-for-disclosures.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 391,008 |
+  | Dividend Distribution Policy | `corporate-governance/codes-and-policies/dividend-distribution-policy.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 673,816 |
+  | Terms of Reference for the Committees | `corporate-governance/codes-and-policies/terms-of-reference-for-the-committees.pdf` | corporate-governance / codes-and-policies | Statutory Policies | 232,356 |
+  | Environment and Social (E&S) Policy | `corporate-governance/codes-and-policies/environment-and-social-policy.pdf` | corporate-governance / codes-and-policies | Corporate Policies | 2,420,500 |
+  | Environment & Social Management System | `corporate-governance/codes-and-policies/esms-new.pdf` | corporate-governance / codes-and-policies | Corporate Policies | 1,436,294 |
+  | Applicable Appendix’s to Environment & Social Management System | `corporate-governance/codes-and-policies/Appendixs_SAEL_ESMS.pdf` | corporate-governance / codes-and-policies | Corporate Policies | 3,863,382 |
+  | Stakeholder Engagement and Communication Policy | `corporate-governance/codes-and-policies/stakeholder-engagement-and-communication-policy.pdf` | corporate-governance / codes-and-policies | Corporate Policies | 2,257,271 |
+  | Anti-Bribery and Corruption Policy | `corporate-governance/codes-and-policies/anti-bribery-and-corruption-policy.pdf` | corporate-governance / codes-and-policies | Corporate Policies | 942,439 |
+  | Policy On Prevention of Sexual Harassment of Employees | `corporate-governance/codes-and-policies/policy-on-prevention-of-sexual-harrasment-of-employees.pdf` | corporate-governance / codes-and-policies | Corporate Policies | 1,185,521 |
+  | Terms & Conditions of Independent Directors | `corporate-governance/codes-and-policies/Terms-&-condition-of-Independent-Directors.pdf` | corporate-governance / codes-and-policies | Corporate Policies | 493,735 |
+  | ESG Report CY24 | `corporate-governance/sustainability-reports/7th-version_SAEL-ESG-Report-23-24.pdf` | corporate-governance / sustainability-reports | ESG and GHG Reports | 11,859,549 |
+  | ESG Report CY23 | `corporate-governance/sustainability-reports/sael-esg-report-cy-2023.pdf` | corporate-governance / sustainability-reports | ESG and GHG Reports | 8,143,097 |
+  | Environmental and Social Impact Assessment (ESIA) | `corporate-governance/sustainability-reports/environmental-and-social-impact-assessment-esia-300mw-solar-power-plant-ysr-kadapa-anantapur-districts-andhra-pradesh.pdf` | corporate-governance / sustainability-reports | SAEL Solar 300MW MHP1 Project’s Environment & Social Reports | 16,530,982 |
+  | Critical Habitat Assessment for a Proposed Solar Power Project in YSR (Kadapa) and Anantapur Districts | `corporate-governance/sustainability-reports/Critical-Habitat-Assesment-CHA-or-300MW-Solar-Power-Plant.pdf` | corporate-governance / sustainability-reports | SAEL Solar 300MW MHP1 Project’s Environment & Social Reports | 2,973,766 |
+  | Climate Risk and Adaption Assessment (CRA) for 300MW Solar Power Plant | `corporate-governance/sustainability-reports/climate-risk-and-adaption-assessment-cra-for-300mw-solar-power-plant.pdf` | corporate-governance / sustainability-reports | SAEL Solar 300MW MHP1 Project’s Environment & Social Reports | 7,164,209 |
+  | SIL_CSR Altered Annual Action Plan for FY 2025-26 | `corporate-governance/csr/sil-csr-altered-annual-action-plan-for-fy-2025-26.pdf` | corporate-governance / csr | FY2026 | 127,280 |
+  | SIL_CSR Annual Action Plan for FY 2025-26 | `corporate-governance/csr/SIL-CSR-Annual-Action-Plan-for-FY-2025-26.pdf` | corporate-governance / csr | FY2026 | 108,730 |
+  | SIL_CSR Annual Action Plan for FY 2026-27 | `corporate-governance/csr/sil-csr-annual-action-plan-for-fy-2026-27.pdf` | corporate-governance / csr | FY2027 | 125,998 |
+  | Notice of 4th AGM held in 2026 | `corporate-governance/general-meeting/gm-notice-of-4th-agm-held-in-2026.pdf` | corporate-governance / general-meeting | Annual General | 301,354 |
+  | Notice of 3rd AGM held in 2025 | `corporate-governance/general-meeting/gm-notice-of-3rd-agm-held-in-2025.pdf` | corporate-governance / general-meeting | Annual General | 559,859 |
+  | Notice of 2nd AGM held in 2024 | `corporate-governance/general-meeting/gm-notice-of-2nd-agm-held-in-2024.pdf` | corporate-governance / general-meeting | Annual General | 467,853 |
+  | Notice of 1st AGM held in 2023 | `corporate-governance/general-meeting/gm-notice-of-1st-agm-held-in-2023.pdf` | corporate-governance / general-meeting | Annual General | 436,430 |
+  | Notice of 4th EGM for FY 2025-26 dt. 31.10.2025 | `corporate-governance/general-meeting/FY-2026/Notice-of-4th-EGM-for-FY-2025-26-dt-31-10-2025.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2026 | 629,361 |
+  | Notice of 3rd EGM for FY 2025-26 dt. 04.10.2025 | `corporate-governance/general-meeting/FY-2026/Notice-of-3rd-EGM-for-FY-2025-26-dt-04-10-2025.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2026 | 547,000 |
+  | Notice of 2nd EGM for FY 2025-26 dt. 22.09.2025 | `corporate-governance/general-meeting/FY-2026/Notice-of-2nd-EGM-for-FY-2025-26-dt-22-09-2025.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2026 | 520,581 |
+  | Notice of 1st EGM for FY 2025-26 dt. 25.08.2025 | `corporate-governance/general-meeting/FY-2026/Notice-of-1st-EGM-for-FY-2025-26-dt-25-08-2025.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2026 | 292,013 |
+  | Notice of 2nd EGM for FY 2024-25 dt. 23.01.2025.pdf | `corporate-governance/general-meeting/FY-2025/Notice-of-2nd-EGM-for-FY-2024-25-dt-23-01-2025.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2025 | 1,424,880 |
+  | Notice of 1st EGM for FY 2024-25 dt. 30.12.2024.pdf | `corporate-governance/general-meeting/FY-2025/Notice-of-1st-EGM-for-FY-2024-25-dt-30-12-2024.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2025 | 979,415 |
+  | Notice of 4th EGM for FY 2023-24 dt. 16.02.2024.pdf | `corporate-governance/general-meeting/FY-2024/Notice-of-4th-EGM-for-FY-2023-24-dt-16-02-2024.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2024 | 1,096,966 |
+  | Notice of 3rd EGM for FY 2023-24 dt. 20.01.2024.pdf | `corporate-governance/general-meeting/FY-2024/Notice-of-3rd-EGM-for-FY-2023-24-dt-20-01-2024.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2024 | 1,437,931 |
+  | Notice of 2nd EGM for FY 2023-24 dt. 06.12.2023.pdf | `corporate-governance/general-meeting/FY-2024/Notice-of-2nd-EGM-for-FY-2023-24-dt-06-12-2023.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2024 | 1,088,629 |
+  | Notice of 1st EGM for FY 2023-24 dt. 19.04.2023.pdf | `corporate-governance/general-meeting/FY-2024/Notice-of-1st-EGM-for-FY-2023-24-dt-19-04-2023.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2024 | 690,926 |
+  | Notice of 7th EGM for FY 2022-23 dt. 21.03.2023.pdf | `corporate-governance/general-meeting/FY-2023/Notice-of-7th-EGM-for-FY-2022-23-dt-21-03-2023.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2023 | 1,004,846 |
+  | Notice of 6th EGM for FY 2022-23 dt. 17.02.2023.pdf | `corporate-governance/general-meeting/FY-2023/Notice-of-6th-EGM-for-FY-2022-23-dt-17-02-2023.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2023 | 1,010,650 |
+  | Notice of 5th EGM for FY 2022-23 dt. 24.01.2023.pdf | `corporate-governance/general-meeting/FY-2023/Notice-of-5th-EGM-for-FY-2022-23-dt-24-01-2023.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2023 | 1,159,887 |
+  | Notice of 4th EGM for FY 2022-23 dt. 24.01.2023.pdf | `corporate-governance/general-meeting/FY-2023/Notice-of-4th-EGM-for-FY-2022-23-dt-24-01-2023.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2023 | 979,643 |
+  | Notice of 3rd EGM for FY 2022-23 dt. 02.06.2022.pdf | `corporate-governance/general-meeting/FY-2023/Notice-of-3rd-EGM-for-FY-2022-23-dt-02-06-2022.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2023 | 994,180 |
+  | Notice of 2nd EGM for FY 2022-23 dt. 02.06.2022.pdf | `corporate-governance/general-meeting/FY-2023/Notice-of-2nd-EGM-for-FY-2022-23-dt-02-06-2022.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2023 | 930,402 |
+  | Notice of 1st EGM for FY 2022-23 dt. 30.04.2022.pdf | `corporate-governance/general-meeting/FY-2023/Notice-of-1st-EGM-for-FY-2022-23-dt-30-04-2022.pdf` | corporate-governance / general-meeting | Extra-Ordinary General Meeting › FY 2023 | 949,328 |
+  | Familiarization Programme_FY-2025-26 | `corporate-governance/familiarization-programme/FY-2026/familiarization-programme-fy-2025-26.pdf` | corporate-governance / familiarization-programme | FY 2026 | 88,446 |
+  | Memorandum of Association and Articles of Association | `corporate-governance/other-documents/MOA-AOA-SAEL-Industries-Limited.pdf` | corporate-governance / other-documents | Other Documents | 6,883,941 |
+  | Composite Scheme of Arrangement | `corporate-governance/other-documents/composite-scheme-of-arrangement.pdf` | corporate-governance / other-documents | Composite Scheme of Arrangement | 5,988,382 |
+  | Jagbani Advertisement | `corporate-governance/other-documents/jagbani-advertisement.pdf` | corporate-governance / other-documents | Composite Scheme of Arrangement | 661,143 |
+  | Tribune Advertisement | `corporate-governance/other-documents/tribune-advertisement.pdf` | corporate-governance / other-documents | Composite Scheme of Arrangement | 601,031 |
+
 - Never commit a backend-supplied image either. The seventeen `/our-team/` portraits were briefly mirrored into `public/team/` while the client's URLs were outstanding; **the client supplied them on 2026-09-10** and the copies were deleted. They live at `web-assets/media/our-team/<slug>.<ext>` — fifteen `.jpg`, two `.webp`, one `.png`, matching the slugs in `mock/data/team-members.json`.
 
 ---
+
+- **The Newsroom's images (60) are not uploaded yet** — inventoried 2026-10-01 from the legacy listing and article pages, every URL checked (all 200), with the pixel size and byte count read from the files the same day. Same mechanical rule as the investor files: **the blob path is the legacy path with `web-assets` in front** — `/img/media/<file>` → `web-assets/img/media/<file>`, file name unchanged. 59 are card images, each also its article's lead image and `og:image` where it has an article; one is inside an article body. While `LEGACY_ASSET_BASE_URL` is set the mock serves each from the legacy site, and `next.config.ts` derives a `remotePatterns` entry for that origin's `/img/` from the same variable, so no hostname is committed. The paths are in `src/lib/content/mock/data/newsroom-items.json` (`image.legacyPath` / `image.path`; the body image as a root-relative `src` in its `body`).
+
+  The legacy CMS wrote the body image's `src` on a development host (`dev1024.sael.co`); the same path serves the same file on www.sael.co, and only the path is kept. It had no `alt` either; the one it has now is a neutral description pending the client's caption.
+
+  Multimedia thumbnails are not files of ours: they are YouTube's (`i.ytimg.com`), built from each video's id, and that host is in `remotePatterns` so `next/image` optimises them. The legacy site's play-button image (`/img/site/play-icon.png`) is not migrated; the cards draw their own.
+
+  | Section | Item id | File under `/img/media/` (legacy) and `web-assets/img/media/` (blob) | Pixels | Bytes |
+  |---|---|---|---|---|
+  | Press Release | `renewable-energy-company-sael-secures-supply-orders-for-1-gwp-of-solar-pv-modules-ntpc-rels-chitrakoot-project-accounts-for-5858-mwp` | `renewable-energy-company-sael-secures-supply-orders-for-1-gwp-of-solar-pv-modules-ntpc-rels-chitrakoot-project-accounts-for-5858-mwp-1788339326.webp` | 700 × 394 | 52,214 |
+  | Press Release | `sael-commissions-its-11th-agri-waste-to-energy-plant-in-india` | `sael-commissions-its-11th-agri-waste-to-energy-plant-in-india-1781155767.webp` | 700 × 394 | 42,392 |
+  | Press Release | `sael-commissions-600-mw-solar-power-projects-in-kurnool-andhra-pradesh` | `sael-commissions-600-mw-solar-power-projects-in-kurnool-andhra-pradesh-1777194516.webp` | 700 × 391 | 57,994 |
+  | Press Release | `sael-commissions-1-gwp-solar-project-at-worlds-largest-re-park-groups-total-operational-capacity-crosses-2-gwp` | `sael-commissions-1-gwp-solar-project-at-worlds-largest-re-park-groups-total-operational-capacity-crosses-2-gwp-1769688561.webp` | 700 × 431 | 24,854 |
+  | Press Release | `sael-to-procure-20-lakh-tonnes-of-paddy-stubble-this-season-via-aggregator-aims-to-convert-waste-into-clean-energy-and-curb-pollution-from-stubble-burning` | `sael-to-procure-20-lakh-tonnes-of-paddy-stubble-this-season-via-aggregator-aims-to-convert-waste-into-clean-energy-and-curb-pollution-from-stubble-burning-1761379345.webp` | 700 × 394 | 38,188 |
+  | Press Release | `sael-industries-ltd-commissions-298-mw-dc-solar-project-in-jalore-rajasthan` | `sael-industries-ltd-commissions-298-mw-dc-solar-project-in-jalore-rajasthan-1756645833.webp` | 700 × 394 | 77,466 |
+  | Press Release | `sael-signs-ppas-for-880-mw-solar-projects-in-gujarat-and-punjab` | `sael-signs-ppas-for-880-mw-solar-projects-in-gujarat-and-punjab-1756649533.webp` | 700 × 392 | 78,930 |
+  | Press Release | `sael-conducts-awareness-drive-on-climate-smart-agricultural-practices-for-farmers-in-punjab-haryana-and-rajasthan` | `sael-conducts-awareness-drive-on-climate-smart-agricultural-practices-for-farmers-in-punjab-haryana-and-rajasthan-1753862988.webp` | 700 × 394 | 24,784 |
+  | Press Release | `sael-commissions-50-mw-solar-power-plant-in-beed-maharashtra` | `sael-commissions-50-mw-solar-power-plant-in-beed-maharashtra-1761716452.webp` | 700 × 394 | 120,514 |
+  | Press Release | `sael-to-set-up-rs8200-crore-integrated-solar-facility-in-uttar-pradesh` | `sael-to-set-up-rs8200-crore-integrated-solar-facility-in-uttar-pradesh-1753361161.webp` | 700 × 394 | 22,952 |
+  | Press Release | `sael-secures-480-mw-solar-power-agreement-with-guvnl-in-gujarat` | `sael-secures-480-mw-solar-power-agreement-with-guvnl-in-gujarat-1753360901.webp` | 700 × 394 | 56,342 |
+  | Press Release | `sael-signs-400-mw-solar-power-purchase-agreement-with-pspcl-in-punjab` | `sael-signs-400-mw-solar-power-purchase-agreement-with-pspcl-in-punjab-1753361318.webp` | 700 × 394 | 44,328 |
+  | Press Release | `sael-secures-us132-million-investment-from-ndb-aiib-societe-generale-for-solar-project-in-andhra-pradesh` | `sael-secures-us132-million-investment-from-ndb-aiib-societe-generale-for-solar-project-in-andhra-pradesh-1753361416.webp` | 700 × 394 | 28,262 |
+  | Our Views | `bridging-the-talent-divide-empowering-rural-talent-to-power-india39s-green-future` | `bridging-the-talent-divide-empowering-rural-talent-to-power-india39s-green-future-1756649255.webp` | 700 × 467 | 47,938 |
+  | Our Views | `indias-solar-manufacturing-growth-moving-towards-energy-independence` | `indias-solar-supply-chain-evolution-from-dependency-to-domestic-strength-1744197119.webp` | 700 × 394 | 16,490 |
+  | Our Views | `transforming-renewable-energy-bridging-gaps-in-the-digital-journey` | `transforming-renewable-energy-bridging-gaps-in-the-digital-journey-1744279942.webp` | 700 × 394 | 20,792 |
+  | Our Views | `beyond-the-rs-20000-crore-boost-the-path-to-faster-green-energy-progress` | `the-path-to-faster-green-energy-progress.jpg` | 800 × 450 | 42,023 |
+  | In The News | `sael-secures-1-gwp-solar-module-orders-in-six-months-ntpc-project-accounts-for-5858-mwp` | `sael-secures-1-gwp-solar-module-orders-in-six-months-ntpc-project-accounts-for-5858-mwp-1788798411.webp` | 700 × 381 | 41,050 |
+  | In The News | `sael-unveils-integrated-5gw-solar-cell-module-manufacturing-facility-at-jewar` | `sael-unveils-integrated-5gw-solar-cell-module-manufacturing-facility-at-jewar-1783420907.webp` | 700 × 480 | 26,612 |
+  | In The News | `sael-industries-commissions-149-mw-agri-waste-to-energy-plant-in-rajasthans-bhadra` | `sael-industries-commissions-149-mw-agri-waste-to-energy-plant-in-rajasthans-bhadra-1781155849.webp` | 700 × 394 | 42,392 |
+  | In The News | `nara-lokesh-inaugurates-600-mw-sael-solar-projects-in-andhra-pradesh` | `nara-lokesh-inaugurates-600-mw-sael-solar-projects-in-andhra-pradesh-1781159381.webp` | 700 × 412 | 17,050 |
+  | In The News | `sael-commissions-rs-3000-crore-solar-projects-in-kadapa-kurnool` | `sael-commissions-rs-3000-crore-solar-projects-in-kadapa-kurnool-1781159715.webp` | 700 × 396 | 32,190 |
+  | In The News | `crisil-ratings-assigns-a-stable-long-term-and-a2-short-term-ratings-to-sael-industries` | `crisil-ratings-assigns-a-stable-long-term-and-a2-short-term-ratings-to-sael-industries-1781159151.webp` | 700 × 532 | 19,076 |
+  | In The News | `iran-war-has-fuelled-15-20-spike-in-solar-module-prices-sael-ceo` | `iran-war-has-fuelled-15-20-spike-in-solar-module-prices-sael-ceo-1781157743.webp` | 700 × 394 | 25,138 |
+  | In The News | `india-emerges-as-third-largest-renewable-energy-market-in-2025-irena` | `india-emerges-as-third-largest-renewable-energy-market-in-2025-irena-1781161307.webp` | 700 × 427 | 14,672 |
+  | In The News | `ipo-bound-sael-industries-begins-1-gigawatt-solar-plant-at-khavda-renewable-energy-park` | `ipo-bound-sael-industries-begins-1-gigawatt-solar-plant-at-khavda-renewable-energy-park-1769690287.webp` | 700 × 394 | 20,788 |
+  | In The News | `pb-har-saw-marked-decline-in-stubble-burning-cases-this-year` | `pb-har-saw-marked-decline-in-stubble-burning-cases-this-year-1765731011.webp` | 700 × 394 | 42,614 |
+  | In The News | `yeida-allots-200-acres-land-to-build-rs8200-crore-solar-hub` | `yeida-allots-200-acres-land-to-build-rs8200-crore-solar-hub-1765730414.webp` | 700 × 394 | 36,296 |
+  | In The News | `sael-industries-to-invest-rs22000-crore-in-ap` | `sael-industries-to-invest-rs22000-crore-in-ap-1765730191.webp` | 700 × 394 | 62,452 |
+  | In The News | `clean-energy-firm-to-procure-2-million-tonnes-of-paddy-stubble` | `clean-energy-firm-to-procure-2-million-tonnes-of-paddy-stubble-1765729093.webp` | 700 × 394 | 28,448 |
+  | In The News | `et-energy-leadership-summit-2025-maps-indias-clean-energy-transition` | `et-energy-leadership-summit-2025-maps-indias-clean-energy-transition-1765728748.webp` | 700 × 394 | 12,874 |
+  | In The News | `agri-waste-power-can-generate-28-gw-needs-solar-like-policy-push-sael-ceo` | `agri-waste-power-can-generate-28-gw-needs-solar-like-policy-push-sael-ceo-1765728181.webp` | 700 × 394 | 20,614 |
+  | In The News | `sael-industries-commissions-first-300-mw-solar-power-project-in-rajasthan` | `sael-industries-commissions-first-300-mw-solar-power-project-in-rajasthan-1761716516.webp` | 700 × 394 | 48,642 |
+  | In The News | `sael-signs-ppas-with-guvnl-pspcl-for-880-mw-solar-projects` | `sael-signs-ppas-with-guvnl-pspcl-for-880-mw-solar-projects-1761716532.webp` | 700 × 394 | 55,614 |
+  | In The News | `can-straw-fired-power-plants-help-end-stubble-burning` | `can-straw-fired-power-plants-help-end-stubble-burning-1755669502.webp` | 700 × 394 | 52,762 |
+  | In The News | `100-gw-of-solar-again-and-amendments-to-almm` | `100-gw-of-solar-again-and-amendments-to-almm-1755669343.webp` | 700 × 394 | 49,894 |
+  | In The News | `laxit-awla-on-saels-role-in-accelerating-indias-clean-energy-future` | `laxit-awla-on-saels-role-in-accelerating-indias-clean-energy-future-1755669231.webp` | 700 × 394 | 6,004 |
+  | In The News | `sael-lights-beed-with-new-50-mw-solar-plant-installation` | `sael-lights-beed-with-new-50-mw-solar-plant-installation-1755668875.webp` | 700 × 394 | 57,830 |
+  | In The News | `interview-sael-ceo-laxit-awla-on-closing-indias-solar-storage-gaps-and-navigating-us-tariffs` | `interview-sael-ceo-laxit-awla-on-closing-indias-solar-storage-gaps-and-navigating-us-tariffs-1755669084.webp` | 700 × 394 | 14,866 |
+  | In The News | `sael-conducts-climate-smart-farming-awareness-drive-for-over-200-farmers-in-north-india` | `sael-conducts-climate-smart-farming-awareness-drive-for-over-200-farmers-in-north-india-1755668732.webp` | 700 × 394 | 24,526 |
+  | In The News | `sael-industries-to-invest-rs8200-crore-in-greater-noida-solar-unit` | `sael-industries-to-invest-rs8200-crore-in-greater-noida-solar-unit-1755668648.webp` | 700 × 394 | 48,344 |
+  | In The News | `indian-clean-energy-firm-sael-to-invest-954-mln-in-solar-manufacturing-plant` | `indian-clean-energy-firm-sael-to-invest-954-mln-in-solar-manufacturing-plant-1755668493.webp` | 700 × 394 | 16,820 |
+  | In The News | `chandigarh-sael-signs-400-mw-solar-ppa-with-pspcl` | `chandigarh-sael-signs-400-mw-solar-ppa-with-pspcl-1755668316.webp` | 700 × 394 | 41,716 |
+  | In The News | `green-fuels-clean-tech-and-climate-finance-on-agenda-as-india-gathers-for-et-india-net-zero-forum-2025` | `green-fuels-clean-tech-and-climate-finance-on-agenda-as-india-gathers-for-et-india-net-zero-forum-2025-1755668225.webp` | 700 × 394 | 13,710 |
+  | In The News | `sael-to-commission-25-gw-solar-capacity-by-fy26-eyes-ipo-amid-limited-waste-to-energy-pipeline` | `sael-to-commission-25-gw-solar-capacity-by-fy26-eyes-ipo-amid-limited-waste-to-energy-pipeline-1755667987.webp` | 700 × 394 | 51,334 |
+  | In The News | `ipo-bound-sael-to-venture-into-solar-cells-with-a-rs5000-crore-plant-in-up` | `ipo-bound-sael-to-venture-into-solar-cells-with-a-rs5000-crore-plant-in-up-1755667786.webp` | 700 × 394 | 73,732 |
+  | In The News | `reliance-sael-jindal-sembcorp-jbm-and-fastnote-win-big-in-sjvns-1200-mw-solar-integrated-with-600-mw-2400-mwh-ess-auction` | `reliance-sael-jindal-sembcorp-jbm-and-fastnote-win-big-in-sjvns-1200-mw-solar-integrated-with-600-mw-2400-mwh-ess-auction-1753357195.webp` | 700 × 394 | 37,044 |
+  | In The News | `from-intermittency-to-reliability-the-role-of-energy-storage-in-scaling-indian-solar-pv` | `from-intermittency-to-reliability-the-role-of-energy-storage-in-scaling-indian-solar-pv-1753357150.webp` | 700 × 394 | 26,218 |
+  | In The News | `bridging-the-digital-divide-the-reality-of-transformation-in-renewable-energy` | `bridging-the-digital-divide-the-reality-of-transformation-in-renewable-energy-1753356848.webp` | 700 × 468 | 22,054 |
+  | In The News | `solar-manufacturing-in-india-paving-the-way-for-a-self-reliant-renewable-future` | `solar-manufacturing-in-india-paving-the-way-for-a-self-reliant-renewable-future-1753356814.webp` | 700 × 394 | 18,444 |
+  | In The News | `delegates-of-norfund-societe-generale-ndb-bank-and-sael-ltd-meet-andhra-pradesh-cm-naidu` | `delegates-of-norfund-societe-generale-ndb-bank-and-sael-ltd-meet-andhra-pradesh-cm-naidu-1753356782.webp` | 700 × 395 | 29,426 |
+  | In The News | `sael-ntpc-blupine-win-secis-12-gw-solar-auction` | `sael-ntpc-blupine-win-secis-12-gw-solar-auction-1753356720.webp` | 700 × 394 | 53,020 |
+  | In The News | `sael-raises-305-m-via-green-bond-issue-overseas` | `sael-raises-305-m-via-green-bond-issue-overseas-1753356645.webp` | 700 × 394 | 57,696 |
+  | In The News | `sael-invests-rs35000-crore-in-renewable-expansion` | `sael-invests-rs35000-crore-in-renewable-expansion-1753356924.webp` | 700 × 394 | 36,322 |
+  | In The News | `sael-to-invest-rs-350-billion-in-renewable-expansion` | `sael-to-invest-rs-350-billion-in-renewable-expansion-1753356465.webp` | 700 × 394 | 22,204 |
+  | In The News | `sael-to-redefine-the-energy-landscape-by-delivering-sustainable-solutions` | `sael-to-redefine-the-energy-landscape-by-delivering-sustainable-solutions-1753356584.webp` | 700 × 394 | 56,116 |
+  | In The News | `sael-to-invest-rs35000-crore-in-renewable-expansion-eyes-10-gw-capacity` | `sael-to-invest-rs35000-crore-in-renewable-expansion-eyes-10-gw-capacity-1753356323.webp` | 700 × 394 | 48,642 |
+  | In The News | `100-bustards-and-the-challenge-to-indias-solar-flight-path` | `100-bustards-and-the-challenge-to-indias-solar-flight-path-1753356267.webp` | 700 × 394 | 120,514 |
+  | In The News | `sael-set-to-close-1-billion-fundraise-from-foreign-domestic-investors` | `sael-set-to-close-1-billion-fundraise-from-foreign-domestic-investors-1753357070.webp` | 700 × 465 | 41,692 |
+  | Press Release body image | `sael-to-set-up-rs8200-crore-integrated-solar-facility-in-uttar-pradesh` | `image-1png_1753361154.webp` | 700 × 676 | 34,682 |
 
 ## 9. Handover checklist
 
@@ -298,6 +541,30 @@ Items the client must supply before the relevant tracker item can complete:
       photograph", so the `alt` describes what is visible — "A person in a business
       suit standing in an office" — and asserts no identity. It should name them
 
+- [ ] **Upload the seventeen Offer Documents files** to the blob paths in §8 —
+      *blocks launch of `/investors/offer-documents/`*; every link on those pages
+      404s until then
+- [ ] **Upload the investor area's other 146 files** to the blob paths in §8 —
+      Corporate Governance, Financials & Reports and Notifications; *blocks
+      launch of those pages once `LEGACY_ASSET_BASE_URL` is unset*
+- [ ] **Supply `MGT 7 Mar'26`** (Annual Return, FY 2026) — the legacy page
+      links `annual-return/FY-2026/MGT-7-Mar-26.pdf`, which is 404 on the
+      legacy site itself, so there is no file to migrate
+- [ ] **Caption files for both DRHP audio-visual videos** (WebVTT — `.vtt`),
+      English and Hindi. None exist: the legacy `<video>` carries no `<track>`,
+      and these are spoken presentations. The site ships without them because
+      there is nothing to ship, not because they are optional; the player picks
+      them up from the data (`captions` on `GET /api/v1/investor-videos`) with
+      no code change. Proposed paths: `web-assets/media/offer-documents/
+      SAEL-DRHP-English.en.vtt` and `SAEL-DRHP-Hindi.hi.vtt`
+- [ ] **A CORS rule on the blob container** allowing `GET` from the site's
+      origins — needed before the first caption file goes up, since a
+      cross-origin `<track>` does not load without it
+- [ ] **Consider re-muxing both DRHP videos with `-movflags +faststart`**
+      (lossless — no re-encode). Both files put their `moov` atom after 106–111 MB
+      of media, so a browser has to fetch the file's tail before it can start.
+      It still plays, via a range request; it starts slower. Legal may prefer
+      the files byte-identical to what was filed, which is a reason to leave them
 - [ ] Favicon / app icon source
 - [ ] OG share image, 1200×630
 

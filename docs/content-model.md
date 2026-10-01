@@ -41,18 +41,40 @@ export interface ImageAsset {
 
 /* ---------- Newsroom ---------- */
 
+/* Built 2026-10-01 with the Newsroom. Four sections; two of them host articles. */
+
+export type NewsCategory = 'press-release' | 'in-the-news' | 'our-views' | 'multimedia';
+export type NewsArticleCategory = 'press-release' | 'our-views';
+
 export interface NewsItem {
   id: string;
-  title: string;
-  publishedAt: string;      // ISO 8601 date, e.g. "2026-06-29"
-  image: ImageAsset | null;
-  /** External publisher URL. SAEL currently links out rather than hosting articles. */
-  externalUrl: string | null;
-  source: string | null;    // "The Hindu BusinessLine"
-  excerpt: string | null;
+  category: NewsCategory;
+  title: string;              // verbatim, as the legacy card reads
+  publishedAt: string | null; // ISO 8601 date; null for Our Views and Multimedia, which show none
+  href: string;               // resolved by the repository: article page, publication, or YouTube watch URL
+  imageUrl: string | null;    // a Multimedia item's is its YouTube thumbnail
+  imageAlt: string | null;    // legacy alt; a card falls back to the title
+  slug: string | null;        // press-release, our-views — verbatim legacy URL segment
+  externalUrl: string | null; // in-the-news
+  videoId: string | null;     // multimedia
+  publication: string | null; // null in every row: the legacy cards show none
+}
+
+export interface NewsArticle extends NewsItem {
+  category: NewsArticleCategory;
+  slug: string;
+  body: string;               // CMS HTML; sanitised again on render (lib/utils/sanitize-article.ts)
 }
 
 /* ---------- Investors ---------- */
+/* Built 2026-09-29 with Offer Documents — see the note after this block. */
+
+export interface BlobFile {
+  url: string;              // absolute, Azure Blob — composed from a path by the repository
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number | null; // carried; whether a page shows it is the page's call
+}
 
 export type InvestorDocumentCategory =
   | 'offer-documents'
@@ -62,16 +84,65 @@ export type InvestorDocumentCategory =
   | 'standalone-financials'
   | 'subsidiary-financials'
   | 'investor-downloads'
-  | 'notifications';
+  | 'notifications';          // its own paginated endpoint, same item shape
+
+/** One listing: a category, and the sub-page within it (its URL slug), or null. */
+export interface InvestorListing {
+  category: InvestorDocumentCategory;
+  section: string | null;
+}
 
 export interface InvestorDocument {
   id: string;
+  title: string;            // verbatim — the published link text
+  category: InvestorDocumentCategory;
+  section: string | null;
+  /** Heading label within a listing, verbatim: "FY 2025", "Statutory Policies". */
+  group: string | null;
+  /** A second tier under `group` — General Meeting's EGM years. Else null. */
+  subgroup: string | null;
+  publishedAt: string | null;
+  file: BlobFile;
+  order: number;            // across the listing; headings follow their first document
+}
+
+export interface CaptionTrack {
+  url: string;              // WebVTT
+  srcLang: string;          // BCP 47
+  label: string;
+}
+
+export interface InvestorVideo {
+  id: string;
   title: string;
   category: InvestorDocumentCategory;
-  /** Grouping label within a category, usually a financial year: "FY 2024-25". */
-  group: string | null;
-  publishedAt: string | null;
-  file: BlobAsset;
+  section: string | null;
+  file: BlobFile;
+  posterUrl: string | null;
+  captions: CaptionTrack[]; // [] when none exist
+}
+
+/* ---------- Governance (2026-09-30) ---------- */
+
+export interface BoardMember {
+  id: string;
+  name: string;             // verbatim — "Øistein Magnar Andresen"
+  designation: string;
+  bio: string | null;       // sanitised HTML, as TeamMember.bio
+  order: number;
+}
+
+export interface CommitteeMember {
+  name: string;             // as the committee page writes it
+  category: string;         // "Non-Executive Independent Director"
+  position: string;         // "Chairman" | "Member" | "Invitee", verbatim
+}
+
+export interface BoardCommittee {
+  id: string;
+  name: string;             // "Audit Committee"
+  members: CommitteeMember[];
+  order: number;
 }
 
 /* ---------- Company ---------- */
@@ -89,6 +160,28 @@ export interface TeamMember {
   portraitZoom: number | null;  // dialog zoom into the passport crop; null = 1.5
   order: number;
 }
+
+**The investor types changed when Offer Documents was built (2026-09-29).**
+Offer Documents is eight sub-pages, not one listing, so a listing is addressed
+by `InvestorListing` — `category` plus `section`, the sub-page's own slug —
+rather than by category alone. `BlobAsset`'s optional `sizeBytes` became
+`BlobFile`'s nullable one, per the conventions below. Documents gained `order`,
+because none of the offer documents is dated and the company's own order is
+part of what it published. Videos became their own type, `InvestorVideo`,
+rather than a document with two fields no PDF would ever fill. `notifications`
+left the category enum: it has its own paginated endpoint. The API contract
+matches — `api-contracts.md` §3.
+
+**The rest of the investor area (2026-09-30)** added `subgroup` — General
+Meeting nests financial years under "Extra-Ordinary General Meeting" — and
+made `order` run across the whole listing rather than within a group, because
+the order of the headings is the company's to set and no sort on the labels
+gives it (CSR runs oldest year first; named groups have no natural order). It
+also added the board and its committees as repository surfaces rather than
+copy: a board changes by resolution and must be current on the site within
+days (SEBI LODR Reg. 46), and it is a separate record from `TeamMember` even
+for the same person, because the governance page words them differently.
+`api-contracts.md` §3–4.
 
 `portraitZoom` was added on 2026-09-17. The biography dialog shows the card's
 photograph zoomed to a head-and-shoulders crop, and the client wants to set
@@ -163,14 +256,16 @@ export interface Paginated<T> {
 
 ```ts
 export interface ContentRepository {
-  // Newsroom
-  getLatestNews(params: { limit: number }): Promise<NewsItem[]>;
-  getNewsPage(params: { page: number; pageSize: number }): Promise<Paginated<NewsItem>>;
+  // Newsroom — built 2026-10-01. No paging: the legacy listings have none,
+  // and paged URLs would be new URLs. `category` omitted is the homepage's call.
+  getNewsItems(options?: { category?: NewsCategory; limit?: number }): Promise<NewsItem[]>;
+  getNewsArticle(category: NewsArticleCategory, slug: string): Promise<NewsArticle | null>;
 
   // Investors
-  getInvestorDocuments(params: {
-    category: InvestorDocumentCategory;
-  }): Promise<InvestorDocument[]>;
+  getInvestorDocuments(listing: InvestorListing): Promise<InvestorDocument[]>;
+  getInvestorVideos(listing: InvestorListing): Promise<InvestorVideo[]>;
+  getBoardMembers(): Promise<BoardMember[]>;
+  getBoardCommittees(): Promise<BoardCommittee[]>;
   getNotifications(params: { page: number; pageSize: number }): Promise<Paginated<InvestorDocument>>;
 
   // Company

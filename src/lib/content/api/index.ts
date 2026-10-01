@@ -1,5 +1,16 @@
-import { NotImplementedError, type ContentRepository } from '../repository';
-import type { CapacityStat, NewsItem, TeamMember } from '../types';
+import { NotImplementedError, type ContentRepository, type NewsItemsQuery } from '../repository';
+import type {
+  BoardCommittee,
+  BoardMember,
+  CapacityStat,
+  InvestorDocument,
+  InvestorListing,
+  InvestorVideo,
+  NewsArticle,
+  NewsArticleCategory,
+  NewsItem,
+  TeamMember,
+} from '../types';
 
 export interface ApiContentRepositoryOptions {
   baseUrl: string;
@@ -30,9 +41,32 @@ export class ApiContentRepository implements ContentRepository {
     return Promise.reject(new NotImplementedError('ApiContentRepository.getCapacityStats'));
   }
 
-  getNewsItems(options?: { limit?: number }): Promise<NewsItem[]> {
+  /**
+   * `GET /api/v1/news?category=…&limit=…`, `category` omitted for the
+   * homepage's call. docs/api-contracts.md §2. Mapped: `href` resolved with
+   * `newsItemHref()` — the same function the mock calls — and a row it
+   * returns `null` for (an article without a slug, a video without an id) is
+   * dropped rather than rendered as a card that goes nowhere; `imageUrl`
+   * read through, falling back to `newsVideoThumbnail(videoId)` for a video
+   * that arrives without one; `imageAlt`, `slug`, `externalUrl`, `videoId`,
+   * `source` → `publication` and `publishedAt` read through. The backend's
+   * sort is trusted. FE-23 wires the body.
+   */
+  getNewsItems(options?: NewsItemsQuery): Promise<NewsItem[]> {
     void options;
     return Promise.reject(new NotImplementedError('ApiContentRepository.getNewsItems'));
+  }
+
+  /**
+   * `GET /api/v1/news/{category}/{slug}` — a 404 maps to `null`, anything
+   * else non-2xx to `ContentUnavailableError`. Mapped as above, plus `body`
+   * read through as HTML; the page sanitises it again, as Our Team does a
+   * biography. FE-23 wires the body.
+   */
+  getNewsArticle(category: NewsArticleCategory, slug: string): Promise<NewsArticle | null> {
+    void category;
+    void slug;
+    return Promise.reject(new NotImplementedError('ApiContentRepository.getNewsArticle'));
   }
 
   /**
@@ -44,5 +78,47 @@ export class ApiContentRepository implements ContentRepository {
    */
   getTeamMembers(): Promise<TeamMember[]> {
     return Promise.reject(new NotImplementedError('ApiContentRepository.getTeamMembers'));
+  }
+
+  /**
+   * `GET /api/v1/investor-documents?category=…&section=…`, `section` omitted
+   * when the listing's is `null`. Mapped `fileUrl`/`fileName`/`mimeType`/
+   * `sizeBytes` → `file`, `displayOrder` → `order`; `category`, `section`,
+   * `group`, `subgroup` and `publishedAt` read straight through. The
+   * backend's sort is trusted — `displayOrder` across the listing — per
+   * docs/api-contracts.md §1. A row that fails the schema is dropped, not the
+   * listing. FE-23 wires the body.
+   */
+  getInvestorDocuments(listing: InvestorListing): Promise<InvestorDocument[]> {
+    void listing;
+    return Promise.reject(new NotImplementedError('ApiContentRepository.getInvestorDocuments'));
+  }
+
+  /**
+   * `GET /api/v1/investor-videos?category=…&section=…`. Mapped as above for
+   * the file; `posterUrl` read through; `captions[]` read through with a
+   * track missing `url` or `srcLang` dropped rather than rendered as a menu
+   * entry that fails to load. FE-23 wires the body.
+   */
+  getInvestorVideos(listing: InvestorListing): Promise<InvestorVideo[]> {
+    void listing;
+    return Promise.reject(new NotImplementedError('ApiContentRepository.getInvestorVideos'));
+  }
+
+  /**
+   * `GET /api/v1/board-members`, mapped `displayOrder` → `order`, `bio` kept
+   * as HTML (the page sanitises it again, as it does a team biography).
+   * FE-23 wires the body.
+   */
+  getBoardMembers(): Promise<BoardMember[]> {
+    return Promise.reject(new NotImplementedError('ApiContentRepository.getBoardMembers'));
+  }
+
+  /**
+   * `GET /api/v1/board-committees`, mapped `displayOrder` → `order`, members
+   * read through in the order sent. FE-23 wires the body.
+   */
+  getBoardCommittees(): Promise<BoardCommittee[]> {
+    return Promise.reject(new NotImplementedError('ApiContentRepository.getBoardCommittees'));
   }
 }

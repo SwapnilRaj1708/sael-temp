@@ -37,47 +37,115 @@ Collections that do not paginate return a bare JSON array.
 
 ## 2. Newsroom
 
+Revised 2026-10-01, when the Newsroom was built. The legacy site has four sections, and two of them host articles on SAEL's own site, which settles this section's old open question: **yes, SAEL hosts article bodies.** That applies to Press Release and Our Views, which need a `slug` and a detail endpoint; In The News still links out.
+
+| `category` | What an item is | Has a date | Destination |
+|---|---|---|---|
+| `press-release` | A release, hosted here | yes | `/newsroom/press-release/{slug}/` |
+| `in-the-news` | Coverage elsewhere | yes | `externalUrl`, opened in a new tab |
+| `our-views` | An opinion piece, hosted here | **no** | `/newsroom/our-views/{slug}/` |
+| `multimedia` | A YouTube video | **no** | the video, played in a dialog |
+
 ### `GET /api/v1/news`
 
 | Param | Type | Default | Notes |
 |---|---|---|---|
-| `page` | int | 1 | 1-based |
-| `pageSize` | int | 9 | max 50 |
-| `limit` | int | — | When present, returns a bare array of the N most recent and ignores paging. Used by the homepage. |
+| `category` | enum | — | One of the four above. **Omitted, it means every category** — the homepage's call (see below). |
+| `limit` | int | — | When present, the first N of the result. |
+
+Returns a **bare array**, no envelope and no paging: the legacy listings put every item on one page (42 is the largest today), and paged listing URLs would be new URLs. If a category ever outgrows the payload ceiling in §6 we will paginate it then, as a deliberate URL decision.
+
+**Order is the backend's**, and the frontend does not re-sort: dated categories newest first, ties in the business's own order; undated categories (Our Views, Multimedia) in the business's own order. A `displayOrder` field is the obvious way to carry that, and the frontend does not need it in the response.
 
 Response item:
 
 ```json
 {
-  "id": "1783420907",
+  "id": "sael-unveils-integrated-5gw-solar-cell-module-manufacturing-facility-at-jewar",
+  "category": "in-the-news",
   "title": "SAEL unveils integrated 5GW solar cell, module manufacturing facility at Jewar",
   "publishedAt": "2026-06-29",
-  "imageUrl": "https://<account>.blob.core.windows.net/public/media/jewar-facility.webp",
-  "imageAlt": null,
-  "externalUrl": "https://www.thehindubusinessline.com/companies/…",
-  "source": "The Hindu BusinessLine",
-  "excerpt": null
+  "imageUrl": "https://<account>.blob.core.windows.net/<container>/web-assets/img/media/sael-unveils-integrated-5gw-solar-cell-module-manufacturing-facility-at-jewar-1783420907.webp",
+  "imageAlt": "SAEL unveils integrated 5GW solar cell, module manufacturing facility at Jewar",
+  "slug": null,
+  "externalUrl": "https://www.thehindubusinessline.com/companies/sael-unveils-integrated-5gw-solar-cell-module-manufacturing-facility-at-jewar/article71157439.ece",
+  "videoId": null,
+  "source": null
 }
 ```
 
-Sorted `publishedAt` descending.
+Which fields are set follows `category`, and the others are `null`, not omitted:
 
-**Open question for backend:** does SAEL intend to host article bodies eventually, or continue linking to external publishers? If the former, we need a `slug` and a `GET /api/v1/news/{slug}` and the frontend gains a detail route. Currently assumed: link-out only.
+- `publishedAt`: set for `press-release` and `in-the-news`, `null` for the other two. ISO 8601 date.
+- `slug`: set for `press-release` and `our-views`. The URL segment, **verbatim from the legacy site, artefacts included**: one Our Views slug contains `india39s`, a mangled apostrophe, and it is a live URL with search equity. Slugs must never be regenerated from titles.
+- `externalUrl`: set for `in-the-news`.
+- `videoId`: set for `multimedia` — the YouTube id, not a URL. The frontend builds the thumbnail, watch and embed URLs.
+- `imageUrl`: absolute. May be `null` for `multimedia`, where the frontend uses YouTube's thumbnail.
+- `imageAlt`: `null` when none was entered; the frontend falls back to the title.
+- `source`: the publication's name. The legacy cards do not show one, so it is `null` today and the frontend shows it only when set.
 
----
+An item missing the field its category needs (an article with no `slug`, say) is dropped by the frontend rather than rendered as a card that goes nowhere.
+
+**The homepage's call, `category` omitted.** The homepage carousel calls `limit=9` with no category. Against this contract that is the newest items across every category, Multimedia and Our Views included, though they have no date. Decide before cutover which category the homepage should show and pass it. The mock does not follow this: it returns the homepage's original six-item fixture unchanged, so the homepage does not change before that decision. `src/lib/content/mock/index.ts`.
+
+### `GET /api/v1/news/{category}/{slug}`
+
+One Press Release or Our Views article. `category` is `press-release` or `our-views`; anything else is a `404`. The response is the item above plus:
+
+```json
+{
+  "body": "<p><strong>Rajasthan: </strong>SAEL Industries Ltd. (SIL), …</p><p>…</p>"
+}
+```
+
+- `body` is HTML, sanitised server-side. The frontend sanitises it again (`src/lib/utils/sanitize-article.ts`) to this allowlist, which is what the legacy articles use: `p br h2 h3 h4 ul ol li strong b em i u a blockquote figure figcaption img`; on `a` only `href`, on `img` only `src alt width height`, and `https:` images only. The article's `<h1>` is its title, so a body starts at `h2`.
+- Images in a body are absolute URLs in the container, like `imageUrl`. **Every body image needs `alt`**: the legacy CMS saved none.
+- `404` for an unknown slug. The frontend renders its not-found page. Any other non-2xx is treated as unavailable.
+
+The frontend builds every article page at build time from the list endpoint's slugs, and a slug not in that list is a 404 until the next build. There is no on-demand rendering (/CLAUDE.md §7), so **a new article appears on the site at the next deploy**, as do new list items.
 
 ## 3. Investor documents
 
-One endpoint serves every document listing on the site — Offer Documents, Corporate Governance, all five Financials & Reports sub-pages, and Investor Downloads.
+One endpoint serves every document listing on the site — the Offer Documents sub-pages, Corporate Governance, all five Financials & Reports sub-pages, and Investor Downloads. A second serves the two disclosure videos. Both are consumed through `getInvestorDocuments(listing)` and `getInvestorVideos(listing)` on the content repository.
+
+*Revised 2026-09-29 with the Offer Documents area, the first investor pages built.* Offer Documents turned out to be eight sub-pages rather than one listing, so a listing is now addressed by `category` **and** `section`; documents gained an explicit `displayOrder`; and videos got their own endpoint.
+
+*Revised again 2026-09-30 with the rest of the investor area.* Corporate Governance is also one category over several pages, so it takes `section` too; documents gained a `subgroup` (General Meeting nests years under a heading); and `displayOrder` now runs across the whole listing rather than within a group, so the business orders the headings as well as the documents. The Financials pages and Notifications are one category each and need no `section`.
 
 ### `GET /api/v1/investor-documents`
 
 | Param | Type | Required | Notes |
 |---|---|---|---|
 | `category` | enum | yes | See enum below |
+| `section` | string | when the category has sections | The sub-page within the category — its URL slug. Only `offer-documents` has sections today; see below. Omit for any other category. |
 | `group` | string | no | Filter to one financial year |
 
 Category enum: `offer-documents`, `corporate-governance`, `annual-return`, `consolidated-financials`, `standalone-financials`, `subsidiary-financials`, `investor-downloads`
+
+Sections of `offer-documents` — each the last segment of the page's URL, so the value a page asks for is the one in its address bar:
+
+| `section` | Page | Documents |
+|---|---|---|
+| `drhp` | `/investors/offer-documents/drhp/` | 1 |
+| `corrigendum-to-drhp` | `…/corrigendum-to-drhp/` | 1 |
+| `addendum-to-drhp` | `…/addendum-to-drhp/` | 1 |
+| `industry-report` | `…/industry-report/` | 1 |
+| `information-with-respect-to-group-companies` | `…/information-with-respect-to-group-companies/` | 9, grouped `FY 2025` / `FY 2024` / `FY 2023` |
+
+The two audio-visual pages are served by `/investor-videos` below, and `outstanding-dues-to-material-creditors` is a table transcribed into the frontend, not a document.
+
+Sections of `corporate-governance`, on the same rule. Board of Directors and Board Committees are not document listings — see the governance endpoints in §4.
+
+| `section` | Page | Documents |
+|---|---|---|
+| `codes-and-policies` | `/investors/corporate-governance/codes-and-policies/` | 24, grouped `Statutory Policies` / `Corporate Policies` |
+| `sustainability-reports` | `…/sustainability-reports/` | 5, grouped `ESG and GHG Reports` / `SAEL Solar 300MW MHP1 Project’s Environment & Social Reports` |
+| `csr` | `…/csr/` | 3, grouped `FY2026` / `FY2027` — the company's spelling and order |
+| `general-meeting` | `…/general-meeting/` | 21, grouped `Annual General` / `Extra-Ordinary General Meeting`, the latter subgrouped `FY 2026` … `FY 2023` |
+| `familiarization-programme` | `…/familiarization-programme/` | 1, grouped `FY 2026` |
+| `other-documents` | `…/other-documents/` | 4, grouped `Other Documents` / `Composite Scheme of Arrangement` |
+
+The one-page categories, with no `section`: `annual-return` (4), `consolidated-financials` (3), `standalone-financials` (3), `subsidiary-financials` (64), `investor-downloads` (12) and `notifications` (2) — every one grouped by financial year.
 
 Response (bare array):
 
@@ -87,30 +155,148 @@ Response (bare array):
     "id": "doc-1042",
     "title": "Annual Return FY 2024-25 (MGT-7)",
     "category": "annual-return",
+    "section": null,
     "group": "FY 2024-25",
+    "subgroup": null,
     "publishedAt": "2025-09-12",
-    "fileUrl": "https://<account>.blob.core.windows.net/public/investors/annual-return-fy2024-25.pdf",
+    "fileUrl": "https://<account>.blob.core.windows.net/<container>/web-assets/documents/investors/annual-return-fy2024-25.pdf",
     "fileName": "annual-return-fy2024-25.pdf",
     "mimeType": "application/pdf",
-    "sizeBytes": 2418123
+    "sizeBytes": 2418123,
+    "displayOrder": 1
   }
 ]
+```
+
+An Offer Documents row, for comparison:
+
+```json
+{
+  "id": "group-companies-fy2024-sun-layer-energy",
+  "title": "Sun Layer Energy Private Limited",
+  "category": "offer-documents",
+  "section": "information-with-respect-to-group-companies",
+  "group": "FY 2024",
+  "subgroup": null,
+  "publishedAt": null,
+  "fileUrl": "https://<account>.blob.core.windows.net/<container>/web-assets/documents/investors/offer-documents/information-with-respect-to-group-companies/FY-2024/Sun-Layer-Energy-Private-Limited.pdf",
+  "fileName": "Sun-Layer-Energy-Private-Limited.pdf",
+  "mimeType": "application/pdf",
+  "sizeBytes": 7208449,
+  "displayOrder": 3
+}
 ```
 
 Requirements on the backend:
 
 - `fileUrl` is an **absolute, publicly readable** Azure Blob URL. The frontend links directly; it does not proxy downloads.
-- `sizeBytes` is needed — the UI shows "PDF · 2.4 MB" so users on mobile data know what they are opening. If unavailable, send `null` and the UI omits it.
-- `group` drives the accordion grouping on the Financials pages. Use a consistent format (`FY 2024-25`). If `group` is `null` for every item in a category, the UI renders a flat list.
-- Sorted by `group` descending, then `publishedAt` descending.
+- `title` is shown **verbatim** as the link text. For regulated documents it is the text the company published — do not normalise, case or trim it.
+- `sizeBytes` is needed — the Financials pages show "PDF · 2.4 MB" so users on mobile data know what they are opening. If unavailable, send `null` and the UI omits it. (The Offer Documents pages deliberately show no size, because the legacy pages show none; they still want the field.)
+- `group` partitions a listing: accordions on the Financials pages, stacked year headings on Group Companies. Use a consistent format (`FY 2024-25`, or `FY 2025` where the published label is that). If `group` is `null` for every item in a listing, the UI renders a flat list.
+- `group` and `subgroup` are **labels, shown verbatim** — send them exactly as the company writes them, inconsistencies included (`FY 2025`, `FY2026`). The frontend derives each heading's anchor from its label (lower-cased, letters and digits only: `FY 2025` → `#fy2025`), which is how the legacy site formed its tab ids, so old deep links still land.
+- `subgroup` divides a group once more, and is `null` everywhere but General Meeting, whose "Extra-Ordinary General Meeting" is divided by financial year. **New 2026-09-30.**
+- `displayOrder` runs **across the whole listing**, ascending, and the frontend shows headings in the order of their first document. **Changed 2026-09-30** from "within a group", because a sort on the labels cannot give the order the company publishes: years run newest first on most pages but oldest first on CSR, and named groups ("ESG and GHG Reports" before "SAEL Solar 300MW MHP1 Project’s …") have no natural sort at all. The proposal before that sorted by `publishedAt`, but none of these documents carries a date.
+- Sorted by `displayOrder` ascending. The frontend does not re-sort (§1).
+- A heading the company shows with nothing under it (General Meeting's "Postal Ballot") is declared by the frontend, not sent — there is no document to carry it.
+- `publishedAt` is `null` where the document has no date to show. Never a placeholder date.
+
+### `GET /api/v1/investor-videos`
+
+*New 2026-09-29.* The DRHP's audio-visual presentations, one video per page. Separate from documents because a video carries a poster and caption tracks, which would otherwise be two meaningless fields on every PDF.
+
+| Param | Type | Required | Notes |
+|---|---|---|---|
+| `category` | enum | yes | As above |
+| `section` | string | when the category has sections | `drhp-audio-visuals-english`, `drhp-audio-visuals-hindi` |
+
+Response (bare array — one item per listing today):
+
+```json
+[
+  {
+    "id": "drhp-audio-visuals-english",
+    "title": "DRHP - Audio Visual (English)",
+    "category": "offer-documents",
+    "section": "drhp-audio-visuals-english",
+    "fileUrl": "https://<account>.blob.core.windows.net/<container>/web-assets/media/offer-documents/SAEL-DRHP-English.mp4",
+    "fileName": "SAEL-DRHP-English.mp4",
+    "mimeType": "video/mp4",
+    "sizeBytes": 111001343,
+    "posterUrl": "https://<account>.blob.core.windows.net/<container>/web-assets/media/offer-documents/drhp-english.png",
+    "captions": [
+      {
+        "url": "https://<account>.blob.core.windows.net/<container>/web-assets/media/offer-documents/SAEL-DRHP-English.en.vtt",
+        "srcLang": "en",
+        "label": "English"
+      }
+    ]
+  }
+]
+```
+
+- `captions` is an array of **WebVTT** tracks, `[]` when there are none — which is the case for both videos today. `srcLang` is BCP 47 (`en`, `hi`); `label` is what the player's caption menu shows. The first track is the default.
+- A caption track on another origin only loads if the container sends CORS headers for the site's origin (`GET`, `https://www.sael.co` and any staging origin). **Configure that before the first `.vtt` is uploaded** — the player turns on `crossorigin` only when a track is present, because with it on and no CORS rule the video itself fails.
+- `posterUrl` may be `null`; the player then shows its own first frame.
+
+### Consent-gated listings — what the backend needs to know
+
+Three Offer Documents pages put their files behind a disclaimer the reader must confirm: `drhp` (per document, on click), and both audio-visual pages (per page, on arrival). **The endpoints do not change for them** — no flag, no auth, no token. The gate is a frontend behaviour:
+
+- The frontend never renders a gated listing's `fileUrl`, `posterUrl` or caption URLs into the page. It fetches them server-side, through a Next.js Server Action, only after the reader presses "I Confirm", and hands the browser just the URL it needs. The rest of the row stays on the server.
+- Which listings are gated is recorded in the frontend's content (`src/app/_content/offer-documents.ts`), next to the disclaimer text, because it changes when the legal text changes — with a filing, which is a reviewed deploy.
+- The files themselves are public blobs, exactly as they were public files on the legacy site. The gate is the click-through affirmation the disclosure requires, not access control, and nothing here pretends otherwise.
+
+**For legal review — indexing.** The proposal is: the gated pages are indexable (their disclaimer text is ordinary HTML), and the gated files are not linked from anything a crawler reads. What that cannot stop is a search engine finding a blob URL some other way — a share, a referrer. If the gated files must also not be indexed, the container needs to send `X-Robots-Tag: noindex` on them. Azure Blob Storage cannot set arbitrary response headers itself, so that means fronting the container with Azure Front Door or CDN and a rules-engine header on the `web-assets/documents/investors/offer-documents/drhp/` and `web-assets/media/offer-documents/` paths. Not configured; a decision for legal and infrastructure.
 
 ### `GET /api/v1/notifications`
 
 Same item shape with `category: "notifications"`, but **paginated** (envelope from §1). Params: `page`, `pageSize` (default 20).
 
+**Not needed yet.** With two notifications, `/investors/notifications/` reads `GET /api/v1/investor-documents?category=notifications` like every other listing, grouped by year. This paginated endpoint stays the proposal for when the list outgrows one page.
+
 ---
 
 ## 4. Company data
+
+### `GET /api/v1/board-members`
+
+*New 2026-09-30.* The Board of Directors, as `/investors/corporate-governance/board-of-directors/` lists it. Bare array, sorted by `displayOrder`.
+
+```json
+[
+  {
+    "id": "jasbir-singh",
+    "name": "Jasbir Singh",
+    "designation": "Managing Director and Chairperson",
+    "bio": "<p><strong>Jasbir Singh</strong> is the Managing Director and Chairperson of our Company. …</p>",
+    "displayOrder": 1
+  }
+]
+```
+
+- **A separate record from `/team`**, even for the same person: this is the governance record, worded for the board page, and neither page may silently rewrite the other.
+- `bio` is HTML with the same permitted tags as `/team` (`p, br, strong, em, ul, ol, li, a`), sanitised by the backend and again by the frontend. `null` when there is none.
+- Why an endpoint rather than copy in the repo: the board changes by resolution, and SEBI LODR Reg. 46 wants the website current within days of it — faster than a deploy cycle, and in step with the Notifications that announce resignations.
+
+### `GET /api/v1/board-committees`
+
+*New 2026-09-30.* The board's committees, as `/investors/corporate-governance/board-committees/` lists them. Bare array, sorted by `displayOrder`; members in the order sent.
+
+```json
+[
+  {
+    "id": "audit-committee",
+    "name": "Audit Committee",
+    "members": [
+      { "name": "Mr. Harbhajan Singh", "category": "Non-Executive Independent Director", "position": "Chairman" }
+    ],
+    "displayOrder": 1
+  }
+]
+```
+
+- Every string is shown verbatim, including where it spells a director differently from `/board-members` ("Bjornar" / "Bjørnar"). The frontend does not reconcile them.
+- `position` is the member's role on the committee — the page's "Designation" column ("Chairman", "Member", "Invitee").
 
 ### `GET /api/v1/team`
 
@@ -262,7 +448,7 @@ Requirements:
 
 Stated so the backend does not build it speculatively:
 
-- Authentication or user accounts (no gated investor area)
+- Authentication or user accounts (no gated investor area). The Offer Documents consent gates are not an exception: they are a click-through disclaimer handled entirely in the frontend, and need nothing from these endpoints — see §3.
 - Search endpoints
 - Multilingual content
 - Careers/job endpoints — `/career/` is a page since 2026-09-22, but its two "Explore" CTAs link out to the Oracle recruiting portal, which is where applications are made. No listing and no application endpoint.
